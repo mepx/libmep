@@ -54,7 +54,7 @@ private:
 	char version[100];
 
 public:
-
+	int get_last_run_index(void);
 	char * get_version(void);
 	int *actual_used_variables;
 	int num_actual_variables;
@@ -293,7 +293,7 @@ private:
 
 		 void init_operators();
 
-		 bool is_training_data_classification_problem(void);
+		 bool is_training_data_a_classification_problem(void);
 
 		 void training_data_scale_to_interval_everywhere(double min, double max);
 		 void training_data_scale_to_interval_all_variables(double min, double max);
@@ -307,7 +307,19 @@ private:
 		 int training_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
 		 int training_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
+		 void training_data_shuffle(void);
 
+		 int move_training_data_to_validation(int count);
+		 int move_training_data_to_test(int count);
+		 int move_test_data_to_training(int count);
+		 int move_validation_data_to_training(int count);
+
+		 void clear(void);
+
+		 double* get_training_data_row(int row);
+		 double** get_training_data(void);
+
+		 char* prg_to_C(int run_index, bool simplified, double *inputs);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;

@@ -1,4 +1,4 @@
-# meplib
+# libmep
 
 Multi Expression Programming library
 

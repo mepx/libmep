@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "meplib.h"
+#include "libmep.h"
 
 #include <errno.h>
 
@@ -2159,7 +2159,7 @@ double t_mep::get_training_data_as_double(int row, int col)
 	return training_data._data_double[row][col];
 }
 //---------------------------------------------------------------------------
-bool t_mep::is_training_data_classification_problem(void)
+bool t_mep::is_training_data_a_classification_problem(void)
 {
 	return training_data.is_classification_problem();
 }
@@ -2212,5 +2212,60 @@ int t_mep::training_data_find_symbol_from_all_variables(const char *find_what, b
 int t_mep::training_data_find_symbol_everywhere(const char *find_what, bool use_regular)
 {
 	return training_data.find_symbol_everywhere(find_what, use_regular);
+}
+//---------------------------------------------------------------------------
+void t_mep::training_data_shuffle(void)
+{
+	training_data.shuffle();
+}
+//---------------------------------------------------------------------------
+int t_mep::move_training_data_to_validation(int count)
+{
+	return training_data.move_to(&validation_data, count);
+}
+//---------------------------------------------------------------------------
+int t_mep::move_training_data_to_test(int count)
+{
+	return training_data.move_to(&test_data, count);
+}
+//---------------------------------------------------------------------------
+int t_mep::move_test_data_to_training(int count)
+{
+	return test_data.move_to(&training_data, count);
+}
+//---------------------------------------------------------------------------
+int t_mep::move_validation_data_to_training(int count)
+{
+	return validation_data.move_to(&training_data, count);
+}
+//---------------------------------------------------------------------------
+int t_mep::get_last_run_index(void)
+{
+	return last_run_index;
+}
+//---------------------------------------------------------------------------
+void t_mep::clear(void)
+{
+	last_run_index = -1;
+	if (stats) {
+		delete[] stats;
+		stats = NULL;
+	}
+
+}
+//---------------------------------------------------------------------------
+double* t_mep::get_training_data_row(int row)
+{
+	return training_data._data_double[row];
+}
+//---------------------------------------------------------------------------
+char* t_mep::prg_to_C(int run_index, bool simplified, double *inputs)
+{
+	return stats[run_index].prg.to_C_double(simplified, inputs, parameters.problem_type);
+}
+//---------------------------------------------------------------------------
+double** t_mep::get_training_data(void)
+{
+	return training_data._data_double;
 }
 //---------------------------------------------------------------------------
