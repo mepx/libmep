@@ -317,9 +317,11 @@ private:
 		 void clear(void);
 
 		 double* get_training_data_row(int row);
-		 double** get_training_data(void);
+		 //double** get_training_data_matrix(void);
 
 		 char* prg_to_C(int run_index, bool simplified, double *inputs);
+
+		 int get_num_outputs(void);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;

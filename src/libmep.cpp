@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2015.12.01.1");
+	strcpy(version, "2015.12.04.0");
 
 	num_operators = 0;
 	//	data_type = DATA_DOUBLE;
@@ -2251,7 +2251,6 @@ void t_mep::clear(void)
 		delete[] stats;
 		stats = NULL;
 	}
-
 }
 //---------------------------------------------------------------------------
 double* t_mep::get_training_data_row(int row)
@@ -2264,8 +2263,15 @@ char* t_mep::prg_to_C(int run_index, bool simplified, double *inputs)
 	return stats[run_index].prg.to_C_double(simplified, inputs, parameters.problem_type);
 }
 //---------------------------------------------------------------------------
-double** t_mep::get_training_data(void)
+/*
+double** t_mep::get_training_data_matrix(void)
 {
 	return training_data._data_double;
+}
+*/
+//---------------------------------------------------------------------------
+int t_mep::get_num_outputs(void)
+{
+	return 1;
 }
 //---------------------------------------------------------------------------
