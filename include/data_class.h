@@ -8,8 +8,8 @@
 class t_data
 {
 private:
-	int from_csv_double(const char *file_name);
-	int from_csv_string(const char *file_name);
+	bool from_csv_double(const char *file_name);
+	bool from_csv_string(const char *file_name);
 
 	void delete_double_data(void);
 	void delete_string_data(void);
@@ -40,8 +40,8 @@ public:
 
     int from_xml(pugi::xml_node parent);
     int to_xml(pugi::xml_node parent);
-	int to_csv(const char *file_name, char ListSeparator);
-	int from_csv(const char *filename);
+	bool to_csv(const char *file_name, char ListSeparator);
+	bool from_csv(const char *filename);
 
 	void to_numeric(void);
 	void to_interval_everywhere(double min, double max);
@@ -58,7 +58,7 @@ public:
 
 	void shuffle(void);
 
-	int detect_list_separator(const char *file_name);
+	bool detect_list_separator(const char *file_name);
 
 	int move_to(t_data *, int count);
 

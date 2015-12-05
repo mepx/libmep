@@ -50,6 +50,8 @@ private:
 	int last_run_index;
 	
 	t_data training_data;
+	t_data validation_data;
+	t_data test_data;
 
 	char version[100];
 
@@ -64,13 +66,12 @@ public:
 	
 	t_mep_stat *stats;
 
-    t_data validation_data;
-    t_data test_data;
 
 	int num_total_vars;
 	int target_col;
     
 public:
+	//---------------------------------------------------------------------------
 	int load_training_data_from_csv(const char* file_name);
 	int save_training_data_to_csv(const char* file_name, char list_separator);
 	int get_training_data_type(void);
@@ -85,6 +86,38 @@ public:
 
 	void training_data_to_numeric(void);
 	
+
+	//---------------------------------------------------------------------------
+	int load_validation_data_from_csv(const char* file_name);
+	int save_validation_data_to_csv(const char* file_name, char list_separator);
+	int get_validation_data_type(void);
+	int get_validation_data_num_columns(void);
+	int get_validation_data_num_rows(void);
+	// assumes that row and col are valid; no test for out of range are performed
+	char *get_validation_data_as_string(int row, int col);
+	// assumes that row and col are valid; no test for out of range are performed
+	double get_validation_data_as_double(int row, int col);
+	// clears the training data internal structurs
+	void clear_validation_data(void);
+
+	void validation_data_to_numeric(void);
+
+	//---------------------------------------------------------------------------
+	int load_test_data_from_csv(const char* file_name);
+	int save_test_data_to_csv(const char* file_name, char list_separator);
+	int get_test_data_type(void);
+	int get_test_data_num_columns(void);
+	int get_test_data_num_rows(void);
+	// assumes that row and col are valid; no test for out of range are performed
+	char *get_test_data_as_string(int row, int col);
+	// assumes that row and col are valid; no test for out of range are performed
+	double get_test_data_as_double(int row, int col);
+	// clears the training data internal structurs
+	void clear_test_data(void);
+
+	void test_data_to_numeric(void);
+	//---------------------------------------------------------------------------
+
 	// returns true if the process is running, false otherwise
 	bool is_running(void);
 
@@ -294,6 +327,8 @@ private:
 		 void init_operators();
 
 		 bool is_training_data_a_classification_problem(void);
+		 bool is_test_data_a_classification_problem(void);
+		 bool is_validation_data_a_classification_problem(void);
 
 		 void training_data_scale_to_interval_everywhere(double min, double max);
 		 void training_data_scale_to_interval_all_variables(double min, double max);
@@ -307,6 +342,32 @@ private:
 		 int training_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
 		 int training_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
+
+
+		 void validation_data_scale_to_interval_everywhere(double min, double max);
+		 void validation_data_scale_to_interval_all_variables(double min, double max);
+		 void validation_data_scale_to_interval_selected_col(double min, double max, int col);
+
+		 int validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+		 int validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+		 int validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
+
+		 int validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+		 int validation_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+		 int validation_data_find_symbol_everywhere(const char *find_what, bool use_regular);
+
+		 void test_data_scale_to_interval_everywhere(double min, double max);
+		 void test_data_scale_to_interval_all_variables(double min, double max);
+		 void test_data_scale_to_interval_selected_col(double min, double max, int col);
+
+		 int test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+		 int test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+		 int test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
+
+		 int test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+		 int test_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+		 int test_data_find_symbol_everywhere(const char *find_what, bool use_regular);
+
 		 void training_data_shuffle(void);
 
 		 int move_training_data_to_validation(int count);
@@ -317,6 +378,8 @@ private:
 		 void clear(void);
 
 		 double* get_training_data_row(int row);
+		 double* get_validation_data_row(int row);
+		 double* get_test_data_row(int row);
 		 //double** get_training_data_matrix(void);
 
 		 char* prg_to_C(int run_index, bool simplified, double *inputs);

@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2015.12.04.0");
+	strcpy(version, "2015.12.05.0");
 
 	num_operators = 0;
 	//	data_type = DATA_DOUBLE;
@@ -2164,6 +2164,16 @@ bool t_mep::is_training_data_a_classification_problem(void)
 	return training_data.is_classification_problem();
 }
 //---------------------------------------------------------------------------
+bool t_mep::is_validation_data_a_classification_problem(void)
+{
+	return validation_data.is_classification_problem();
+}
+//---------------------------------------------------------------------------
+bool t_mep::is_test_data_a_classification_problem(void)
+{
+	return test_data.is_classification_problem();
+}
+//---------------------------------------------------------------------------
 void t_mep::training_data_to_numeric(void)
 {
 	training_data.to_numeric();
@@ -2273,5 +2283,209 @@ double** t_mep::get_training_data_matrix(void)
 int t_mep::get_num_outputs(void)
 {
 	return 1;
+}
+//---------------------------------------------------------------------------
+
+
+
+void t_mep::validation_data_to_numeric(void)
+{
+	validation_data.to_numeric();
+}
+//---------------------------------------------------------------------------
+void t_mep::validation_data_scale_to_interval_everywhere(double min, double max)
+{
+	validation_data.to_interval_everywhere(min, max);
+}
+//---------------------------------------------------------------------------
+void t_mep::validation_data_scale_to_interval_all_variables(double min, double max)
+{
+	validation_data.to_interval_all_variables(min, max);
+}
+//---------------------------------------------------------------------------
+void t_mep::validation_data_scale_to_interval_selected_col(double min, double max, int col)
+{
+	validation_data.to_interval_selected_col(min, max, col);
+}
+//---------------------------------------------------------------------------
+int t_mep::validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular)
+{
+	return validation_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular)
+{
+	return validation_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular)
+{
+	return validation_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular)
+{
+	return validation_data.find_symbol_from_selected_col(find_what, col, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::validation_data_find_symbol_from_all_variables(const char *find_what, bool use_regular)
+{
+	return validation_data.find_symbol_from_all_variables(find_what, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::validation_data_find_symbol_everywhere(const char *find_what, bool use_regular)
+{
+	return validation_data.find_symbol_everywhere(find_what, use_regular);
+}
+//---------------------------------------------------------------------------
+
+
+
+
+void t_mep::test_data_to_numeric(void)
+{
+	test_data.to_numeric();
+}
+//---------------------------------------------------------------------------
+void t_mep::test_data_scale_to_interval_everywhere(double min, double max)
+{
+	test_data.to_interval_everywhere(min, max);
+}
+//---------------------------------------------------------------------------
+void t_mep::test_data_scale_to_interval_all_variables(double min, double max)
+{
+	test_data.to_interval_all_variables(min, max);
+}
+//---------------------------------------------------------------------------
+void t_mep::test_data_scale_to_interval_selected_col(double min, double max, int col)
+{
+	test_data.to_interval_selected_col(min, max, col);
+}
+//---------------------------------------------------------------------------
+int t_mep::test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular)
+{
+	return test_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular)
+{
+	return test_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular)
+{
+	return test_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular)
+{
+	return test_data.find_symbol_from_selected_col(find_what, col, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::test_data_find_symbol_from_all_variables(const char *find_what, bool use_regular)
+{
+	return test_data.find_symbol_from_all_variables(find_what, use_regular);
+}
+//---------------------------------------------------------------------------
+int t_mep::test_data_find_symbol_everywhere(const char *find_what, bool use_regular)
+{
+	return test_data.find_symbol_everywhere(find_what, use_regular);
+}
+//---------------------------------------------------------------------------
+
+
+
+int t_mep::load_validation_data_from_csv(const char* file_name)
+{
+	return validation_data.from_csv(file_name);
+}
+//---------------------------------------------------------------------------
+int t_mep::save_validation_data_to_csv(const char* file_name, char list_separator)
+{
+	return validation_data.to_csv(file_name, list_separator);
+}
+//---------------------------------------------------------------------------
+int t_mep::get_validation_data_type(void)
+{
+	return validation_data.data_type;
+}
+//---------------------------------------------------------------------------
+int t_mep::get_validation_data_num_columns(void)
+{
+	return validation_data.num_cols;
+}
+//---------------------------------------------------------------------------
+int t_mep::get_validation_data_num_rows(void)
+{
+	return validation_data.num_data;
+}
+//---------------------------------------------------------------------------
+void t_mep::clear_validation_data(void)
+{
+	return validation_data.clear_data();
+}
+//---------------------------------------------------------------------------
+char *t_mep::get_validation_data_as_string(int row, int col)
+{
+	return validation_data._data_string[row][col];
+}
+//---------------------------------------------------------------------------
+double t_mep::get_validation_data_as_double(int row, int col)
+{
+	return validation_data._data_double[row][col];
+}
+//---------------------------------------------------------------------------
+
+
+
+
+int t_mep::load_test_data_from_csv(const char* file_name)
+{
+	return test_data.from_csv(file_name);
+}
+//---------------------------------------------------------------------------
+int t_mep::save_test_data_to_csv(const char* file_name, char list_separator)
+{
+	return test_data.to_csv(file_name, list_separator);
+}
+//---------------------------------------------------------------------------
+int t_mep::get_test_data_type(void)
+{
+	return test_data.data_type;
+}
+//---------------------------------------------------------------------------
+int t_mep::get_test_data_num_columns(void)
+{
+	return test_data.num_cols;
+}
+//---------------------------------------------------------------------------
+int t_mep::get_test_data_num_rows(void)
+{
+	return test_data.num_data;
+}
+//---------------------------------------------------------------------------
+void t_mep::clear_test_data(void)
+{
+	return test_data.clear_data();
+}
+//---------------------------------------------------------------------------
+char *t_mep::get_test_data_as_string(int row, int col)
+{
+	return test_data._data_string[row][col];
+}
+//---------------------------------------------------------------------------
+double t_mep::get_test_data_as_double(int row, int col)
+{
+	return test_data._data_double[row][col];
+}
+//---------------------------------------------------------------------------
+double* t_mep::get_validation_data_row(int row)
+{
+	return validation_data._data_double[row];
+}
+//---------------------------------------------------------------------------
+double* t_mep::get_test_data_row(int row)
+{
+	return test_data._data_double[row];
 }
 //---------------------------------------------------------------------------

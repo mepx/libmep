@@ -320,7 +320,8 @@ bool my_fgets(char*buf, int max_n, FILE *f)
 		buf[i] = 0;
 	return (i > 0);
 }
-int t_data::to_csv(const char *filename, char list_separator)
+//------------------------------------------------------------
+bool t_data::to_csv(const char *filename, char list_separator)
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -346,7 +347,7 @@ int t_data::to_csv(const char *filename, char list_separator)
 	return true;
 }
 //-----------------------------------------------------------------
-int t_data::detect_list_separator(const char *file_name)
+bool t_data::detect_list_separator(const char *file_name)
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -404,8 +405,12 @@ void t_data::count_0_class(int target_col)
 			num_class_0++;
 }
 //-----------------------------------------------------------------
-int t_data::from_csv(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_data::from_csv(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
 {
+
+	if (!detect_list_separator(filename))
+		return false;
+
 	FILE *f = NULL;
 #ifdef WIN32
 	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
@@ -428,13 +433,13 @@ int t_data::from_csv(const char *filename) // extra_variable is used by test dat
 	fclose(f);
 
 	if (strpbrk(buf, "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|"))
-		from_csv_string(filename);
+		return from_csv_string(filename);
 	else
-		from_csv_double(filename);
-	return true;
+		return from_csv_double(filename);
+
 }
 //-----------------------------------------------------------------
-int t_data::from_csv_string(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_data::from_csv_string(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -525,7 +530,7 @@ int t_data::from_csv_string(const char *filename) // extra_variable is used by t
 	return true;
 }
 //-----------------------------------------------------------------
-int t_data::from_csv_double(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_data::from_csv_double(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -983,6 +988,6 @@ bool t_data::is_classification_problem(void)
 	for (int i = 0; i < num_data; i++)
 		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 &&  fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)
 			return false;
-
+	return true;
 }
 //-----------------------------------------------------------------
