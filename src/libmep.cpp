@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2015.12.05.0");
+	strcpy(version, "2015.12.05.1");
 
 	num_operators = 0;
 	//	data_type = DATA_DOUBLE;
@@ -83,11 +83,11 @@ void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value
 
 void t_mep::allocate_sub_population(t_sub_population &pop)
 {
-	pop.offspring1.allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability < 1E-6, &parameters.constants);
-	pop.offspring2.allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability < 1E-6, &parameters.constants);
+	pop.offspring1.allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability > 1E-6, &parameters.constants);
+	pop.offspring2.allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability > 1E-6, &parameters.constants);
 	pop.individuals = new chromosome[parameters.subpopulation_size];
 	for (int j = 0; j < parameters.subpopulation_size; j++)
-		pop.individuals[j].allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability < 1E-6, &parameters.constants);
+		pop.individuals[j].allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability > 1E-6, &parameters.constants);
 }
 //---------------------------------------------------------------------------
 void t_mep::get_best(chromosome& dest)
