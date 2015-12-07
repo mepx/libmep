@@ -54,6 +54,10 @@ private:
 	t_data test_data;
 
 	char version[100];
+	t_mep_stat *stats;
+
+	bool get_error_double(chromosome &Individual, double *inputs, double *outputs);
+	bool evaluate_double(chromosome &Individual, double *inputs, double *outputs);
 
 public:
 	int get_last_run_index(void);
@@ -64,12 +68,9 @@ public:
 	int *variables_utilization;
 	bool modified_project;
 	
-	t_mep_stat *stats;
-
-
 	int num_total_vars;
 	int target_col;
-    
+
 public:
 	//---------------------------------------------------------------------------
 	int load_training_data_from_csv(const char* file_name);
@@ -140,8 +141,10 @@ public:
 
 	int stats_to_csv(const char* file_name);
 
-	bool evaluate_double(chromosome &Individual, double *inputs, double *outputs);
-	bool get_error_double(chromosome &Individual, double *inputs, double *outputs);
+	
+	
+	bool get_output(int run_index, double *inputs, double *outputs);
+
 	//void evolve_one_subpopulation_for_one_generation(t_sub_population &pop, double**, s_value_class *tmp_value_class);
 	//void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, t_parameters &params, double **training_data, int num_training_data, int num_variables, double ** eval_double, s_value_class *tmp_value_class);
 	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);

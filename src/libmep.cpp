@@ -393,6 +393,24 @@ bool t_mep::compute_classification_error_on_double_data_return_error(chromosome 
 	return true;
 }
 //---------------------------------------------------------------------------
+bool t_mep::get_output(int run_index, double *inputs, double *outputs)
+{
+	if (run_index > -1) {
+		if (!evaluate_double(stats[run_index].prg, inputs, outputs))
+			return false;
+		if (parameters.problem_type == PROBLEM_CLASSIFICATION) {
+			if (outputs[0] <= stats[run_index].prg.best_class_threshold)
+				outputs[0] = 0;
+			else
+				outputs[0] = 1;
+		}
+	}
+	else
+	  return false;
+
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep::get_error_double(chromosome &Individual, double *inputs, double *outputs)
 {
 	if (!evaluate_double(Individual, inputs, outputs))
