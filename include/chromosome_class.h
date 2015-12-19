@@ -24,7 +24,7 @@ struct chromosome
 
 	long num_constants;
 	double *constants_double;
-	int num_total_vars;
+	int num_total_variables;
 	long code_length;
 
 	chromosome();

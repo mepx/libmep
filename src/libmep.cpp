@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2015.12.05.1");
+	strcpy(version, "2015.12.19.0");
 
 	num_operators = 0;
 	//	data_type = DATA_DOUBLE;
@@ -35,8 +35,11 @@ t_mep::t_mep()
 	variables_utilization = NULL;
 	actual_used_variables = NULL;
 	num_actual_variables = 0;
-	num_total_vars = 0;
+	num_total_variables = 0;
 	target_col = -1;
+	problem_description = new char[100];
+	strcpy(problem_description, "Problem description here ...");
+
 }
 //---------------------------------------------------------------------------
 t_mep::~t_mep()
@@ -55,6 +58,11 @@ t_mep::~t_mep()
 		delete[] stats;
 		stats = NULL;
 	}
+
+	if (problem_description) {
+		delete[] problem_description;
+		problem_description = NULL;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value_class)
@@ -66,14 +74,14 @@ void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value
 			(*eval_double)[c][i] = new double[training_data.num_data];
 	}
 
-	cached_eval_matrix_double = new double*[num_total_vars];
-	for (int i = 0; i < num_total_vars; i++)
+	cached_eval_matrix_double = new double*[num_total_variables];
+	for (int i = 0; i < num_total_variables; i++)
 		cached_eval_matrix_double[i] = NULL;
 	for (int i = 0; i < num_actual_variables; i++)
 		cached_eval_matrix_double[actual_used_variables[i]] = new double[training_data.num_data];
 
-	cached_sum_of_errors = new double[num_total_vars];
-	cached_threashold = new double[num_total_vars];
+	cached_sum_of_errors = new double[num_total_variables];
+	cached_threashold = new double[num_total_variables];
 
 	*array_value_class = new s_value_class*[parameters.num_threads];
 	for (int c = 0; c < parameters.num_threads; c++)
@@ -83,11 +91,11 @@ void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value
 
 void t_mep::allocate_sub_population(t_sub_population &pop)
 {
-	pop.offspring1.allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability > 1E-6, &parameters.constants);
-	pop.offspring2.allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability > 1E-6, &parameters.constants);
+	pop.offspring1.allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
+	pop.offspring2.allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
 	pop.individuals = new chromosome[parameters.subpopulation_size];
 	for (int j = 0; j < parameters.subpopulation_size; j++)
-		pop.individuals[j].allocate_memory(parameters.code_length, num_total_vars, parameters.constants_probability > 1E-6, &parameters.constants);
+		pop.individuals[j].allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
 }
 //---------------------------------------------------------------------------
 void t_mep::get_best(chromosome& dest)
@@ -141,16 +149,16 @@ void t_mep::fitness_regression_double(chromosome &Individual, double** eval_doub
 
 
 		if (Individual.prg[i].op >= 0)
-			if (Individual.prg[i].op < num_total_vars) // a variable, which is cached already
+			if (Individual.prg[i].op < num_total_variables) // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[Individual.prg[i].op];
 
 			else {// a constant
 				sum_of_errors = 0;
-				int cst_index = Individual.prg[i].op - num_total_vars;
+				int cst_index = Individual.prg[i].op - num_total_variables;
 				if (cached_sum_of_errors_for_constants[cst_index] < -0.5) {
 					double *eval = eval_double[line_of_constants[cst_index]];
 					for (int k = 0; k < num_training_data; k++)
-						sum_of_errors += fabs(eval[k] - training_data._data_double[k][num_total_vars]);
+						sum_of_errors += fabs(eval[k] - training_data._data_double[k][num_total_variables]);
 				}
 				else
 					sum_of_errors = cached_sum_of_errors_for_constants[cst_index];
@@ -160,7 +168,7 @@ void t_mep::fitness_regression_double(chromosome &Individual, double** eval_doub
 			double *eval = eval_double[i];
 			sum_of_errors = 0;
 			for (int k = 0; k < num_training_data; k++)
-				sum_of_errors += fabs(eval[k] - training_data._data_double[k][num_total_vars]);
+				sum_of_errors += fabs(eval[k] - training_data._data_double[k][num_total_variables]);
 		}
 		if (Individual.fit > sum_of_errors / training_data.num_data) {
 			Individual.fit = sum_of_errors / training_data.num_data;
@@ -249,18 +257,18 @@ void t_mep::fitness_classification_double2(chromosome &Individual, double **eval
 	for (int i = 0; i < parameters.code_length; i++) {   // read the chromosome from top to down
 		double sum_of_errors;
 		if (Individual.prg[i].op >= 0)
-			if (Individual.prg[i].op < num_total_vars) { // a variable, which is cached already
+			if (Individual.prg[i].op < num_total_variables) { // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[Individual.prg[i].op];
 				best_threshold = cached_threashold[Individual.prg[i].op];
 			}
 			else {// a constant
 				if (training_data.num_class_0 < training_data.num_data - training_data.num_class_0) {// i must classify everything as 1
 					sum_of_errors = training_data.num_class_0;
-					best_threshold = eval_double[line_of_constants[Individual.prg[i].op - num_total_vars]][0] - 1;
+					best_threshold = eval_double[line_of_constants[Individual.prg[i].op - num_total_variables]][0] - 1;
 				}
 				else {// less of 1, I must classify everything as class 0
 					sum_of_errors = training_data.num_data - training_data.num_class_0;
-					best_threshold = eval_double[line_of_constants[Individual.prg[i].op - num_total_vars]][0];
+					best_threshold = eval_double[line_of_constants[Individual.prg[i].op - num_total_variables]][0];
 				}
 			}
 		else {// an operator
@@ -269,7 +277,7 @@ void t_mep::fitness_classification_double2(chromosome &Individual, double **eval
 
 			for (int k = 0; k < training_data.num_data; k++) {
 				tmp_value_class[k].value = eval[k];
-				tmp_value_class[k].clasa = training_data._data_double[k][num_total_vars];
+				tmp_value_class[k].clasa = training_data._data_double[k][num_total_variables];
 			}
 			qsort((void*)tmp_value_class, training_data.num_data, sizeof(s_value_class), sort_function_value_class);
 
@@ -535,10 +543,10 @@ bool t_mep::evaluate_double(chromosome &Individual, double *inputs, double *outp
 			break;
 
 		default:  // a variable
-			if (Individual.prg[i].op < Individual.num_total_vars)
+			if (Individual.prg[i].op < Individual.num_total_variables)
 				eval_vect[i] = inputs[Individual.prg[i].op];
 			else
-				eval_vect[i] = Individual.constants_double[Individual.prg[i].op - Individual.num_total_vars];
+				eval_vect[i] = Individual.constants_double[Individual.prg[i].op - Individual.num_total_variables];
 			break;
 		}
 		if (errno || is_error_case || isnan(eval_vect[i]) || isinf(eval_vect[i])) {
@@ -585,7 +593,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 			cached_sum_of_errors[actual_used_variables[v]] = 0;
 			for (int k = 0; k < training_data.num_data; k++) {
 				cached_eval_matrix_double[actual_used_variables[v]][k] = training_data._data_double[k][actual_used_variables[v]];
-				cached_sum_of_errors[actual_used_variables[v]] += fabs(cached_eval_matrix_double[actual_used_variables[v]][k] - training_data._data_double[k][num_total_vars]);
+				cached_sum_of_errors[actual_used_variables[v]] += fabs(cached_eval_matrix_double[actual_used_variables[v]][k] - training_data._data_double[k][num_total_variables]);
 			}
 		}
 	else
@@ -595,7 +603,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 			for (int k = 0; k < training_data.num_data; k++) {
 				cached_eval_matrix_double[actual_used_variables[v]][k] = training_data._data_double[k][actual_used_variables[v]];
 				array_value_class[k].value = training_data._data_double[k][actual_used_variables[v]];
-				array_value_class[k].clasa = training_data._data_double[k][num_total_vars];
+				array_value_class[k].clasa = training_data._data_double[k][num_total_variables];
 			}
 			qsort((void*)array_value_class, training_data.num_data, sizeof(s_value_class), sort_function_value_class);
 
@@ -642,34 +650,34 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 
 		if (Individual.prg[i].op < 0) {// an operator
 			if (Individual.prg[Individual.prg[i].adr1].op >= 0)
-				if (Individual.prg[Individual.prg[i].adr1].op < num_total_vars)
+				if (Individual.prg[Individual.prg[i].adr1].op < num_total_variables)
 					arg1 = cached_eval_matrix_double[Individual.prg[Individual.prg[i].adr1].op];
 				else
-					arg1 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr1].op - num_total_vars]];
+					arg1 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr1].op - num_total_variables]];
 			else
 				arg1 = eval_double[Individual.prg[i].adr1];
 
 			if (Individual.prg[Individual.prg[i].adr2].op >= 0)
-				if (Individual.prg[Individual.prg[i].adr2].op < num_total_vars)
+				if (Individual.prg[Individual.prg[i].adr2].op < num_total_variables)
 					arg2 = cached_eval_matrix_double[Individual.prg[Individual.prg[i].adr2].op];
 				else
-					arg2 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr2].op - num_total_vars]];
+					arg2 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr2].op - num_total_variables]];
 			else
 				arg2 = eval_double[Individual.prg[i].adr2];
 
 			if (Individual.prg[Individual.prg[i].adr3].op >= 0)
-				if (Individual.prg[Individual.prg[i].adr3].op < num_total_vars)
+				if (Individual.prg[Individual.prg[i].adr3].op < num_total_variables)
 					arg3 = cached_eval_matrix_double[Individual.prg[Individual.prg[i].adr3].op];
 				else
-					arg3 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr3].op - num_total_vars]];
+					arg3 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr3].op - num_total_variables]];
 			else
 				arg3 = eval_double[Individual.prg[i].adr3];
 
 			if (Individual.prg[Individual.prg[i].adr4].op >= 0)
-				if (Individual.prg[Individual.prg[i].adr4].op < num_total_vars)
+				if (Individual.prg[Individual.prg[i].adr4].op < num_total_variables)
 					arg4 = cached_eval_matrix_double[Individual.prg[Individual.prg[i].adr4].op];
 				else
-					arg4 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr4].op - num_total_vars]];
+					arg4 = eval_double[line_of_constants[Individual.prg[Individual.prg[i].adr4].op - num_total_variables]];
 			else
 				arg4 = eval_double[Individual.prg[i].adr4];
 		}
@@ -839,10 +847,10 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			break;
 
 		default:  // a constant
-			if (Individual.prg[i].op >= Individual.num_total_vars)
-				if (line_of_constants[Individual.prg[i].op - Individual.num_total_vars] == -1) {
-					line_of_constants[Individual.prg[i].op - Individual.num_total_vars] = i;
-					int constant_index = Individual.prg[i].op - Individual.num_total_vars;
+			if (Individual.prg[i].op >= Individual.num_total_variables)
+				if (line_of_constants[Individual.prg[i].op - Individual.num_total_variables] == -1) {
+					line_of_constants[Individual.prg[i].op - Individual.num_total_variables] = i;
+					int constant_index = Individual.prg[i].op - Individual.num_total_variables;
 					for (int k = 0; k < num_training_data; k++)
 						eval[k] = Individual.constants_double[constant_index];
 				}
@@ -888,7 +896,7 @@ void t_mep::delete_values(double ****eval_double, s_value_class ***array_value_c
 		(*eval_double) = NULL;
 	}
 	if (cached_eval_matrix_double) {
-		for (int i = 0; i < num_total_vars; i++)
+		for (int i = 0; i < num_total_variables; i++)
 			delete[] cached_eval_matrix_double[i];
 		delete[] cached_eval_matrix_double;
 		cached_eval_matrix_double = NULL;
@@ -1232,26 +1240,7 @@ int t_mep::to_xml(pugi::xml_node parent)
 {
 	// utilized variables
 	char tmp_str[10000];
-	/*
-	pugi::xml_node num_utilized_variables_node = parent.append_child("num_utilized_variables");
-	pugi::xml_node num_utilized_variables_data_node = num_utilized_variables_node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_actual_variables);
-	num_utilized_variables_data_node.set_value(tmp_str);
 
-	if (actual_used_variables){
-	pugi::xml_node utilized_variables_node = parent.append_child("utilized_variables");
-
-	tmp_str[0] = 0;
-	for (int v = 0; v < num_actual_variables; v++){
-	char tmp_s[30];
-	sprintf(tmp_s, "%d", actual_used_variables[v]);
-	strcat(tmp_str, tmp_s);
-	strcat(tmp_str, " ");
-	}
-	pugi::xml_node utilized_variables_data_node = utilized_variables_node.append_child(pugi::node_pcdata);
-	utilized_variables_data_node.set_value(tmp_str);
-	}
-	*/
 	pugi::xml_node training_node = parent.append_child("training");
 	training_data.to_xml(training_node);
 	pugi::xml_node validation_node = parent.append_child("validation");
@@ -1311,11 +1300,11 @@ int t_mep::from_xml(pugi::xml_node parent)
 	if (node)
 		training_data.from_xml(node);
 
-	num_total_vars = training_data.num_cols - 1;
+	num_total_variables = training_data.num_cols - 1;
 
 	if (training_data.num_data) {
-		//actual_used_variables = new int[num_total_vars];
-		variables_utilization = new int[num_total_vars];
+		//actual_used_variables = new int[num_total_variables];
+		variables_utilization = new int[num_total_variables];
 
 		node = parent.child("variables_utilization");
 		if (node) {
@@ -1338,8 +1327,8 @@ int t_mep::from_xml(pugi::xml_node parent)
 			}
 		}
 		else {// not found, use everything
-			//num_actual_variables = num_total_vars;
-			for (int i = 0; i < num_total_vars; i++) {
+			//num_actual_variables = num_total_variables;
+			for (int i = 0; i < num_total_variables; i++) {
 				variables_utilization[i] = 1;
 				//actual_used_variables[i] = i;
 			}
@@ -1382,9 +1371,100 @@ int t_mep::from_xml(pugi::xml_node parent)
 			stats[last_run_index].from_xml(row, parameters.num_generations, parameters.code_length);
 		last_run_index--;
 	}
+
+	modified_project = false;
+
 	return true;
 }
 //---------------------------------------------------------------------------
+int t_mep::to_xml(const char *filename)
+{
+	pugi::xml_document doc;
+	// add node with some name
+	pugi::xml_node body = doc.append_child("project");
+
+	pugi::xml_node problem_description_node = body.append_child("problem_description");
+	pugi::xml_node data = problem_description_node.append_child(pugi::node_pcdata);
+	data.set_value(problem_description);
+
+	pugi::xml_node version_node = body.append_child("version");
+	data = version_node.append_child(pugi::node_pcdata);
+	data.set_value(version);
+
+	pugi::xml_node alg_node = body.append_child("algorithm");
+	to_xml(alg_node);
+
+	modified_project = false;
+
+#ifdef WIN32
+	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+	wchar_t *w_filename = new wchar_t[count_chars];
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
+
+	int result = doc.save_file(w_filename);
+	delete[] w_filename;
+	return result;
+#else
+	return doc.save_file(filename);
+#endif
+
+}
+//-----------------------------------------------------------------
+int t_mep::from_xml(const char* filename)
+{
+	pugi::xml_document doc;
+
+	pugi::xml_parse_result result;
+
+#ifdef WIN32
+	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+	wchar_t *w_filename = new wchar_t[count_chars];
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
+
+	result = doc.load_file(w_filename);
+	delete[] w_filename;
+#else
+	result = doc.load_file(filename);
+#endif
+
+	if (result.status != pugi::status_ok)
+		return false;
+
+	pugi::xml_node body_node = doc.child("project");
+
+	if (!body_node)
+		return false;
+
+	if (problem_description) {
+		delete[] problem_description;
+		problem_description = NULL;
+	}
+	pugi::xml_node node = body_node.child("problem_description");
+	if (node) {
+		const char *value_as_cstring = node.child_value();
+		
+		if (strlen(value_as_cstring)) {
+			problem_description = new char[strlen(value_as_cstring) + 1];
+			strcpy(problem_description, value_as_cstring);
+		}
+	}
+	else {
+		problem_description = new char[100];
+		strcpy(problem_description, "Problem description here ...");
+	}
+
+
+	pugi::xml_node alg_node = body_node.child("algorithm");
+
+	if (!alg_node)
+		return false;
+
+	from_xml(alg_node);
+
+	return true;
+}
+//-----------------------------------------------------------------
+
 double t_mep::get_best_training_error(int run, int gen)
 {
 	if (stats[run].best_training_error)
@@ -1587,10 +1667,10 @@ void t_mep::get_list_of_used_variables(void)
 	}
 
 	num_actual_variables = 0;
-	num_total_vars = training_data.num_cols - 1;
-	if (num_total_vars) {
-		actual_used_variables = new int[num_total_vars];
-		for (int i = 0; i < num_total_vars; i++)
+	num_total_variables = training_data.num_cols - 1;
+	if (num_total_variables) {
+		actual_used_variables = new int[num_total_variables];
+		for (int i = 0; i < num_total_variables; i++)
 			if (variables_utilization[i]) {
 				actual_used_variables[num_actual_variables] = i;
 				num_actual_variables++;
@@ -1686,6 +1766,7 @@ long t_mep::get_simplified_programs(void)
 void t_mep::set_mutation_probability(double value)
 {
 	parameters.mutation_probability = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_crossover_probability(double value)
@@ -1696,77 +1777,92 @@ void t_mep::set_crossover_probability(double value)
 void t_mep::set_code_length(long value)
 {
 	parameters.code_length = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 
 void t_mep::set_subpopulation_size(long value)
 {
 	parameters.subpopulation_size = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_threads(long value)
 {
 	parameters.num_threads = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_tournament_size(long value)
 {
 	parameters.tournament_size = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_generations(long value)
 {
 	parameters.num_generations = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_problem_type(long value)
 {
 	parameters.problem_type = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_subpopulations(long value)
 {
 	parameters.num_subpopulations = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_operators_probability(double value)
 {
 	parameters.operators_probability = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_variables_probability(double value)
 {
 	parameters.variables_probability = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_probability(double value)
 {
 	parameters.constants_probability = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_use_validation_data(long value)
 {
 	parameters.use_validation_data = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_crossover_type(long value)
 {
 	parameters.crossover_type = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_random_seed(long value)
 {
 	parameters.random_seed = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_runs(long value)
 {
 	parameters.num_runs = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_simplified_programs(long value)
 {
 	parameters.simplified_programs = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 long t_mep::get_num_automatic_constants(void)
@@ -1812,6 +1908,7 @@ double t_mep::get_constants_mutation_max_deviation(void)
 void t_mep::set_num_automatic_constants(long value)
 {
 	parameters.constants.num_automatic_constants = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_user_defined_constants(long value)
@@ -1825,41 +1922,50 @@ void t_mep::set_num_user_defined_constants(long value)
 		parameters.constants.constants_double = new double[parameters.constants.num_user_defined_constants];
 	else
 		parameters.constants.constants_double = NULL;
+
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_min_constants_interval_double(double value)
 {
 	parameters.constants.min_constants_interval_double = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_max_constants_interval_double(double value)
 {
 	parameters.constants.max_constants_interval_double = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_double(long index, double value)
 {
 	parameters.constants.constants_double[index] = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_type(long value)
 {
 	parameters.constants.constants_type = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_can_evolve(long value)
 {
 	parameters.constants.constants_can_evolve = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_mutation_max_deviation(double value)
 {
 	parameters.constants.constants_mutation_max_deviation = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::init_parameters(void)
 {
 	parameters.init();
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 bool t_mep::get_addition(void)
@@ -1995,136 +2101,163 @@ bool t_mep::get_ifalbcd(void)
 void t_mep::set_addition(bool value)
 {
 	operators.use_addition = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_subtraction(bool value)
 {
 	operators.use_subtraction = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_multiplication(bool value)
 {
 	operators.use_multiplication = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_division(bool value)
 {
 	operators.use_division = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_power(bool value)
 {
 	operators.use_power = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_sqrt(bool value)
 {
 	operators.use_sqrt = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_exp(bool value)
 {
 	operators.use_exp = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_pow10(bool value)
 {
 	operators.use_pow10 = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_ln(bool value)
 {
 	operators.use_ln = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_log10(bool value)
 {
 	operators.use_log10 = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_log2(bool value)
 {
 	operators.use_log2 = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_floor(bool value)
 {
 	operators.use_floor = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_ceil(bool value)
 {
 	operators.use_ceil = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_abs(bool value)
 {
 	operators.use_abs = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_inv(bool value)
 {
 	operators.use_inv = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_x2(bool value)
 {
 	operators.use_x2 = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_min(bool value)
 {
 	operators.use_min = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_max(bool value)
 {
 	operators.use_max = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_sin(bool value)
 {
 	operators.use_sin = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_cos(bool value)
 {
 	operators.use_cos = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_tan(bool value)
 {
 	operators.use_tan = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_asin(bool value)
 {
 	operators.use_asin = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_acos(bool value)
 {
 	operators.use_acos = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_atan(bool value)
 {
 	operators.use_atan = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_iflz(bool value)
 {
 	operators.use_iflz = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::set_ifalbcd(bool value)
 {
 	operators.use_ifalbcd = value;
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::init_operators()
 {
 	operators.init();
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 bool t_mep::is_running(void)
@@ -2134,7 +2267,31 @@ bool t_mep::is_running(void)
 //---------------------------------------------------------------------------
 int t_mep::load_training_data_from_csv(const char* file_name)
 {
-	return training_data.from_csv(file_name);
+	int result = training_data.from_csv(file_name);
+
+	if (result) {
+		num_total_variables = training_data.num_cols;
+		num_actual_variables = num_total_variables;
+
+
+		if (variables_utilization) {
+			delete[] variables_utilization;
+			variables_utilization = NULL;
+		}
+
+		variables_utilization = new int[num_total_variables];
+
+		for (int i = 0; i < num_total_variables; i++)
+			variables_utilization[i] = 1;
+
+		if (actual_used_variables) {
+			delete[] actual_used_variables;
+			actual_used_variables = NULL;
+		}
+	}
+
+	modified_project = true;
+	return result;
 }
 //---------------------------------------------------------------------------
 int t_mep::save_training_data_to_csv(const char* file_name, char list_separator)
@@ -2195,16 +2352,19 @@ bool t_mep::is_test_data_a_classification_problem(void)
 void t_mep::training_data_to_numeric(void)
 {
 	training_data.to_numeric();
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::training_data_scale_to_interval_everywhere(double min, double max)
 {
 	training_data.to_interval_everywhere(min, max);
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::training_data_scale_to_interval_all_variables(double min, double max)
 {
 	training_data.to_interval_all_variables(min, max);
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 void t_mep::training_data_scale_to_interval_selected_col(double min, double max, int col)
@@ -2245,6 +2405,7 @@ int t_mep::training_data_find_symbol_everywhere(const char *find_what, bool use_
 void t_mep::training_data_shuffle(void)
 {
 	training_data.shuffle();
+	modified_project = true;
 }
 //---------------------------------------------------------------------------
 int t_mep::move_training_data_to_validation(int count)
@@ -2259,12 +2420,43 @@ int t_mep::move_training_data_to_test(int count)
 //---------------------------------------------------------------------------
 int t_mep::move_test_data_to_training(int count)
 {
-	return test_data.move_to(&training_data, count);
+	int result = test_data.move_to(&training_data, count);
+
+	if (training_data.num_data == count) { // means that it was empty before
+		if (variables_utilization) {
+			delete[] variables_utilization;
+			variables_utilization = NULL;
+		}
+		num_total_variables = training_data.num_cols - 1;
+
+		variables_utilization = new int[num_total_variables];
+
+		for (int i = 0; i < num_total_variables; i++)
+			variables_utilization[i] = 1;
+	}
+	modified_project = true;
+
+	return result;
 }
 //---------------------------------------------------------------------------
 int t_mep::move_validation_data_to_training(int count)
 {
-	return validation_data.move_to(&training_data, count);
+	int result = validation_data.move_to(&training_data, count);
+
+	if (training_data.num_data == count) { // means that it was empty before
+		if (variables_utilization) {
+			delete[] variables_utilization;
+			variables_utilization = NULL;
+		}
+		num_total_variables = training_data.num_cols - 1;
+
+		variables_utilization = new int[num_total_variables];
+
+		for (int i = 0; i < num_total_variables; i++)
+			variables_utilization[i] = 1;
+	}
+	modified_project = true;
+	return result;
 }
 //---------------------------------------------------------------------------
 int t_mep::get_last_run_index(void)
@@ -2274,6 +2466,8 @@ int t_mep::get_last_run_index(void)
 //---------------------------------------------------------------------------
 void t_mep::clear(void)
 {
+	modified_project = true;
+
 	last_run_index = -1;
 	if (stats) {
 		delete[] stats;
@@ -2308,21 +2502,25 @@ int t_mep::get_num_outputs(void)
 
 void t_mep::validation_data_to_numeric(void)
 {
+	modified_project = true;
 	validation_data.to_numeric();
 }
 //---------------------------------------------------------------------------
 void t_mep::validation_data_scale_to_interval_everywhere(double min, double max)
 {
+	modified_project = true;
 	validation_data.to_interval_everywhere(min, max);
 }
 //---------------------------------------------------------------------------
 void t_mep::validation_data_scale_to_interval_all_variables(double min, double max)
 {
+	modified_project = true;
 	validation_data.to_interval_all_variables(min, max);
 }
 //---------------------------------------------------------------------------
 void t_mep::validation_data_scale_to_interval_selected_col(double min, double max, int col)
 {
+	modified_project = true;
 	validation_data.to_interval_selected_col(min, max, col);
 }
 //---------------------------------------------------------------------------
@@ -2362,21 +2560,25 @@ int t_mep::validation_data_find_symbol_everywhere(const char *find_what, bool us
 
 void t_mep::test_data_to_numeric(void)
 {
+	modified_project = true;
 	test_data.to_numeric();
 }
 //---------------------------------------------------------------------------
 void t_mep::test_data_scale_to_interval_everywhere(double min, double max)
 {
+	modified_project = true;
 	test_data.to_interval_everywhere(min, max);
 }
 //---------------------------------------------------------------------------
 void t_mep::test_data_scale_to_interval_all_variables(double min, double max)
 {
+	modified_project = true;
 	test_data.to_interval_all_variables(min, max);
 }
 //---------------------------------------------------------------------------
 void t_mep::test_data_scale_to_interval_selected_col(double min, double max, int col)
 {
+	modified_project = true;
 	test_data.to_interval_selected_col(min, max, col);
 }
 //---------------------------------------------------------------------------
@@ -2415,6 +2617,7 @@ int t_mep::test_data_find_symbol_everywhere(const char *find_what, bool use_regu
 
 int t_mep::load_validation_data_from_csv(const char* file_name)
 {
+	modified_project = true;
 	return validation_data.from_csv(file_name);
 }
 //---------------------------------------------------------------------------
@@ -2440,6 +2643,7 @@ int t_mep::get_validation_data_num_rows(void)
 //---------------------------------------------------------------------------
 void t_mep::clear_validation_data(void)
 {
+	modified_project = true;
 	return validation_data.clear_data();
 }
 //---------------------------------------------------------------------------
@@ -2459,6 +2663,7 @@ double t_mep::get_validation_data_as_double(int row, int col)
 
 int t_mep::load_test_data_from_csv(const char* file_name)
 {
+	modified_project = true;
 	return test_data.from_csv(file_name);
 }
 //---------------------------------------------------------------------------
@@ -2484,6 +2689,7 @@ int t_mep::get_test_data_num_rows(void)
 //---------------------------------------------------------------------------
 void t_mep::clear_test_data(void)
 {
+	modified_project = true;
 	return test_data.clear_data();
 }
 //---------------------------------------------------------------------------
@@ -2505,5 +2711,82 @@ double* t_mep::get_validation_data_row(int row)
 double* t_mep::get_test_data_row(int row)
 {
 	return test_data._data_double[row];
+}
+//---------------------------------------------------------------------------
+int t_mep::get_num_total_variables(void)
+{ 
+	return num_total_variables;
+}
+//---------------------------------------------------------------------------
+void t_mep::set_num_total_variables(int value)
+{
+	num_total_variables = value;
+	target_col = num_total_variables;
+	modified_project = true;
+}
+//---------------------------------------------------------------------------
+void t_mep::init(void)
+{
+	init_parameters();
+	init_operators();
+
+	clear_training_data();
+	clear_validation_data();
+	clear_test_data();
+
+
+	if (actual_used_variables) {
+		delete[] actual_used_variables;
+		actual_used_variables = NULL;
+	}
+	if (variables_utilization) {
+		delete[] variables_utilization;
+		variables_utilization = NULL;
+	}
+
+	num_actual_variables = 0;
+
+	modified_project = false;
+}
+//---------------------------------------------------------------------------
+int t_mep::get_num_actual_variables(void)
+{
+	return num_actual_variables;
+}
+//---------------------------------------------------------------------------
+bool t_mep::is_variable_utilized(int index)
+{
+	return variables_utilization[index];
+}
+//---------------------------------------------------------------------------
+void t_mep::set_variable_utilization(int index, bool value)
+{
+	variables_utilization[index] = value;
+	modified_project = true;
+}
+//---------------------------------------------------------------------------
+bool t_mep::is_project_modified(void)
+{
+	return modified_project;
+}
+//---------------------------------------------------------------------------
+void t_mep::set_problem_description(const char* value)
+{
+	if (problem_description) {
+		delete[] problem_description;
+		problem_description = NULL;
+	}
+
+	if (strlen(value)) {
+		problem_description = new char[strlen(value) + 1];
+		strcpy(problem_description, value);
+	}
+
+	modified_project = true;
+}
+//---------------------------------------------------------------------------
+char* t_mep::get_problem_description(void)
+{
+	return problem_description;
 }
 //---------------------------------------------------------------------------

@@ -59,19 +59,66 @@ private:
 	bool get_error_double(chromosome &Individual, double *inputs, double *outputs);
 	bool evaluate_double(chromosome &Individual, double *inputs, double *outputs);
 
-public:
-	int get_last_run_index(void);
-	char * get_version(void);
-	int *actual_used_variables;
-	int num_actual_variables;
 
-	int *variables_utilization;
-	bool modified_project;
-	
-	int num_total_vars;
+	int num_total_variables;
 	int target_col;
 
+	int num_actual_variables;
+	int *variables_utilization;
+
+	int *actual_used_variables;
+
+	bool modified_project;
+
+	char *problem_description;
+
+	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
+	long tournament(t_sub_population &pop);
+
+	//   void uniform_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
+	//void one_cut_point_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
+	//void mutation(chromosome &Individual); // mutate the individual
+
+	void fitness_regression_double(chromosome &Individual, double **);
+	void fitness_classification_double(chromosome &Individual, double**);
+
+	void generate_random_individuals(void); // randomly initializes the individuals
+
+	double compute_validation_error(int *, int*, double **eval_double);
+
+	void allocate_sub_population(t_sub_population &pop);
+	void ReadTrainingData(void);
+
+	void allocate_values(double ****, s_value_class***);
+	void delete_values(double ****, s_value_class***);
+
+	void sort_by_fitness(t_sub_population &pop); // sort ascending the individuals in population
+	void compute_best_and_average_error(double &best_error, double &mean_error);
+	void compute_eval_matrix_double(chromosome &Individual, double **, int*);
+	void compute_eval_vector_double(chromosome &Individual);
+	void compute_cached_eval_matrix_double(void);
+	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
+
+
+	bool compute_regression_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
+	bool compute_classification_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
+	bool compute_regression_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
+	bool compute_classification_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
+
+	int to_xml(pugi::xml_node parent);
+	int from_xml(pugi::xml_node parent);
+
+
 public:
+
+	t_mep();
+	~t_mep();
+
+	int get_last_run_index(void);
+	char * get_version(void);
+
+	int get_num_total_variables(void);
+	void set_num_total_variables(int value);
 	//---------------------------------------------------------------------------
 	int load_training_data_from_csv(const char* file_name);
 	int save_training_data_to_csv(const char* file_name, char list_separator);
@@ -87,7 +134,6 @@ public:
 
 	void training_data_to_numeric(void);
 	
-
 	//---------------------------------------------------------------------------
 	int load_validation_data_from_csv(const char* file_name);
 	int save_validation_data_to_csv(const char* file_name, char list_separator);
@@ -131,8 +177,6 @@ public:
 	int get_latest_generation(int run);
 	double get_test_error(int run);
 
-	t_mep();
-	~t_mep();
 
 	void stop(void);
 
@@ -161,44 +205,8 @@ public:
 
 	void get_list_of_used_variables(void);
 
-	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent);
-
-private:
-
-
-	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
-	long tournament(t_sub_population &pop);
-
- //   void uniform_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
-	//void one_cut_point_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
-    //void mutation(chromosome &Individual); // mutate the individual
-
-	void fitness_regression_double(chromosome &Individual, double **);
-	void fitness_classification_double(chromosome &Individual, double**);
-
-	void generate_random_individuals(void); // randomly initializes the individuals
-	
-	double compute_validation_error(int *, int*, double **eval_double);
-
-	void allocate_sub_population(t_sub_population &pop);
-    void ReadTrainingData(void);
-
-	void allocate_values(double ****, s_value_class***);
-	void delete_values(double ****, s_value_class***);
-
-	void sort_by_fitness(t_sub_population &pop); // sort ascending the individuals in population
-	void compute_best_and_average_error(double &best_error, double &mean_error);
-	void compute_eval_matrix_double(chromosome &Individual, double **, int*);
-	void compute_eval_vector_double(chromosome &Individual);
-	void compute_cached_eval_matrix_double(void);
-	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
-
-
-	bool compute_regression_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
-	bool compute_classification_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
-	bool compute_regression_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
-	bool compute_classification_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
+	int to_xml(const char* file_name);
+	int from_xml(const char* file_name);
 
 	public:
 
@@ -388,6 +396,14 @@ private:
 		 char* prg_to_C(int run_index, bool simplified, double *inputs);
 
 		 int get_num_outputs(void);
+		 void init(void);
+		 int get_num_actual_variables(void);
+		 bool is_variable_utilized(int index);
+		 void set_variable_utilization(int index, bool value);
+		 bool is_project_modified(void);
+
+		 void set_problem_description(const char* value);
+		 char* get_problem_description(void);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;

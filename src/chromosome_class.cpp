@@ -26,7 +26,7 @@ void chromosome::allocate_memory(long code_length, int num_vars, bool use_consta
 	this->code_length = code_length;
 	prg = new code3[code_length];
 	s_prg = NULL;
-	this->num_total_vars = num_vars;
+	this->num_total_variables = num_vars;
 
 	if (use_constants) {
 		if (constants->constants_type == USER_DEFINED_CONSTANTS) {
@@ -63,7 +63,7 @@ void chromosome::clear(void)
 
 	num_constants = 0;
 	code_length = 0;
-	num_total_vars = 0;
+	num_total_variables = 0;
 
 	if (constants_double){
 		delete[] constants_double;
@@ -77,7 +77,7 @@ chromosome& chromosome::operator = (const chromosome &source)
 		//		clear();
 
 		code_length = source.code_length;
-		num_total_vars = source.num_total_vars;
+		num_total_variables = source.num_total_variables;
 
 		if (!prg)// I do this for stats only
 			prg = new code3[code_length];        // a string of genes
@@ -191,7 +191,7 @@ void print_instruction(int op, int adr1, int adr2, int adr3, int adr4, char * tm
 //---------------------------------------------------------------------------------
 char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 {
-	char *prog = new char[(code_length + num_constants + num_total_vars) * 100 + 1000];
+	char *prog = new char[(code_length + num_constants + num_total_variables) * 100 + 1000];
 	char tmp_s[100];
 	prog[0] = 0;
 	strcat(prog, "#include <math.h>\n");
@@ -240,13 +240,13 @@ char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 			}
 			else
 			{ // a variable
-				if (s_prg[i].op < num_total_vars){
+				if (s_prg[i].op < num_total_variables){
 					sprintf(tmp_s, "x[%d];", s_prg[i].op);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
 				else{
-					sprintf(tmp_s, "constants[%d];", s_prg[i].op - num_total_vars);
+					sprintf(tmp_s, "constants[%d];", s_prg[i].op - num_total_variables);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -279,13 +279,13 @@ char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 			}
 			else
 			{ // a variable
-				if (prg[i].op < num_total_vars){
+				if (prg[i].op < num_total_variables){
 					sprintf(tmp_s, "x[%d];", prg[i].op);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
 				else{
-					sprintf(tmp_s, "constants[%d];", prg[i].op - num_total_vars);
+					sprintf(tmp_s, "constants[%d];", prg[i].op - num_total_variables);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -312,9 +312,9 @@ char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 	strcat(prog, "\n");
 	strcat(prog, "//example of utilization ...\n");
 	strcat(prog, "\n");
-	sprintf(tmp_s, "  double x[%d];\n", num_total_vars);
+	sprintf(tmp_s, "  double x[%d];\n", num_total_variables);
 	strcat(prog, tmp_s);
-	for (int i = 0; i < num_total_vars; i++){
+	for (int i = 0; i < num_total_variables; i++){
 		sprintf(tmp_s, "  x[%d] = %lf;\n", i, data[i]);
 		strcat(prog, tmp_s);
 	}
@@ -343,7 +343,7 @@ int chromosome::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("num_variables");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_total_vars);
+	sprintf(tmp_str, "%d", num_total_variables);
 	data.set_value(tmp_str);
 
 	pugi::xml_node node_code = parent.append_child("code");
@@ -415,10 +415,10 @@ int chromosome::from_xml(pugi::xml_node parent)
 	node = parent.child("num_variables");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_total_vars = atoi(value_as_cstring);
+		num_total_variables = atoi(value_as_cstring);
 	}
 	else
-		num_total_vars = 1;
+		num_total_variables = 1;
 
 	if (code_length){
 		prg = new code3[code_length];
@@ -613,7 +613,7 @@ void chromosome::generate_random(t_parameters *parameters, int *actual_operators
 	if (p <= parameters->variables_probability)
 		prg[0].op = actual_variables[rand() % num_actual_variables];
 	else
-		prg[0].op = num_total_vars + rand() % num_constants;
+		prg[0].op = num_total_variables + rand() % num_constants;
 
 	for (int i = 1; i < parameters->code_length; i++) {
 		double p = rand() / (double)RAND_MAX;
@@ -624,7 +624,7 @@ void chromosome::generate_random(t_parameters *parameters, int *actual_operators
 			if (p <= parameters->operators_probability + parameters->variables_probability)
 				prg[i].op = actual_variables[rand() % num_actual_variables];
 			else
-				prg[i].op = num_total_vars + rand() % num_constants;
+				prg[i].op = num_total_variables + rand() % num_constants;
 
 		prg[i].adr1 = rand() % i;
 		prg[i].adr2 = rand() % i;
@@ -645,7 +645,7 @@ void chromosome::mutation(t_parameters *parameters, int *actual_operators, int n
 		if (q <= parameters->variables_probability)
 			prg[0].op = actual_variables[rand() % num_actual_variables];
 		else
-			prg[0].op = num_total_vars + rand() % num_constants;
+			prg[0].op = num_total_variables + rand() % num_constants;
 	}
 
 	for (int i = 1; i < code_length; i++) {
@@ -659,7 +659,7 @@ void chromosome::mutation(t_parameters *parameters, int *actual_operators, int n
 				if (q <= parameters->operators_probability + parameters->variables_probability)
 					prg[i].op = actual_variables[rand() % num_actual_variables];
 				else
-					prg[i].op = num_total_vars + rand() % num_constants;
+					prg[i].op = num_total_variables + rand() % num_constants;
 		}
 
 		p = rand() / (double)RAND_MAX;      // mutate the first address  (adr1)
@@ -701,8 +701,8 @@ void chromosome::one_cut_point_crossover(const chromosome &parent2, chromosome &
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;
 
-	offspring1.num_total_vars = num_total_vars;
-	offspring2.num_total_vars = num_total_vars;
+	offspring1.num_total_variables = num_total_variables;
+	offspring2.num_total_variables = num_total_variables;
 
 	int pct, i;
 	pct = 1 + rand() % (code_length - 2);
@@ -734,8 +734,8 @@ void chromosome::uniform_crossover(const chromosome &parent2, chromosome &offspr
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;
 
-	offspring1.num_total_vars = num_total_vars;
-	offspring2.num_total_vars = num_total_vars;
+	offspring1.num_total_variables = num_total_variables;
+	offspring2.num_total_variables = num_total_variables;
 
 	for (int i = 0; i < code_length; i++)
 		if (rand() % 2) {
