@@ -3,6 +3,8 @@
 
 #include "pugixml.hpp"
 
+#define DATA_DOUBLE 0
+#define DATA_STRING 1
 
 //-----------------------------------------------------------------
 class t_data
@@ -44,9 +46,9 @@ public:
 	bool from_csv(const char *filename);
 
 	void to_numeric(void);
-	void to_interval_everywhere(double min, double max);
-	void to_interval_all_variables(double min, double max);
-	void to_interval_selected_col(double min, double max, int col);
+	int to_interval_everywhere(double min, double max);
+	int to_interval_all_variables(double min, double max);
+	int to_interval_selected_col(double min, double max, int col);
     
 	int replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
 	int replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
