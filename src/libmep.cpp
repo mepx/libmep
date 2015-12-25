@@ -19,10 +19,10 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2015.12.25.0");
+	strcpy(version, "2015.12.25.1");
 
 	num_operators = 0;
-	//	data_type = DATA_DOUBLE;
+	
 
 	cached_eval_matrix_double = NULL;
 	cached_sum_of_errors = NULL;
@@ -1236,7 +1236,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep::to_xml(pugi::xml_node parent)
+int t_mep::to_pugixml_node(pugi::xml_node parent)
 {
 	// utilized variables
 	char tmp_str[10000];
@@ -1282,7 +1282,7 @@ int t_mep::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep::from_xml(pugi::xml_node parent)
+int t_mep::from_pugixml_node(pugi::xml_node parent)
 {
 	//get the utilized variables first
 	/*
@@ -1394,7 +1394,7 @@ int t_mep::to_xml(const char *filename)
 	data.set_value(version);
 
 	pugi::xml_node alg_node = body.append_child("algorithm");
-	to_xml(alg_node);
+	to_pugixml_node(alg_node);
 
 	modified_project = false;
 
@@ -1461,7 +1461,7 @@ int t_mep::from_xml(const char* filename)
 	if (!alg_node)
 		return false;
 
-	from_xml(alg_node);
+	from_pugixml_node(alg_node);
 
 	return true;
 }
@@ -1767,104 +1767,139 @@ long t_mep::get_simplified_programs(void)
 //---------------------------------------------------------------------------
 void t_mep::set_mutation_probability(double value)
 {
-	parameters.mutation_probability = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.mutation_probability = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_crossover_probability(double value)
 {
-	parameters.crossover_probability = value;
+	if (_stopped) {
+		parameters.crossover_probability = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_code_length(long value)
 {
-	parameters.code_length = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.code_length = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 
 void t_mep::set_subpopulation_size(long value)
 {
-	parameters.subpopulation_size = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.subpopulation_size = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_threads(long value)
 {
-	parameters.num_threads = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.num_threads = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_tournament_size(long value)
 {
-	parameters.tournament_size = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.tournament_size = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_generations(long value)
 {
-	parameters.num_generations = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.num_generations = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_problem_type(long value)
 {
-	parameters.problem_type = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.problem_type = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_subpopulations(long value)
 {
-	parameters.num_subpopulations = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.num_subpopulations = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_operators_probability(double value)
 {
-	parameters.operators_probability = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.operators_probability = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_variables_probability(double value)
 {
-	parameters.variables_probability = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.variables_probability = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_probability(double value)
 {
-	parameters.constants_probability = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants_probability = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_use_validation_data(long value)
 {
-	parameters.use_validation_data = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.use_validation_data = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_crossover_type(long value)
 {
-	parameters.crossover_type = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.crossover_type = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_random_seed(long value)
 {
-	parameters.random_seed = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.random_seed = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_runs(long value)
 {
-	parameters.num_runs = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.num_runs = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_simplified_programs(long value)
 {
-	parameters.simplified_programs = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.simplified_programs = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 long t_mep::get_num_automatic_constants(void)
@@ -1909,65 +1944,83 @@ double t_mep::get_constants_mutation_max_deviation(void)
 //---------------------------------------------------------------------------
 void t_mep::set_num_automatic_constants(long value)
 {
-	parameters.constants.num_automatic_constants = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.num_automatic_constants = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_user_defined_constants(long value)
 {
-	if (parameters.constants.constants_double)
-		delete[]parameters.constants.constants_double;
+	if (_stopped) {
+		if (parameters.constants.constants_double)
+			delete[]parameters.constants.constants_double;
 
-	parameters.constants.num_user_defined_constants = value;
+		parameters.constants.num_user_defined_constants = value;
 
-	if (parameters.constants.num_user_defined_constants)
-		parameters.constants.constants_double = new double[parameters.constants.num_user_defined_constants];
-	else
-		parameters.constants.constants_double = NULL;
+		if (parameters.constants.num_user_defined_constants)
+			parameters.constants.constants_double = new double[parameters.constants.num_user_defined_constants];
+		else
+			parameters.constants.constants_double = NULL;
 
-	modified_project = true;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_min_constants_interval_double(double value)
 {
-	parameters.constants.min_constants_interval_double = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.min_constants_interval_double = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_max_constants_interval_double(double value)
 {
-	parameters.constants.max_constants_interval_double = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.max_constants_interval_double = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_double(long index, double value)
 {
-	parameters.constants.constants_double[index] = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.constants_double[index] = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_type(long value)
 {
-	parameters.constants.constants_type = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.constants_type = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_can_evolve(long value)
 {
-	parameters.constants.constants_can_evolve = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.constants_can_evolve = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_constants_mutation_max_deviation(double value)
 {
-	parameters.constants.constants_mutation_max_deviation = value;
-	modified_project = true;
+	if (_stopped) {
+		parameters.constants.constants_mutation_max_deviation = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::init_parameters(void)
 {
-	parameters.init();
-	modified_project = true;
+	if (_stopped) {
+		parameters.init();
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 bool t_mep::get_addition(void)
@@ -2102,164 +2155,218 @@ bool t_mep::get_ifalbcd(void)
 //---------------------------------------------------------------------------
 void t_mep::set_addition(bool value)
 {
-	operators.use_addition = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_addition = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_subtraction(bool value)
 {
-	operators.use_subtraction = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_subtraction = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_multiplication(bool value)
 {
-	operators.use_multiplication = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_multiplication = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_division(bool value)
 {
-	operators.use_division = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_division = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_power(bool value)
 {
-	operators.use_power = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_power = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_sqrt(bool value)
 {
-	operators.use_sqrt = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_sqrt = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_exp(bool value)
 {
-	operators.use_exp = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_exp = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_pow10(bool value)
 {
-	operators.use_pow10 = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_pow10 = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_ln(bool value)
 {
-	operators.use_ln = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_ln = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_log10(bool value)
 {
-	operators.use_log10 = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_log10 = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_log2(bool value)
 {
-	operators.use_log2 = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_log2 = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_floor(bool value)
 {
-	operators.use_floor = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_floor = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_ceil(bool value)
 {
-	operators.use_ceil = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_ceil = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_abs(bool value)
 {
-	operators.use_abs = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_abs = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_inv(bool value)
 {
-	operators.use_inv = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_inv = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_x2(bool value)
 {
-	operators.use_x2 = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_x2 = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_min(bool value)
 {
-	operators.use_min = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_min = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_max(bool value)
 {
-	operators.use_max = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_max = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_sin(bool value)
 {
-	operators.use_sin = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_sin = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_cos(bool value)
 {
-	operators.use_cos = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_cos = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_tan(bool value)
 {
-	operators.use_tan = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_tan = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_asin(bool value)
 {
-	operators.use_asin = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_asin = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_acos(bool value)
 {
-	operators.use_acos = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_acos = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_atan(bool value)
 {
-	operators.use_atan = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_atan = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_iflz(bool value)
 {
-	operators.use_iflz = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_iflz = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_ifalbcd(bool value)
 {
-	operators.use_ifalbcd = value;
-	modified_project = true;
+	if (_stopped) {
+		operators.use_ifalbcd = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::init_operators()
 {
-	operators.init();
-	modified_project = true;
+	if (_stopped) {
+		operators.init();
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 bool t_mep::is_running(void)
@@ -2269,33 +2376,37 @@ bool t_mep::is_running(void)
 //---------------------------------------------------------------------------
 int t_mep::load_training_data_from_csv(const char* file_name)
 {
-	int result = training_data.from_csv(file_name);
+	if (_stopped) {
+		int result = training_data.from_csv(file_name);
 
-	if (result) {
-		num_total_variables = training_data.num_cols;
-		num_actual_variables = num_total_variables;
+		if (result) {
+			num_total_variables = training_data.num_cols;
+			num_actual_variables = num_total_variables;
 
 
-		if (variables_utilization) {
-			delete[] variables_utilization;
-			variables_utilization = NULL;
+			if (variables_utilization) {
+				delete[] variables_utilization;
+				variables_utilization = NULL;
+			}
+
+			variables_utilization = new int[num_total_variables];
+
+			for (int i = 0; i < num_total_variables; i++)
+				variables_utilization[i] = 1;
+
+			if (actual_used_variables) {
+				delete[] actual_used_variables;
+				actual_used_variables = NULL;
+			}
+
+			get_list_of_used_variables();
 		}
 
-		variables_utilization = new int[num_total_variables];
-
-		for (int i = 0; i < num_total_variables; i++)
-			variables_utilization[i] = 1;
-
-		if (actual_used_variables) {
-			delete[] actual_used_variables;
-			actual_used_variables = NULL;
-		}
-
-		get_list_of_used_variables();
+		modified_project = true;
+		return result;
 	}
-
-	modified_project = true;
-	return result;
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::save_training_data_to_csv(const char* file_name, char list_separator)
@@ -2320,7 +2431,9 @@ int t_mep::get_training_data_num_rows(void)
 //---------------------------------------------------------------------------
 void t_mep::clear_training_data(void)
 {
-	return training_data.clear_data();
+	if (_stopped) {
+		return training_data.clear_data();
+	}
 }
 //---------------------------------------------------------------------------
 char * t_mep::get_version(void)
@@ -2355,40 +2468,71 @@ bool t_mep::is_test_data_a_classification_problem(void)
 //---------------------------------------------------------------------------
 void t_mep::training_data_to_numeric(void)
 {
-	training_data.to_numeric();
-	modified_project = true;
+	if (_stopped) {
+		training_data.to_numeric();
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::training_data_scale_to_interval_everywhere(double min, double max)
 {
-	training_data.to_interval_everywhere(min, max);
-	modified_project = true;
+	if (_stopped) {
+		training_data.to_interval_everywhere(min, max);
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::training_data_scale_to_interval_all_variables(double min, double max)
 {
-	training_data.to_interval_all_variables(min, max);
-	modified_project = true;
+	if (_stopped) {
+		training_data.to_interval_all_variables(min, max);
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::training_data_scale_to_interval_selected_col(double min, double max, int col)
 {
-	training_data.to_interval_selected_col(min, max, col);
+	if (_stopped) {
+		training_data.to_interval_selected_col(min, max, col);
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 int t_mep::training_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular)
 {
-	return training_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+	if (_stopped) {
+		int result = training_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+		if (result)
+			modified_project = true;
+		return result;
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::training_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular)
 {
-	return training_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+	if (_stopped) {
+		
+		int result = training_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+		if (result)
+			modified_project = true;
+		return result;
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::training_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular)
 {
-	return training_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+	if (_stopped) {
+		int result = training_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+		if (result)
+			modified_project = true;
+		return result;
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::training_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular)
@@ -2408,59 +2552,83 @@ int t_mep::training_data_find_symbol_everywhere(const char *find_what, bool use_
 //---------------------------------------------------------------------------
 void t_mep::training_data_shuffle(void)
 {
-	training_data.shuffle();
-	modified_project = true;
+	if (_stopped) {
+		training_data.shuffle();
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 int t_mep::move_training_data_to_validation(int count)
 {
-	return training_data.move_to(&validation_data, count);
+	if (_stopped) {
+		int result = training_data.move_to(&validation_data, count);
+		if (result)
+			modified_project = true;
+		return result;
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::move_training_data_to_test(int count)
 {
-	return training_data.move_to(&test_data, count);
+	if (_stopped) {
+		int result = training_data.move_to(&test_data, count);
+		if (result)
+			modified_project = true;
+		return result;
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::move_test_data_to_training(int count)
 {
-	int result = test_data.move_to(&training_data, count);
+	if (_stopped) {
+		int result = test_data.move_to(&training_data, count);
 
-	if (training_data.num_data == count) { // means that it was empty before
-		if (variables_utilization) {
-			delete[] variables_utilization;
-			variables_utilization = NULL;
+		if (training_data.num_data == count) { // means that it was empty before
+			if (variables_utilization) {
+				delete[] variables_utilization;
+				variables_utilization = NULL;
+			}
+			num_total_variables = training_data.num_cols - 1;
+
+			variables_utilization = new int[num_total_variables];
+
+			for (int i = 0; i < num_total_variables; i++)
+				variables_utilization[i] = 1;
 		}
-		num_total_variables = training_data.num_cols - 1;
+		modified_project = true;
 
-		variables_utilization = new int[num_total_variables];
-
-		for (int i = 0; i < num_total_variables; i++)
-			variables_utilization[i] = 1;
+		return result;
 	}
-	modified_project = true;
-
-	return result;
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::move_validation_data_to_training(int count)
 {
-	int result = validation_data.move_to(&training_data, count);
+	if (_stopped) {
+		int result = validation_data.move_to(&training_data, count);
 
-	if (training_data.num_data == count) { // means that it was empty before
-		if (variables_utilization) {
-			delete[] variables_utilization;
-			variables_utilization = NULL;
+		if (training_data.num_data == count) { // means that it was empty before
+			if (variables_utilization) {
+				delete[] variables_utilization;
+				variables_utilization = NULL;
+			}
+			num_total_variables = training_data.num_cols - 1;
+
+			variables_utilization = new int[num_total_variables];
+
+			for (int i = 0; i < num_total_variables; i++)
+				variables_utilization[i] = 1;
 		}
-		num_total_variables = training_data.num_cols - 1;
-
-		variables_utilization = new int[num_total_variables];
-
-		for (int i = 0; i < num_total_variables; i++)
-			variables_utilization[i] = 1;
+		modified_project = true;
+		return result;
 	}
-	modified_project = true;
-	return result;
+	else
+	  return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::get_last_run_index(void)
@@ -2470,12 +2638,14 @@ int t_mep::get_last_run_index(void)
 //---------------------------------------------------------------------------
 void t_mep::clear(void)
 {
-	modified_project = true;
+	if (_stopped) {
+		modified_project = true;
 
-	last_run_index = -1;
-	if (stats) {
-		delete[] stats;
-		stats = NULL;
+		last_run_index = -1;
+		if (stats) {
+			delete[] stats;
+			stats = NULL;
+		}
 	}
 }
 //---------------------------------------------------------------------------
@@ -2503,41 +2673,64 @@ int t_mep::get_num_outputs(void)
 //---------------------------------------------------------------------------
 void t_mep::validation_data_to_numeric(void)
 {
-	modified_project = true;
-	validation_data.to_numeric();
+	if (_stopped) {
+		modified_project = true;
+		validation_data.to_numeric();
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::validation_data_scale_to_interval_everywhere(double min, double max)
 {
-	modified_project = true;
-	validation_data.to_interval_everywhere(min, max);
+	if (_stopped) {
+		modified_project = true;
+		validation_data.to_interval_everywhere(min, max);
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::validation_data_scale_to_interval_all_variables(double min, double max)
 {
-	modified_project = true;
-	validation_data.to_interval_all_variables(min, max);
+	if (_stopped) {
+		modified_project = true;
+		validation_data.to_interval_all_variables(min, max);
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::validation_data_scale_to_interval_selected_col(double min, double max, int col)
 {
-	modified_project = true;
-	validation_data.to_interval_selected_col(min, max, col);
+	if (_stopped) {
+		modified_project = true;
+		validation_data.to_interval_selected_col(min, max, col);
+	}
 }
 //---------------------------------------------------------------------------
 int t_mep::validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular)
 {
-	return validation_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+	if (_stopped) {
+		modified_project = true;
+		return validation_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular)
 {
-	return validation_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+	if (_stopped) {
+		modified_project = true;
+		return validation_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular)
 {
-	return validation_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+	if (_stopped) {
+		modified_project = true;
+		return validation_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular)
@@ -2555,47 +2748,65 @@ int t_mep::validation_data_find_symbol_everywhere(const char *find_what, bool us
 	return validation_data.find_symbol_everywhere(find_what, use_regular);
 }
 //---------------------------------------------------------------------------
-
-
-
-
 void t_mep::test_data_to_numeric(void)
 {
-	modified_project = true;
-	test_data.to_numeric();
+	if (_stopped) {
+		modified_project = true;
+		test_data.to_numeric();
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::test_data_scale_to_interval_everywhere(double min, double max)
 {
-	modified_project = true;
-	test_data.to_interval_everywhere(min, max);
+	if (_stopped) {
+		modified_project = true;
+		test_data.to_interval_everywhere(min, max);
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::test_data_scale_to_interval_all_variables(double min, double max)
 {
-	modified_project = true;
-	test_data.to_interval_all_variables(min, max);
+	if (_stopped) {
+		modified_project = true;
+		test_data.to_interval_all_variables(min, max);
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::test_data_scale_to_interval_selected_col(double min, double max, int col)
 {
-	modified_project = true;
-	test_data.to_interval_selected_col(min, max, col);
+	if (_stopped) {
+		modified_project = true;
+		test_data.to_interval_selected_col(min, max, col);
+	}
 }
 //---------------------------------------------------------------------------
 int t_mep::test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular)
 {
-	return test_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+	if (_stopped) {
+		return test_data.replace_symbol_from_selected_col(find_what, replace_with, col, use_regular);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular)
 {
-	return test_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+	if (_stopped) {
+		modified_project = true;
+		return test_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular)
 {
-	return test_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+	if (_stopped) {
+		modified_project = true;
+		return test_data.replace_symbol_everywhere(find_what, replace_with, use_regular);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular)
@@ -2613,13 +2824,14 @@ int t_mep::test_data_find_symbol_everywhere(const char *find_what, bool use_regu
 	return test_data.find_symbol_everywhere(find_what, use_regular);
 }
 //---------------------------------------------------------------------------
-
-
-
 int t_mep::load_validation_data_from_csv(const char* file_name)
 {
-	modified_project = true;
-	return validation_data.from_csv(file_name);
+	if (_stopped) {
+		modified_project = true;
+		return validation_data.from_csv(file_name);
+	}
+	else
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::save_validation_data_to_csv(const char* file_name, char list_separator)
@@ -2644,8 +2856,10 @@ int t_mep::get_validation_data_num_rows(void)
 //---------------------------------------------------------------------------
 void t_mep::clear_validation_data(void)
 {
-	modified_project = true;
-	return validation_data.clear_data();
+	if (_stopped) {
+		modified_project = true;
+		return validation_data.clear_data();
+	}
 }
 //---------------------------------------------------------------------------
 char *t_mep::get_validation_data_as_string(int row, int col)
@@ -2658,10 +2872,6 @@ double t_mep::get_validation_data_as_double(int row, int col)
 	return validation_data._data_double[row][col];
 }
 //---------------------------------------------------------------------------
-
-
-
-
 int t_mep::load_test_data_from_csv(const char* file_name)
 {
 	modified_project = true;
@@ -2690,8 +2900,10 @@ int t_mep::get_test_data_num_rows(void)
 //---------------------------------------------------------------------------
 void t_mep::clear_test_data(void)
 {
-	modified_project = true;
-	return test_data.clear_data();
+	if (_stopped) {
+		modified_project = true;
+		return test_data.clear_data();
+	}
 }
 //---------------------------------------------------------------------------
 char *t_mep::get_test_data_as_string(int row, int col)
@@ -2721,33 +2933,37 @@ int t_mep::get_num_total_variables(void)
 //---------------------------------------------------------------------------
 void t_mep::set_num_total_variables(int value)
 {
-	num_total_variables = value;
-	target_col = num_total_variables;
-	modified_project = true;
+	if (_stopped) {
+		num_total_variables = value;
+		target_col = num_total_variables;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::init(void)
 {
-	init_parameters();
-	init_operators();
+	if (_stopped) {
+		init_parameters();
+		init_operators();
 
-	clear_training_data();
-	clear_validation_data();
-	clear_test_data();
+		clear_training_data();
+		clear_validation_data();
+		clear_test_data();
 
 
-	if (actual_used_variables) {
-		delete[] actual_used_variables;
-		actual_used_variables = NULL;
+		if (actual_used_variables) {
+			delete[] actual_used_variables;
+			actual_used_variables = NULL;
+		}
+		if (variables_utilization) {
+			delete[] variables_utilization;
+			variables_utilization = NULL;
+		}
+
+		num_actual_variables = 0;
+
+		modified_project = false;
 	}
-	if (variables_utilization) {
-		delete[] variables_utilization;
-		variables_utilization = NULL;
-	}
-
-	num_actual_variables = 0;
-
-	modified_project = false;
 }
 //---------------------------------------------------------------------------
 int t_mep::get_num_actual_variables(void)
@@ -2762,8 +2978,10 @@ bool t_mep::is_variable_utilized(int index)
 //---------------------------------------------------------------------------
 void t_mep::set_variable_utilization(int index, bool value)
 {
-	variables_utilization[index] = value;
-	modified_project = true;
+	if (_stopped) {
+		variables_utilization[index] = value;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 bool t_mep::is_project_modified(void)
@@ -2773,17 +2991,20 @@ bool t_mep::is_project_modified(void)
 //---------------------------------------------------------------------------
 void t_mep::set_problem_description(const char* value)
 {
-	if (problem_description) {
-		delete[] problem_description;
-		problem_description = NULL;
-	}
+	if (_stopped) {
 
-	if (strlen(value)) {
-		problem_description = new char[strlen(value) + 1];
-		strcpy(problem_description, value);
-	}
+		if (problem_description) {
+			delete[] problem_description;
+			problem_description = NULL;
+		}
 
-	modified_project = true;
+		if (strlen(value)) {
+			problem_description = new char[strlen(value) + 1];
+			strcpy(problem_description, value);
+		}
+
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 char* t_mep::get_problem_description(void)

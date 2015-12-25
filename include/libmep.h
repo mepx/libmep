@@ -104,9 +104,7 @@ private:
 	bool compute_regression_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
 	bool compute_classification_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
 
-	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent);
-
+	void get_list_of_used_variables(void);
 
 public:
 
@@ -202,10 +200,14 @@ public:
 	void sort_stats_by_validation_error(bool ascending);
 	void sort_stats_by_test_error(bool ascending);
 
-	void get_list_of_used_variables(void);
 
 	int to_xml(const char* file_name);
 	int from_xml(const char* file_name);
+
+	int to_pugixml_node(pugi::xml_node parent);
+	int from_pugixml_node(pugi::xml_node parent);
+
+
 
 	public:
 
