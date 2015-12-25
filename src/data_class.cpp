@@ -676,6 +676,7 @@ int t_data::to_interval_everywhere(double min, double max)
 		return 0;
 	if (num_targets)
       return to_interval_selected_col(min, max, num_cols - 1);
+	return 1;
 }
 //-----------------------------------------------------------------
 int t_data::to_interval_selected_col(double min, double max, int col)
