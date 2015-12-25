@@ -15,7 +15,7 @@
 #include "utils_mep.h"
 
 //-----------------------------------------------------------------
-typedef void (*f_on_progress)(void);
+typedef void(*f_on_progress)(void);
 //-----------------------------------------------------------------
 
 //-----------------------------------------------------------------
@@ -47,7 +47,7 @@ private:
 
 	bool _stopped;
 	int last_run_index;
-	
+
 	t_data training_data;
 	t_data validation_data;
 	t_data test_data;
@@ -130,7 +130,7 @@ public:
 	void clear_training_data(void);
 
 	void training_data_to_numeric(void);
-	
+
 	//---------------------------------------------------------------------------
 	int load_validation_data_from_csv(const char* file_name);
 	int save_validation_data_to_csv(const char* file_name, char list_separator);
@@ -166,7 +166,7 @@ public:
 	bool is_running(void);
 
 	// starts the optimization process
-	int start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run);    
+	int start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run);
 	double get_best_training_error(int run, int gen);
 	double get_best_validation_error(int run);
 	double get_average_training_error(int run, int gen);
@@ -182,8 +182,8 @@ public:
 
 	int stats_to_csv(const char* file_name);
 
-	
-	
+
+
 	bool get_output(int run_index, double *inputs, double *outputs);
 
 	//void evolve_one_subpopulation_for_one_generation(t_sub_population &pop, double**, s_value_class *tmp_value_class);
@@ -209,202 +209,202 @@ public:
 
 
 
-	public:
+public:
 
-		double get_mutation_probability(void);                   // mutation probability
-		double get_crossover_probability(void);               // crossover probability
-		long get_code_length(void);              // the number of genes
+	double get_mutation_probability(void);                   // mutation probability
+	double get_crossover_probability(void);               // crossover probability
+	long get_code_length(void);              // the number of genes
 
-		long get_subpopulation_size(void);                 // the number of individuals in population  (must be an odd number!!!)
-		long get_num_threads(void);
-		long get_tournament_size(void);
-		long get_num_generations(void);
-		long get_problem_type(void); // 0- regression, 1-classification
+	long get_subpopulation_size(void);                 // the number of individuals in population  (must be an odd number!!!)
+	long get_num_threads(void);
+	long get_tournament_size(void);
+	long get_num_generations(void);
+	long get_problem_type(void); // 0- regression, 1-classification
 
-		long get_num_subpopulations(void);
-		double get_operators_probability(void);
-		double get_variables_probability(void);
-		double get_constants_probability(void);
-		long get_use_validation_data(void);
-		long get_crossover_type(void);
+	long get_num_subpopulations(void);
+	double get_operators_probability(void);
+	double get_variables_probability(void);
+	double get_constants_probability(void);
+	long get_use_validation_data(void);
+	long get_crossover_type(void);
 
-		long get_random_seed(void);
-		long get_num_runs(void);
+	long get_random_seed(void);
+	long get_num_runs(void);
 
-		long get_simplified_programs(void);
+	long get_simplified_programs(void);
 
-		void set_mutation_probability(double value);                   // mutation probability
-		void set_crossover_probability(double value);               // crossover probability
-		void set_code_length(long value);              // the number of genes
+	void set_mutation_probability(double value);                   // mutation probability
+	void set_crossover_probability(double value);               // crossover probability
+	void set_code_length(long value);              // the number of genes
 
-		void set_subpopulation_size(long value);                 // the number of individuals in population  (must be an odd number!!!)
-		void set_num_threads(long value);
-		void set_tournament_size(long value);
-		void set_num_generations(long value);
-		void set_problem_type(long value); // 0- regression, 1-classification
+	void set_subpopulation_size(long value);                 // the number of individuals in population  (must be an odd number!!!)
+	void set_num_threads(long value);
+	void set_tournament_size(long value);
+	void set_num_generations(long value);
+	void set_problem_type(long value); // 0- regression, 1-classification
 
-		void set_num_subpopulations(long value);
-		void set_operators_probability(double value);
-		void set_variables_probability(double value);
-		void set_constants_probability(double value);
-		void set_use_validation_data(long value);
-		void set_crossover_type(long value);
+	void set_num_subpopulations(long value);
+	void set_operators_probability(double value);
+	void set_variables_probability(double value);
+	void set_constants_probability(double value);
+	void set_use_validation_data(long value);
+	void set_crossover_type(long value);
 
-		void set_random_seed(long value);
-		void set_num_runs(long value);
+	void set_random_seed(long value);
+	void set_num_runs(long value);
 
-		void set_simplified_programs(long value);
-
-
-		long get_num_automatic_constants(void);
-		long get_num_user_defined_constants(void);
-		double get_min_constants_interval_double(void);
-		double get_max_constants_interval_double(void);
-
-		double get_constants_double(long index);
-
-		long get_constants_type(void);
-		long get_constants_can_evolve(void);
-		double get_constants_mutation_max_deviation(void);
-
-		void set_num_automatic_constants(long value);
-		void set_num_user_defined_constants(long value);
-		void set_min_constants_interval_double(double value);
-		void set_max_constants_interval_double(double value);
-
-		void set_constants_double(long index, double value);
-
-		void set_constants_type(long value);
-		void  set_constants_can_evolve(long value);
-		void set_constants_mutation_max_deviation(double value);
-
-		void init_parameters(void);
-
-		 bool get_addition(void); 
-			bool get_subtraction(void); 
-			bool get_multiplication(void); 
-			bool get_division(void); 
-			bool get_power(void); 
-			bool get_sqrt(void); 
-			bool get_exp(void); 
-			bool get_pow10(void); 
-			bool get_ln(void); 
-			bool get_log10(void); 
-			bool get_log2(void); 
-			bool get_floor(void); 
-			bool get_ceil(void); 
-			bool get_abs(void); 
-			bool get_inv(void); 
-			bool get_x2(void); 
-			bool get_min(void); 
-			bool get_max(void);
-		 bool get_sin(void); 
-			bool get_cos(void); 
-			bool get_tan(void); 
-			bool get_asin(void); 
-			bool get_acos(void); 
-			bool get_atan(void);
-		 bool get_iflz(void); 
-		 bool get_ifalbcd(void);
+	void set_simplified_programs(long value);
 
 
+	long get_num_automatic_constants(void);
+	long get_num_user_defined_constants(void);
+	double get_min_constants_interval_double(void);
+	double get_max_constants_interval_double(void);
 
-		 void set_addition(bool value);
-			void set_subtraction(bool value);
-			void set_multiplication(bool value);
-			void set_division(bool value);
-			void set_power(bool value);
-			void set_sqrt(bool value);
-			void set_exp(bool value);
-			void set_pow10(bool value);
-			void set_ln(bool value);
-			void set_log10(bool value);
-			void set_log2(bool value);
-			void set_floor(bool value);
-			void set_ceil(bool value);
-			void set_abs(bool value);
-			void set_inv(bool value);
-			void set_x2(bool value);
-			void set_min(bool value);
-			void set_max(bool value);
-		 void set_sin(bool value);
-			void set_cos(bool value);
-			void set_tan(bool value);
-			void set_asin(bool value);
-			void set_acos(bool value);
-			void set_atan(bool value);
-		 void set_iflz(bool value);
-		 void set_ifalbcd(bool value);
+	double get_constants_double(long index);
 
-		 void init_operators();
+	long get_constants_type(void);
+	long get_constants_can_evolve(void);
+	double get_constants_mutation_max_deviation(void);
 
-		 bool is_training_data_a_classification_problem(void);
-		 bool is_test_data_a_classification_problem(void);
-		 bool is_validation_data_a_classification_problem(void);
+	void set_num_automatic_constants(long value);
+	void set_num_user_defined_constants(long value);
+	void set_min_constants_interval_double(double value);
+	void set_max_constants_interval_double(double value);
 
-		 void training_data_scale_to_interval_everywhere(double min, double max);
-		 void training_data_scale_to_interval_all_variables(double min, double max);
-		 void training_data_scale_to_interval_selected_col(double min, double max, int col);
+	void set_constants_double(long index, double value);
 
-		 int training_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
-		 int training_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
-		 int training_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
+	void set_constants_type(long value);
+	void  set_constants_can_evolve(long value);
+	void set_constants_mutation_max_deviation(double value);
 
-		 int training_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
-		 int training_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
-		 int training_data_find_symbol_everywhere(const char *find_what, bool use_regular);
+	void init_parameters(void);
+
+	bool get_addition(void);
+	bool get_subtraction(void);
+	bool get_multiplication(void);
+	bool get_division(void);
+	bool get_power(void);
+	bool get_sqrt(void);
+	bool get_exp(void);
+	bool get_pow10(void);
+	bool get_ln(void);
+	bool get_log10(void);
+	bool get_log2(void);
+	bool get_floor(void);
+	bool get_ceil(void);
+	bool get_abs(void);
+	bool get_inv(void);
+	bool get_x2(void);
+	bool get_min(void);
+	bool get_max(void);
+	bool get_sin(void);
+	bool get_cos(void);
+	bool get_tan(void);
+	bool get_asin(void);
+	bool get_acos(void);
+	bool get_atan(void);
+	bool get_iflz(void);
+	bool get_ifalbcd(void);
 
 
 
-		 void validation_data_scale_to_interval_everywhere(double min, double max);
-		 void validation_data_scale_to_interval_all_variables(double min, double max);
-		 void validation_data_scale_to_interval_selected_col(double min, double max, int col);
+	void set_addition(bool value);
+	void set_subtraction(bool value);
+	void set_multiplication(bool value);
+	void set_division(bool value);
+	void set_power(bool value);
+	void set_sqrt(bool value);
+	void set_exp(bool value);
+	void set_pow10(bool value);
+	void set_ln(bool value);
+	void set_log10(bool value);
+	void set_log2(bool value);
+	void set_floor(bool value);
+	void set_ceil(bool value);
+	void set_abs(bool value);
+	void set_inv(bool value);
+	void set_x2(bool value);
+	void set_min(bool value);
+	void set_max(bool value);
+	void set_sin(bool value);
+	void set_cos(bool value);
+	void set_tan(bool value);
+	void set_asin(bool value);
+	void set_acos(bool value);
+	void set_atan(bool value);
+	void set_iflz(bool value);
+	void set_ifalbcd(bool value);
 
-		 int validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
-		 int validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
-		 int validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
+	void init_operators();
 
-		 int validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
-		 int validation_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
-		 int validation_data_find_symbol_everywhere(const char *find_what, bool use_regular);
+	bool is_training_data_a_classification_problem(void);
+	bool is_test_data_a_classification_problem(void);
+	bool is_validation_data_a_classification_problem(void);
 
-		 void test_data_scale_to_interval_everywhere(double min, double max);
-		 void test_data_scale_to_interval_all_variables(double min, double max);
-		 void test_data_scale_to_interval_selected_col(double min, double max, int col);
+	void training_data_scale_to_interval_everywhere(double min, double max);
+	void training_data_scale_to_interval_all_variables(double min, double max);
+	void training_data_scale_to_interval_selected_col(double min, double max, int col);
 
-		 int test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
-		 int test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
-		 int test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
+	int training_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+	int training_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+	int training_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
 
-		 int test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
-		 int test_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
-		 int test_data_find_symbol_everywhere(const char *find_what, bool use_regular);
+	int training_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+	int training_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+	int training_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
-		 void training_data_shuffle(void);
 
-		 int move_training_data_to_validation(int count);
-		 int move_training_data_to_test(int count);
-		 int move_test_data_to_training(int count);
-		 int move_validation_data_to_training(int count);
 
-		 void clear(void);
+	void validation_data_scale_to_interval_everywhere(double min, double max);
+	void validation_data_scale_to_interval_all_variables(double min, double max);
+	void validation_data_scale_to_interval_selected_col(double min, double max, int col);
 
-		 double* get_training_data_row(int row);
-		 double* get_validation_data_row(int row);
-		 double* get_test_data_row(int row);
-		 //double** get_training_data_matrix(void);
+	int validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+	int validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+	int validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
 
-		 char* program_as_C(int run_index, bool simplified, double *inputs);
+	int validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+	int validation_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+	int validation_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
-		 int get_num_outputs(void);
-		 void init(void);
-		 int get_num_actual_variables(void);
-		 bool is_variable_utilized(int index);
-		 void set_variable_utilization(int index, bool value);
-		 bool is_project_modified(void);
+	void test_data_scale_to_interval_everywhere(double min, double max);
+	void test_data_scale_to_interval_all_variables(double min, double max);
+	void test_data_scale_to_interval_selected_col(double min, double max, int col);
 
-		 void set_problem_description(const char* value);
-		 char* get_problem_description(void);
+	int test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+	int test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+	int test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
+
+	int test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+	int test_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+	int test_data_find_symbol_everywhere(const char *find_what, bool use_regular);
+
+	void training_data_shuffle(void);
+
+	int move_training_data_to_validation(int count);
+	int move_training_data_to_test(int count);
+	int move_test_data_to_training(int count);
+	int move_validation_data_to_training(int count);
+
+	void clear(void);
+
+	double* get_training_data_row(int row);
+	double* get_validation_data_row(int row);
+	double* get_test_data_row(int row);
+	//double** get_training_data_matrix(void);
+
+	char* program_as_C(int run_index, bool simplified, double *inputs);
+
+	int get_num_outputs(void);
+	void init(void);
+	int get_num_actual_variables(void);
+	bool is_variable_utilized(int index);
+	void set_variable_utilization(int index, bool value);
+	bool is_project_modified(void);
+
+	void set_problem_description(const char* value);
+	char* get_problem_description(void);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;

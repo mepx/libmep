@@ -22,7 +22,7 @@ t_mep::t_mep()
 	strcpy(version, "2015.12.25.1");
 
 	num_operators = 0;
-	
+
 
 	cached_eval_matrix_double = NULL;
 	cached_sum_of_errors = NULL;
@@ -414,7 +414,7 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 		}
 	}
 	else
-	  return false;
+		return false;
 
 	return true;
 }
@@ -1444,7 +1444,7 @@ int t_mep::from_xml(const char* filename)
 	pugi::xml_node node = body_node.child("problem_description");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		
+
 		if (strlen(value_as_cstring)) {
 			problem_description = new char[strlen(value_as_cstring) + 1];
 			strcpy(problem_description, value_as_cstring);
@@ -1680,7 +1680,7 @@ void t_mep::get_list_of_used_variables(void)
 	}
 }
 //---------------------------------------------------------------------------
-double t_mep::get_mutation_probability(void)                   
+double t_mep::get_mutation_probability(void)
 {
 	return parameters.mutation_probability;
 }
@@ -2513,7 +2513,7 @@ int t_mep::training_data_replace_symbol_from_selected_col(const char *find_what,
 int t_mep::training_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular)
 {
 	if (_stopped) {
-		
+
 		int result = training_data.replace_symbol_from_all_variables(find_what, replace_with, use_regular);
 		if (result)
 			modified_project = true;
@@ -2628,7 +2628,7 @@ int t_mep::move_validation_data_to_training(int count)
 		return result;
 	}
 	else
-	  return false;
+		return false;
 }
 //---------------------------------------------------------------------------
 int t_mep::get_last_run_index(void)
@@ -2662,7 +2662,7 @@ char* t_mep::program_as_C(int run_index, bool simplified, double *inputs)
 /*
 double** t_mep::get_training_data_matrix(void)
 {
-	return training_data._data_double;
+return training_data._data_double;
 }
 */
 //---------------------------------------------------------------------------
@@ -2927,7 +2927,7 @@ double* t_mep::get_test_data_row(int row)
 }
 //---------------------------------------------------------------------------
 int t_mep::get_num_total_variables(void)
-{ 
+{
 	return num_total_variables;
 }
 //---------------------------------------------------------------------------
