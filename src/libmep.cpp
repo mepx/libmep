@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2015.12.19.0");
+	strcpy(version, "2015.12.25.0");
 
 	num_operators = 0;
 	//	data_type = DATA_DOUBLE;
@@ -1333,6 +1333,8 @@ int t_mep::from_xml(pugi::xml_node parent)
 				//actual_used_variables[i] = i;
 			}
 		}
+
+		get_list_of_used_variables();
 	}
 
 	node = parent.child("target_col");
@@ -2288,6 +2290,8 @@ int t_mep::load_training_data_from_csv(const char* file_name)
 			delete[] actual_used_variables;
 			actual_used_variables = NULL;
 		}
+
+		get_list_of_used_variables();
 	}
 
 	modified_project = true;
@@ -2480,7 +2484,7 @@ double* t_mep::get_training_data_row(int row)
 	return training_data._data_double[row];
 }
 //---------------------------------------------------------------------------
-char* t_mep::prg_to_C(int run_index, bool simplified, double *inputs)
+char* t_mep::program_as_C(int run_index, bool simplified, double *inputs)
 {
 	return stats[run_index].prg.to_C_double(simplified, inputs, parameters.problem_type);
 }
@@ -2497,9 +2501,6 @@ int t_mep::get_num_outputs(void)
 	return 1;
 }
 //---------------------------------------------------------------------------
-
-
-
 void t_mep::validation_data_to_numeric(void)
 {
 	modified_project = true;

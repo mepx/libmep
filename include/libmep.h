@@ -10,7 +10,6 @@
 #include "parameters_class.h"
 #include "data_class.h"
 #include "operators_class.h"
-#include "umystring.h"
 #include "chromosome_class.h"
 #include "mep_stats.h"
 #include "utils_mep.h"
@@ -393,7 +392,7 @@ public:
 		 double* get_test_data_row(int row);
 		 //double** get_training_data_matrix(void);
 
-		 char* prg_to_C(int run_index, bool simplified, double *inputs);
+		 char* program_as_C(int run_index, bool simplified, double *inputs);
 
 		 int get_num_outputs(void);
 		 void init(void);
