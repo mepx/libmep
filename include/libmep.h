@@ -109,6 +109,16 @@ private:
 
 	void get_list_of_used_variables(void);
 
+	void delete_sub_population(t_sub_population &pop);
+
+	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);
+
+
+	void fitness_regression(chromosome &Individual, double **);
+	void fitness_classification(chromosome &individual, double **, s_value_class *);
+	void fitness_classification_double_cache_all_training_data(chromosome &Individual, double **eval_double, s_value_class *);
+
+
 public:
 
 	t_mep();
@@ -151,39 +161,76 @@ public:
 	// returns a training data as double (if data type is 0)
 	// assumes that row and col are valid; no test for out of range are performed
 	double get_training_data_as_double(int row, int col);
-	// clears the training data internal structurs
+
+	// clears the training data internal structures
 	void clear_training_data(void);
 
+	// transform string values from training data to real values
 	void training_data_to_numeric(void);
 
-	//---------------------------------------------------------------------------
+
+	// loads the validation data from a csv file
 	int load_validation_data_from_csv(const char* file_name);
+
+	// saves the validation data to a csv files
 	int save_validation_data_to_csv(const char* file_name, char list_separator);
+
+	// returns the data type of the validation data: 
+	// 0 for real
+	// 1 for string
 	int get_validation_data_type(void);
+
+	// returns the number of columns of the validation data
 	int get_validation_data_num_columns(void);
+
+	// returns the number of validation data
 	int get_validation_data_num_rows(void);
+
+	// returns a validation data as string (if data type is 1)
 	// assumes that row and col are valid; no test for out of range are performed
 	char *get_validation_data_as_string(int row, int col);
+	
+	// returns a validation data as double (if data type is 0)
 	// assumes that row and col are valid; no test for out of range are performed
 	double get_validation_data_as_double(int row, int col);
-	// clears the training data internal structurs
+	
+	// clears the validation data internal structures
 	void clear_validation_data(void);
 
+	// transform string values from validation data to real values
 	void validation_data_to_numeric(void);
 
-	//---------------------------------------------------------------------------
+
+
+	// loads the test data from a csv file
 	int load_test_data_from_csv(const char* file_name);
+	
+	// saves the validation data to a csv files
 	int save_test_data_to_csv(const char* file_name, char list_separator);
+
+	// returns the data type of the test data: 
+	// 0 for real
+	// 1 for string
 	int get_test_data_type(void);
+
+	// returns the number of columns of the test data
 	int get_test_data_num_columns(void);
+
+	// returns the number of validation data
 	int get_test_data_num_rows(void);
+	
+	// returns a test data as string (if data type is 1)
 	// assumes that row and col are valid; no test for out of range are performed
 	char *get_test_data_as_string(int row, int col);
+	
+	// returns a test data as double (if data type is 0)
 	// assumes that row and col are valid; no test for out of range are performed
 	double get_test_data_as_double(int row, int col);
-	// clears the training data internal structurs
+
+	// clears the test data internal structurs
 	void clear_test_data(void);
 
+	// transform string values from validation data to real values
 	void test_data_to_numeric(void);
 	//---------------------------------------------------------------------------
 
@@ -192,93 +239,167 @@ public:
 
 	// starts the optimization process
 	int start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run);
-	double get_best_training_error(int run, int gen);
+
+	// returns the best training error
+	double get_best_training_error(int run, int generation);
+	
+	// returns the best validation error
 	double get_best_validation_error(int run);
-	double get_average_training_error(int run, int gen);
+
+	// returns the average (over the entire population) training error
+	double get_average_training_error(int run, int generation);
+
+	// returns the running time
 	double get_running_time(int run);
+
+	// returns the last generation of a given run (useful when the run has been stopped earlier)
 	int get_latest_generation(int run);
+
+	// returns the error on the test data
 	double get_test_error(int run);
 
-
+	// stops the optimization process
 	void stop(void);
 
-	void delete_sub_population(t_sub_population &pop);
+	// gets the best chromosome
 	void get_best(chromosome& dest);
 
+	// save statistics to csv file
 	int stats_to_csv(const char* file_name);
 
-
-
+	// gets the output obtaining by running the best program in a given run against in input
 	bool get_output(int run_index, double *inputs, double *outputs);
 
 	//void evolve_one_subpopulation_for_one_generation(t_sub_population &pop, double**, s_value_class *tmp_value_class);
 	//void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, t_parameters &params, double **training_data, int num_training_data, int num_variables, double ** eval_double, s_value_class *tmp_value_class);
-	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);
 
-
-	void fitness_regression(chromosome &Individual, double **);
-	void fitness_classification(chromosome &individual, double **, s_value_class *);
-	void fitness_classification_double_cache_all_training_data(chromosome &Individual, double **eval_double, s_value_class *);
 
 	void sort_stats_by_running_time(bool ascending);
 	void sort_stats_by_training_error(bool ascending);
 	void sort_stats_by_validation_error(bool ascending);
 	void sort_stats_by_test_error(bool ascending);
 
-
+	// saves everything to an xml file
 	int to_xml(const char* file_name);
+	
+	// saves everything to an xml file
 	int from_xml(const char* file_name);
 
+	// saves everything to a pugixml node
 	int to_pugixml_node(pugi::xml_node parent);
+	
+	// loads everything from a pugixml node
 	int from_pugixml_node(pugi::xml_node parent);
-
-
 
 public:
 
-	double get_mutation_probability(void);                   // mutation probability
-	double get_crossover_probability(void);               // crossover probability
-	long get_code_length(void);              // the number of genes
+	// returns the mutation probability
+	double get_mutation_probability(void);                   
 
-	long get_subpopulation_size(void);                 // the number of individuals in population  (must be an odd number!!!)
+	// returns crossover probability
+	double get_crossover_probability(void);               
+
+	// returns the length of a chromosome (the number of genes)
+	long get_code_length(void);              
+
+	// returns the number of individuals in a (sub)population
+	long get_subpopulation_size(void);                 
+
+	// returns the number of threads of the program. On each thread a subpopulation is evolved
 	long get_num_threads(void);
+
+	// returns the tournament size
 	long get_tournament_size(void);
+
+	// returns the number of generations
 	long get_num_generations(void);
-	long get_problem_type(void); // 0- regression, 1-classification
 
+	// returns the problem type
+	// 0 - symbolic regression, 
+	// 1 - classification
+	long get_problem_type(void); 
+
+	// returns the number of sub-populations
 	long get_num_subpopulations(void);
-	double get_operators_probability(void);
-	double get_variables_probability(void);
-	double get_constants_probability(void);
-	long get_use_validation_data(void);
-	long get_crossover_type(void);
 
+	// returns the probability of operators occurence
+	double get_operators_probability(void);
+
+	// returns the probability of variables occurence
+	double get_variables_probability(void);
+
+	// returns the probability of constants occurence
+	double get_constants_probability(void);
+
+	// returns true if the validation data is used
+	bool get_use_validation_data(void);
+
+	// returns the crossover type 
+	// 0 UNIFORM_CROSSOVER
+	// 1 ONE_CUTTING_POINT_CROSSOVER
+	int get_crossover_type(void);
+
+	// returns the seed for generating random numbers
 	long get_random_seed(void);
+
+	// returns the number of runs
 	long get_num_runs(void);
 
-	long get_simplified_programs(void);
+	// returns true if the programs are returned in the simplified form (introns are removed)
+	bool get_simplified_programs(void);
 
-	void set_mutation_probability(double value);                   // mutation probability
-	void set_crossover_probability(double value);               // crossover probability
-	void set_code_length(long value);              // the number of genes
+	// sets the mutation probability
+	void set_mutation_probability(double value);                   
 
-	void set_subpopulation_size(long value);                 // the number of individuals in population  (must be an odd number!!!)
+	// sets the crossover probability
+	void set_crossover_probability(double value);               
+
+	// sets the number of genes in a chromosome
+	void set_code_length(long value);          
+
+	// sets the number of individuals in population
+	void set_subpopulation_size(long value);                 
+
+	// sets the number of threads
 	void set_num_threads(long value);
+
+	// sets the tournament size
 	void set_tournament_size(long value);
+
+	// sets the number of generations
 	void set_num_generations(long value);
-	void set_problem_type(long value); // 0- regression, 1-classification
 
+	// sets the problem type
+	// 0- regression, 
+	// 1-classification
+	void set_problem_type(long value); 
+
+	// sets the number of subpopulations
 	void set_num_subpopulations(long value);
-	void set_operators_probability(double value);
-	void set_variables_probability(double value);
-	void set_constants_probability(double value);
-	void set_use_validation_data(long value);
-	void set_crossover_type(long value);
 
+	// sets the operators probability
+	void set_operators_probability(double value);
+
+	// sets the variables probability
+	void set_variables_probability(double value);
+
+	// sets the constants probability
+	void set_constants_probability(double value);
+
+	// sets the utilization of validation data
+	void set_use_validation_data(bool value);
+
+	// sets the crossover type
+	void set_crossover_type(int value);
+
+	// sets the random seed
 	void set_random_seed(long value);
+
+	// sets the number of runs
 	void set_num_runs(long value);
 
-	void set_simplified_programs(long value);
+	// sets the simplified programs parameters
+	void set_simplified_programs(bool value);
 
 
 	long get_num_automatic_constants(void);
@@ -412,14 +533,17 @@ public:
 	int move_test_data_to_training(int count);
 	int move_validation_data_to_training(int count);
 
-	void clear(void);
+	// clears everything
+	void clear_stats(void);
 
 	double* get_training_data_row(int row);
 	double* get_validation_data_row(int row);
 	double* get_test_data_row(int row);
 	//double** get_training_data_matrix(void);
 
+	// returns the chromosome as a C program
 	char* program_as_C(int run_index, bool simplified, double *inputs);
+
 
 	int get_num_outputs(void);
 	void init(void);
