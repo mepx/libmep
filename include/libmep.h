@@ -63,13 +63,15 @@ private:
 	int target_col;
 
 	int num_actual_variables;
-	int *variables_utilization;
+	bool *variables_utilization;
 
 	int *actual_used_variables;
 
 	bool modified_project;
 
 	char *problem_description;
+
+	bool cache_results_for_all_training_data;
 
 	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
 	long tournament(t_sub_population &pop);
@@ -78,8 +80,9 @@ private:
 	//void one_cut_point_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
 	//void mutation(chromosome &Individual); // mutate the individual
 
-	void fitness_regression_double(chromosome &Individual, double **);
-	void fitness_classification_double(chromosome &Individual, double**);
+	void fitness_regression_double_cache_all_training_data(chromosome &Individual, double **);
+	void fitness_classification_double_cache_all_training_data(chromosome &Individual, double**);
+	void fitness_regression_double(chromosome &Individual, double* eval_array_double, double *fitness_array);
 
 	void generate_random_individuals(void); // randomly initializes the individuals
 
@@ -111,19 +114,41 @@ public:
 	t_mep();
 	~t_mep();
 
-	int get_last_run_index(void);
-	char * get_version(void);
+	// returns the version of the library
+	const char * get_version(void);
 
+	// returns the index of the last run (if multiple runs are performed)
+	int get_last_run_index(void);
+
+	// returns the number of variables
 	int get_num_total_variables(void);
+
+	// sets the number of variables
 	void set_num_total_variables(int value);
 	//---------------------------------------------------------------------------
+
+	// loads the training data from a csv file
 	int load_training_data_from_csv(const char* file_name);
+
+	// saves the training data to a csv files
 	int save_training_data_to_csv(const char* file_name, char list_separator);
+
+	// returns the data type of the training data: 
+	// 0 for real
+	// 1 for string
 	int get_training_data_type(void);
+
+	// returns the number of columns of the training data
 	int get_training_data_num_columns(void);
+
+	// returns the number of training data
 	int get_training_data_num_rows(void);
+
+	// returns a training data as string (if data type is 1)
 	// assumes that row and col are valid; no test for out of range are performed
 	char *get_training_data_as_string(int row, int col);
+
+	// returns a training data as double (if data type is 0)
 	// assumes that row and col are valid; no test for out of range are performed
 	double get_training_data_as_double(int row, int col);
 	// clears the training data internal structurs
@@ -193,7 +218,7 @@ public:
 
 	void fitness_regression(chromosome &Individual, double **);
 	void fitness_classification(chromosome &individual, double **, s_value_class *);
-	void fitness_classification_double2(chromosome &Individual, double **eval_double, s_value_class *);
+	void fitness_classification_double_cache_all_training_data(chromosome &Individual, double **eval_double, s_value_class *);
 
 	void sort_stats_by_running_time(bool ascending);
 	void sort_stats_by_training_error(bool ascending);
@@ -405,6 +430,11 @@ public:
 
 	void set_problem_description(const char* value);
 	char* get_problem_description(void);
+
+	void set_cache_results_for_all_training_data(bool value);
+	bool get_cache_results_for_all_training_data(void);
+
+	long long get_memory_consumption(void);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;
