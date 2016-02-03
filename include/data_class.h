@@ -3,8 +3,8 @@
 
 #include "pugixml.hpp"
 
-#define DATA_DOUBLE 0
-#define DATA_STRING 1
+#define MEP_DATA_DOUBLE 0
+#define MEP_DATA_STRING 1
 
 //-----------------------------------------------------------------
 class t_data

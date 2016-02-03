@@ -58,7 +58,7 @@ void t_data::clear_data(void)
 	delete_data();
 	num_data = 0;
 	num_cols = 0;
-	data_type = DATA_DOUBLE;// double
+	data_type = MEP_DATA_DOUBLE;// double
 	num_targets = 1;
 }
 //-----------------------------------------------------------------
@@ -73,7 +73,7 @@ void t_data::init(void)
 
 	list_separator = ' ';
 
-	data_type = DATA_DOUBLE;// double
+	data_type = MEP_DATA_DOUBLE;// double
 	num_targets = 1;
 
 }
@@ -143,7 +143,7 @@ int t_data::from_xml(pugi::xml_node parent)
 		data_type = atoi(value_as_cstring);
 	}
 	else
-		data_type = DATA_DOUBLE;// double by default
+		data_type = MEP_DATA_DOUBLE;// double by default
 	/*
 	node = parent.child("has_missing_values");
 	if (node) {
@@ -161,7 +161,7 @@ int t_data::from_xml(pugi::xml_node parent)
 	else
 		list_separator = ' ';// blank space by default
 
-	if (data_type == DATA_DOUBLE) {
+	if (data_type == MEP_DATA_DOUBLE) {
 		if (num_data) {
 			_data_double = new double*[num_data];
 			for (int r = 0; r < num_data; r++)
@@ -183,7 +183,7 @@ int t_data::from_xml(pugi::xml_node parent)
 	if (!node_data)
 		return true;
 	int r = 0;
-	if (data_type == DATA_DOUBLE) {// double
+	if (data_type == MEP_DATA_DOUBLE) {// double
 		for (pugi::xml_node row = node_data.child("row"); row; row = row.next_sibling("row"), r++) {
 			const char *value_as_cstring = row.child_value();
 			int num_jumped_chars = 0;
@@ -462,7 +462,7 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 	char *buf = new char[10000];
 	char * start_buf = buf;
 
-	data_type = DATA_STRING;
+	data_type = MEP_DATA_STRING;
 	num_data = 0;
 
 	while (my_fgets(buf, 10000, f)) {
@@ -554,7 +554,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 	char * start_buf = buf;
 
 	num_data = 0;
-	data_type = DATA_DOUBLE;
+	data_type = MEP_DATA_DOUBLE;
 
 	while (my_fgets(buf, 10000, f)) {
 		long len = strlen(buf);
@@ -620,7 +620,7 @@ void t_data::to_numeric(void)
 	if (num_data) {
 		int *index_new_strings = new int[num_data];
 		//		int count_new_strings = 0;
-		if (data_type == DATA_STRING) {// string
+		if (data_type == MEP_DATA_STRING) {// string
 			if (_data_string) {
 
 				delete_double_data();
@@ -666,7 +666,7 @@ void t_data::to_numeric(void)
 
 		delete[] index_new_strings;
 	}
-	data_type = DATA_DOUBLE;
+	data_type = MEP_DATA_DOUBLE;
 }
 //-----------------------------------------------------------------
 int t_data::to_interval_everywhere(double min, double max)
@@ -682,7 +682,7 @@ int t_data::to_interval_everywhere(double min, double max)
 int t_data::to_interval_selected_col(double min, double max, int col)
 {
 	if (num_data)
-		if (data_type == DATA_DOUBLE) {// double
+		if (data_type == MEP_DATA_DOUBLE) {// double
 
 
 			double min_col = _data_double[0][col];
@@ -712,7 +712,7 @@ int t_data::to_interval_selected_col(double min, double max, int col)
 int t_data::to_interval_all_variables(double min, double max)
 {
 	if (num_data)
-		if (data_type == DATA_DOUBLE) {// double
+		if (data_type == MEP_DATA_DOUBLE) {// double
 			for (int v = 0; v < num_cols; v++) {
 				//is this numeric or alpha ?
 
@@ -752,7 +752,7 @@ int t_data::move_to(t_data *dest, int count)
 			dest->num_targets = num_targets;
 		}
         
-		if (data_type == DATA_DOUBLE) {// double
+		if (data_type == MEP_DATA_DOUBLE) {// double
 
 			double** tmp_data_double = new double*[dest->num_data + count];
 			for (int i = 0; i < dest->num_data; i++)
@@ -778,7 +778,7 @@ int t_data::move_to(t_data *dest, int count)
 				_data_double = NULL;
 			}
 
-			dest->data_type = DATA_DOUBLE;
+			dest->data_type = MEP_DATA_DOUBLE;
 		}
 		else {// string
 			char*** tmp_data_string = new char**[dest->num_data + count];
@@ -805,7 +805,7 @@ int t_data::move_to(t_data *dest, int count)
 				_data_string = NULL;
 			}
 
-			dest->data_type = DATA_STRING;
+			dest->data_type = MEP_DATA_STRING;
 		}
 
 
@@ -832,7 +832,7 @@ bool re_match(char *str, const char *pattern, bool use_regular)
 int t_data::replace_symbol_from_selected_col(const char *s_find_what, const char* s_replace_with, int col, bool use_regular)
 {
 	int count_replaced = 0;
-	if (data_type == DATA_STRING) { // string
+	if (data_type == MEP_DATA_STRING) { // string
 		for (int t = 0; t < num_data; t++)
 			if (re_match(_data_string[t][col], s_find_what, use_regular)) {
 				// this is a missing value
@@ -841,7 +841,7 @@ int t_data::replace_symbol_from_selected_col(const char *s_find_what, const char
 			}
 	}
 	else
-		if (data_type == DATA_DOUBLE) { // double
+		if (data_type == MEP_DATA_DOUBLE) { // double
 			// try to convert them to double
 			char* pEnd;
 			double d_find_what;
@@ -874,7 +874,7 @@ int  t_data::replace_symbol_everywhere(const char *s_find_what, const char* s_re
 int  t_data::replace_symbol_from_all_variables(const char *s_find_what, const char* s_replace_with, bool use_regular)
 {
 	int count_replaced = 0;
-	if (data_type == DATA_STRING) { // string
+	if (data_type == MEP_DATA_STRING) { // string
 		for (int col = 0; col < num_cols - 1; col++)
 			for (int t = 0; t < num_data; t++)
 				if (re_match(_data_string[t][col], s_find_what, use_regular)) {
@@ -884,7 +884,7 @@ int  t_data::replace_symbol_from_all_variables(const char *s_find_what, const ch
 				}
 	}
 	else
-		if (data_type == DATA_DOUBLE) { // double
+		if (data_type == MEP_DATA_DOUBLE) { // double
 			// try to convert them to double
 			char* pEnd;
 			double d_find_what;
@@ -907,7 +907,7 @@ int  t_data::replace_symbol_from_all_variables(const char *s_find_what, const ch
 int t_data::find_symbol_from_selected_col(const char *s_find_what, int col, bool use_regular)
 {
 	int count_found = 0;
-	if (data_type == DATA_STRING) { // string
+	if (data_type == MEP_DATA_STRING) { // string
 		for (int t = 0; t < num_data; t++)
 			if (re_match(_data_string[t][col], s_find_what, use_regular)) {
 				// this is a missing value
@@ -915,7 +915,7 @@ int t_data::find_symbol_from_selected_col(const char *s_find_what, int col, bool
 			}
 	}
 	else
-		if (data_type == DATA_DOUBLE) { // double
+		if (data_type == MEP_DATA_DOUBLE) { // double
 			// try to convert them to double
 			char* pEnd;
 			double d_find_what;
@@ -946,7 +946,7 @@ int t_data::find_symbol_from_all_variables(const char *s_find_what, bool use_reg
 {
 	int count_found;
 	count_found = 0;
-	if (data_type == DATA_STRING) { // string
+	if (data_type == MEP_DATA_STRING) { // string
 		for (int col = 0; col < num_cols - 1; col++)
 			for (int t = 0; t < num_data; t++)
 				if (re_match(_data_string[t][col], s_find_what, use_regular)) {
@@ -956,7 +956,7 @@ int t_data::find_symbol_from_all_variables(const char *s_find_what, bool use_reg
 				}
 	}
 	else
-		if (data_type == DATA_DOUBLE) { // double
+		if (data_type == MEP_DATA_DOUBLE) { // double
 			// try to convert them to double
 			char* pEnd;
 			double d_find_what;
@@ -975,7 +975,7 @@ int t_data::find_symbol_from_all_variables(const char *s_find_what, bool use_reg
 //-----------------------------------------------------------------
 void t_data::shuffle(void)
 {
-	if (data_type == DATA_DOUBLE) { // double
+	if (data_type == MEP_DATA_DOUBLE) { // double
 		for (int i = num_data - 1; i >= 1; i--){
 			int j = rand() % (i + 1);
 			double *row = _data_double[i];
