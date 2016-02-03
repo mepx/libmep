@@ -1877,12 +1877,12 @@ double t_mep::get_constants_probability(void)
 	return parameters.constants_probability;
 }
 //---------------------------------------------------------------------------
-long t_mep::get_use_validation_data(void)
+bool t_mep::get_use_validation_data(void)
 {
 	return parameters.use_validation_data;
 }
 //---------------------------------------------------------------------------
-long t_mep::get_crossover_type(void)
+int t_mep::get_crossover_type(void)
 {
 	return parameters.crossover_type;
 }
@@ -1897,7 +1897,7 @@ long t_mep::get_num_runs(void)
 	return parameters.num_runs;
 }
 //---------------------------------------------------------------------------
-long t_mep::get_simplified_programs(void)
+bool t_mep::get_simplified_programs(void)
 {
 	return parameters.simplified_programs;
 }
@@ -1999,7 +1999,7 @@ void t_mep::set_constants_probability(double value)
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep::set_use_validation_data(long value)
+void t_mep::set_use_validation_data(bool value)
 {
 	if (_stopped) {
 		parameters.use_validation_data = value;
@@ -2007,7 +2007,7 @@ void t_mep::set_use_validation_data(long value)
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep::set_crossover_type(long value)
+void t_mep::set_crossover_type(int value)
 {
 	if (_stopped) {
 		parameters.crossover_type = value;
@@ -2031,7 +2031,7 @@ void t_mep::set_num_runs(long value)
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep::set_simplified_programs(long value)
+void t_mep::set_simplified_programs(bool value)
 {
 	if (_stopped) {
 		parameters.simplified_programs = value;
@@ -2773,7 +2773,7 @@ int t_mep::get_last_run_index(void)
 	return last_run_index;
 }
 //---------------------------------------------------------------------------
-void t_mep::clear(void)
+void t_mep::clear_stats(void)
 {
 	if (_stopped) {
 		modified_project = true;
@@ -3164,5 +3164,7 @@ long long t_mep::get_memory_consumption(void)
 {
 	// for chromosomes
 	long long chromosomes_memory = 0;
+
+	return 0;
 }
 //---------------------------------------------------------------------------
