@@ -27,13 +27,13 @@ public:
     
 	long num_subpopulations;
 	double operators_probability, variables_probability, constants_probability;
-	int use_validation_data;
+	bool use_validation_data;
 	int crossover_type;
 
 	long random_seed;
 	long num_runs;
 
-	int simplified_programs;
+	bool simplified_programs;
 
 	t_constants constants;
 
