@@ -76,10 +76,6 @@ private:
 	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
 	long tournament(t_sub_population &pop);
 
-	//   void uniform_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
-	//void one_cut_point_crossover(const chromosome &parent1, const chromosome &parent2, chromosome &offspring1, chromosome &offspring2);
-	//void mutation(chromosome &Individual); // mutate the individual
-
 	void fitness_regression_double_cache_all_training_data(chromosome &Individual, double **);
 	void fitness_classification_double_cache_all_training_data(chromosome &Individual, double**);
 	void fitness_regression_double(chromosome &Individual, double* eval_array_double, double *fitness_array);
@@ -89,7 +85,6 @@ private:
 	double compute_validation_error(int *, int*, double **eval_double);
 
 	void allocate_sub_population(t_sub_population &pop);
-	void ReadTrainingData(void);
 
 	void allocate_values(double ****, s_value_class***);
 	void delete_values(double ****, s_value_class***);
@@ -401,163 +396,395 @@ public:
 	// sets the simplified programs parameters
 	void set_simplified_programs(bool value);
 
-
+	// returns the number of automatic constants
 	long get_num_automatic_constants(void);
+
+	// returns the number of user defined constants
 	long get_num_user_defined_constants(void);
+
+	// returns the min interval for automatic constants
 	double get_min_constants_interval_double(void);
+
+	// returns the max interval for automatic constants
 	double get_max_constants_interval_double(void);
 
+	// returns a constant
 	double get_constants_double(long index);
 
+	// returns the constants type
+	// 0 - USER_DEFINED_CONSTANTS
+	// 1- AUTOMATIC_CONSTANTS
 	long get_constants_type(void);
-	long get_constants_can_evolve(void);
+
+	// returns true if the constants can evolve
+	bool get_constants_can_evolve(void);
+
+	// returns the max deviation within which the constants can evolve
 	double get_constants_mutation_max_deviation(void);
 
+	// sets the number of automatically generated constants
 	void set_num_automatic_constants(long value);
+
+	// sets the number of user defined constants
 	void set_num_user_defined_constants(long value);
+
+	// sets the lower bound of the constants interval
 	void set_min_constants_interval_double(double value);
+	
+	// sets the upper bound of the constants interval
 	void set_max_constants_interval_double(double value);
 
+	// sets a particular user-defined constant
 	void set_constants_double(long index, double value);
 
+	// sets the constants type
+	// 0 - USER_DEFINED_CONSTANTS
+	// 1- AUTOMATIC_CONSTANTS
 	void set_constants_type(long value);
-	void  set_constants_can_evolve(long value);
+
+	// sets if the constants can evolve
+	void  set_constants_can_evolve(bool value);
+
+	// sets the max deviation when constants can evolve
 	void set_constants_mutation_max_deviation(double value);
 
+	// initialize the parameters
 	void init_parameters(void);
 
+	// returns true if the addition operator is enabled
 	bool get_addition(void);
+	
+	// returns true if the subtraction operator is enabled
 	bool get_subtraction(void);
+	
+	// returns true if the multiplication operator is enabled
 	bool get_multiplication(void);
+	
+	// returns true if the division operator is enabled
 	bool get_division(void);
+	
+	// returns true if the power operator is enabled
 	bool get_power(void);
+	
+	// returns true if the sqrt operator is enabled
 	bool get_sqrt(void);
+	
+	// returns true if the exp operator is enabled
 	bool get_exp(void);
+	
+	// returns true if the pow10 operator is enabled
 	bool get_pow10(void);
+	
+	// returns true if the ln (natural logarithm) operator is enabled
 	bool get_ln(void);
+	
+	// returns true if the log10 (log in base 10) operator is enabled
 	bool get_log10(void);
+
+	// returns true if the log2 (log in base 2) operator is enabled
 	bool get_log2(void);
+	
+	// returns true if the floor operator is enabled
 	bool get_floor(void);
+	
+	// returns true if the ceil operator is enabled
 	bool get_ceil(void);
+	
+	// returns true if the absolute operator is enabled
 	bool get_abs(void);
+	
+	// returns true if the inv (1/x) operator is enabled
 	bool get_inv(void);
+	
+	// returns true if the x^2 operator is enabled
 	bool get_x2(void);
+	
+	// returns true if the min (x, y) operator is enabled
 	bool get_min(void);
+	
+	// returns true if the max(x, y) operator is enabled
 	bool get_max(void);
+	
+	// returns true if the sin operator is enabled
 	bool get_sin(void);
+	
+	// returns true if the cos operator is enabled
 	bool get_cos(void);
+	
+	// returns true if the tan operator is enabled
 	bool get_tan(void);
+	
+	// returns true if the asin operator is enabled
 	bool get_asin(void);
+	
+	// returns true if the acos operator is enabled
 	bool get_acos(void);
+	
+	// returns true if the atan operator is enabled
 	bool get_atan(void);
+	
+	// returns true if the "if lower than zero" operator is enabled
 	bool get_iflz(void);
+	
+	// returns true if the "if a lower than b returns c else returns d" operator is enabled
 	bool get_ifalbcd(void);
 
 
-
+	// sets if the addition operator is enabled or not
 	void set_addition(bool value);
+	
+	// sets if the subtraction operator is enabled or not
 	void set_subtraction(bool value);
+
+	// sets if the multiplication operator is enabled or not
 	void set_multiplication(bool value);
+
+	// sets if the division operator is enabled or not
 	void set_division(bool value);
+
+	// sets if the power operator is enabled or not
 	void set_power(bool value);
+
+	// sets if the sqrt operator is enabled or not
 	void set_sqrt(bool value);
+
+	// sets if the exp operator is enabled or not
 	void set_exp(bool value);
+
+	// sets if the pow10 operator is enabled or not
 	void set_pow10(bool value);
+
+	// sets if the ln operator is enabled or not
 	void set_ln(bool value);
+
+	// sets if the log10 operator is enabled or not
 	void set_log10(bool value);
+
+	// sets if the log2 operator is enabled or not
 	void set_log2(bool value);
+
+	// sets if the floor operator is enabled or not
 	void set_floor(bool value);
+
+	// sets if the ceil operator is enabled or not
 	void set_ceil(bool value);
+
+	// sets if the abs operator is enabled or not
 	void set_abs(bool value);
+
+	// sets if the inv (1/x) operator is enabled or not
 	void set_inv(bool value);
+
+	// sets if the x^2 operator is enabled or not
 	void set_x2(bool value);
+
+	// sets if the min operator is enabled or not
 	void set_min(bool value);
+
+	// sets if the max operator is enabled or not
 	void set_max(bool value);
+
+	// sets if the sin operator is enabled or not
 	void set_sin(bool value);
+	
+	// sets if the cos operator is enabled or not
 	void set_cos(bool value);
+	
+	// sets if the tan operator is enabled or not
 	void set_tan(bool value);
+	
+	// sets if the asin operator is enabled or not
 	void set_asin(bool value);
+	
+	// sets if the acos operator is enabled or not
 	void set_acos(bool value);
+	
+	// sets if the atan operator is enabled or not
 	void set_atan(bool value);
+	
+	// sets if the "if less than zero" operator is enabled or not
 	void set_iflz(bool value);
+	
+	// sets if the "if a lower than b returns c else returns d" operator is enabled or not
 	void set_ifalbcd(bool value);
 
+	// initialize operators
 	void init_operators();
 
+	// returns true if the training data is a classification problem (last column has only 0 and 1)
 	bool is_training_data_a_classification_problem(void);
+
+	// returns true if the test data is a classification problem (last column has only 0 and 1)
 	bool is_test_data_a_classification_problem(void);
+
+	// returns true if the validation data is a classification problem (last column has only 0 and 1)
 	bool is_validation_data_a_classification_problem(void);
 
+	// scale all training data to [min, max] interval
 	void training_data_scale_to_interval_everywhere(double min, double max);
+
+	// scale all training data variables to [min, max] interval
 	void training_data_scale_to_interval_all_variables(double min, double max);
+
+	// scale the selected training data column to [min, max] interval
 	void training_data_scale_to_interval_selected_col(double min, double max, int col);
 
+	// replace a given string in the training data column
+	// returns the number of replacements
 	int training_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+	
+	// replace a given string in all variables of the training data matrix
+	// returns the number of replacements
 	int training_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+
+	// replace a given string everywhere in the training data matrix
+	// returns the number of replacements
 	int training_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
 
+	// searches for a string in a particular col of the training matrix
+	// returns the number of findings
 	int training_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+	
+	// searches for a string in all variables of the training matrix
+	// returns the number of findings
 	int training_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+	
+	// searches for a string in all training matrix
+	// returns the number of findings
 	int training_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
 
-
+	// scale all validation data to [min, max] interval
 	void validation_data_scale_to_interval_everywhere(double min, double max);
+
+	// scale all validation data variables to [min, max] interval
 	void validation_data_scale_to_interval_all_variables(double min, double max);
+
+	// scale the selected validation data column to [min, max] interval
 	void validation_data_scale_to_interval_selected_col(double min, double max, int col);
 
+	// replace a given string in the validation data column
+	// returns the number of replacements
 	int validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+
+	// replace a given string in all variables of the validation data matrix
+	// returns the number of replacements
 	int validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+
+	// replace a given string everywhere in the validation data matrix
+	// returns the number of replacements
 	int validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
 
+	// searches for a string in a particular col of the validation matrix
+	// returns the number of findings
 	int validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+
+	// searches for a string in all variables of the validation matrix
+	// returns the number of findings
 	int validation_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+
+	// searches for a string in all validation matrix
+	// returns the number of findings
 	int validation_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
+	// scale all test data to [min, max] interval
 	void test_data_scale_to_interval_everywhere(double min, double max);
+
+	// scale all test data variables to [min, max] interval
 	void test_data_scale_to_interval_all_variables(double min, double max);
+
+	// scale the selected test data column to [min, max] interval
 	void test_data_scale_to_interval_selected_col(double min, double max, int col);
 
+	// replace a given string in the test data column
+	// returns the number of replacements
 	int test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
+
+	// replace a given string in all variables of the test data matrix
+	// returns the number of replacements
 	int test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
+
+	// replace a given string everywhere in the training data matrix
+	// returns the number of replacements
 	int test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
 
+	// searches for a string in a particular col of the test matrix
+	// returns the number of findings
 	int test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
+
+	// searches for a string in all variables of the test matrix
+	// returns the number of findings
 	int test_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
+
+	// searches for a string in all test matrix
+	// returns the number of findings
 	int test_data_find_symbol_everywhere(const char *find_what, bool use_regular);
 
+	// randomly re-arrange rows of the training matrix
 	void training_data_shuffle(void);
 
-	int move_training_data_to_validation(int count);
-	int move_training_data_to_test(int count);
-	int move_test_data_to_training(int count);
-	int move_validation_data_to_training(int count);
+	// moves rows_count rows from training matrix to validation matrix
+	int move_training_data_to_validation(int rows_count);
+	
+	// moves rows_count rows from training matrix to test matrix
+	int move_training_data_to_test(int rows_count);
+	
+	// moves rows_count rows from test matrix to training matrix
+	int move_test_data_to_training(int rows_count);
+	
+	// moves rows_count rows from validation matrix to training matrix
+	int move_validation_data_to_training(int rows_count);
 
 	// clears everything
 	void clear_stats(void);
 
+	// returns an entire row of the training matrix
 	double* get_training_data_row(int row);
+
+	// returns an entire row of the validation matrix
 	double* get_validation_data_row(int row);
+
+	// returns an entire row of the test matrix
 	double* get_test_data_row(int row);
+
 	//double** get_training_data_matrix(void);
 
 	// returns the chromosome as a C program
 	char* program_as_C(int run_index, bool simplified, double *inputs);
 
-
+	// returns the number of outputs of the program/
+	// currently only problems with 1 output are handled
 	int get_num_outputs(void);
+
+	// init operators, parameters and clears all data
 	void init(void);
+
+	// returns the number of enabled variables
 	int get_num_actual_variables(void);
+
+	// returns true if a particular variable is enable
 	bool is_variable_utilized(int index);
-	void set_variable_utilization(int index, bool value);
+
+	// sets if a particular variable is enabled or not
+	void set_variable_utilization(int index, bool new_state);
+
+	// returns true if the project has been modified
 	bool is_project_modified(void);
 
+	// sets the problem description
 	void set_problem_description(const char* value);
+
+	// returns the problem description
 	char* get_problem_description(void);
 
-	void set_cache_results_for_all_training_data(bool value);
-	bool get_cache_results_for_all_training_data(void);
+	// sets if the results are cached for all training data
+	// caching will speed up the process, but will take much more memmory
+	void set_enable_cache_results_for_all_training_data(bool value);
 
+	// gets if the results are cached for all training data
+	bool get_enable_cache_results_for_all_training_data(void);
+
+	// returns the memmory consumption in bytes
 	long long get_memory_consumption(void);
 };
 //-----------------------------------------------------------------

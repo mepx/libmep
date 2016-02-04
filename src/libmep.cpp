@@ -2069,7 +2069,7 @@ long t_mep::get_constants_type(void)
 	return parameters.constants.constants_type;
 }
 //---------------------------------------------------------------------------
-long t_mep::get_constants_can_evolve(void)
+bool t_mep::get_constants_can_evolve(void)
 {
 	return parameters.constants.constants_can_evolve;
 }
@@ -2136,7 +2136,7 @@ void t_mep::set_constants_type(long value)
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep::set_constants_can_evolve(long value)
+void t_mep::set_constants_can_evolve(bool value)
 {
 	if (_stopped) {
 		parameters.constants.constants_can_evolve = value;
@@ -3149,13 +3149,13 @@ char* t_mep::get_problem_description(void)
 	return problem_description;
 }
 //---------------------------------------------------------------------------
-void t_mep::set_cache_results_for_all_training_data(bool value)
+void t_mep::set_enable_cache_results_for_all_training_data(bool value)
 {
 	if (_stopped)
 	  cache_results_for_all_training_data = value;
 }
 //---------------------------------------------------------------------------
-bool t_mep::get_cache_results_for_all_training_data(void)
+bool t_mep::get_enable_cache_results_for_all_training_data(void)
 {
 	return cache_results_for_all_training_data;
 }
