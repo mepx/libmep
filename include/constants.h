@@ -4,7 +4,7 @@
 #include "pugixml.hpp"
 
 #define USER_DEFINED_CONSTANTS 0
-#define PROGRAM_GENERATED_CONSTANTS 1
+#define AUTOMATIC_CONSTANTS 1
 
 //-----------------------------------------------------------------
 class t_constants{
@@ -16,7 +16,7 @@ public:
 	double *constants_double;
 
 	long constants_type;
-	long constants_can_evolve;
+	bool constants_can_evolve;
 	double constants_mutation_max_deviation;
 
 	t_constants(void);
