@@ -257,11 +257,11 @@ char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 		if (problem_type == PROBLEM_REGRESSION)
 			sprintf(tmp_s, "  outputs[0] = prg[%d];", num_utilized - 1);
 		else
-			sprintf(tmp_s, "  if (prg[%d] < %lf)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", num_utilized - 1, best_class_threshold);
+			sprintf(tmp_s, "  if (prg[%d] <= %lf)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", num_utilized - 1, best_class_threshold);
 
 		strcat(prog, tmp_s);
 	}
-	else{
+	else{// not simplified
 		strcat(prog, "  double prg[");
 		sprintf(tmp_s, "%ld", code_length);
 		strcat(prog, tmp_s);
@@ -297,7 +297,7 @@ char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 			sprintf(tmp_s, "  outputs[0] = prg[%d];", best);
 		else{
 			//            wxLogDebug(wxString() << best << " " << best_class_threshold);
-			sprintf(tmp_s, "  if (prg[%d] < %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", best, best_class_threshold);
+			sprintf(tmp_s, "  if (prg[%d] <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", best, best_class_threshold);
 			//          wxLogDebug(wxString(tmp_s));
 		}
 
