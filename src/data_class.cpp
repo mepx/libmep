@@ -255,8 +255,10 @@ int t_data::to_xml(pugi::xml_node parent)
 	tmp_str[1] = 0;
 	data.set_value(tmp_str);
 
-	if (!num_data || !num_cols)
+	if (!num_data || !num_cols) {
+		delete[] tmp_str;
 		return true;
+	}
 
 	for (int c = 0; c < num_cols; c++) {
 	}
@@ -270,7 +272,7 @@ int t_data::to_xml(pugi::xml_node parent)
 			tmp_str[0] = 0;
 			for (int c = 0; c < num_cols; c++) {
 				char tmp_s[30];
-				sprintf(tmp_s, "%lf", this->_data_double[r][c]);
+				sprintf(tmp_s, "%lg", this->_data_double[r][c]);
 				strcat(tmp_str, tmp_s);
 				strcat(tmp_str, " ");
 			}
@@ -343,7 +345,7 @@ bool t_data::to_csv(const char *filename, char list_separator)
 		return false;
 	for (int d = 0; d < num_data; d++) {
 		for (int v = 0; v < num_cols; v++)
-			fprintf(f, "%lf%c", _data_double[d][v], list_separator);
+			fprintf(f, "%lg%c", _data_double[d][v], list_separator);
 	}
 
 	fclose(f);

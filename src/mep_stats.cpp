@@ -36,14 +36,14 @@ int t_mep_stat::to_xml(pugi::xml_node parent)
 	char tmp_str[100];
 	pugi::xml_node node = parent.append_child("running_time");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", running_time);
+	sprintf(tmp_str, "%lg", running_time);
 	data.set_value(tmp_str);
 
 	pugi::xml_node best_training_error_node = parent.append_child("best_training_error");
 	for (int g = 0; g <= last_gen; g++){
 		pugi::xml_node node = best_training_error_node.append_child("e");
 		pugi::xml_node data = node.append_child(pugi::node_pcdata);
-		sprintf(tmp_str, "%lf", best_training_error[g]);
+		sprintf(tmp_str, "%lg", best_training_error[g]);
 		data.set_value(tmp_str);
 	}
 
@@ -51,18 +51,18 @@ int t_mep_stat::to_xml(pugi::xml_node parent)
 	for (int g = 0; g <= last_gen; g++){
 		pugi::xml_node node = average_training_error_node.append_child("e");
 		pugi::xml_node data = node.append_child(pugi::node_pcdata);
-		sprintf(tmp_str, "%lf", average_training_error[g]);
+		sprintf(tmp_str, "%lg", average_training_error[g]);
 		data.set_value(tmp_str);
 	}
 
 	node = parent.append_child("best_validation_error");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", best_validation_error);
+	sprintf(tmp_str, "%lg", best_validation_error);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("test_error");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", test_error);
+	sprintf(tmp_str, "%lg", test_error);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("last_generation");

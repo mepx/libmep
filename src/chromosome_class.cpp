@@ -364,7 +364,7 @@ int chromosome::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("error");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", fit);
+	sprintf(tmp_str, "%lg", fit);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("binary_classification_threshold");
@@ -388,7 +388,7 @@ int chromosome::to_xml(pugi::xml_node parent)
 			tmp_cst_str = new char[num_constants * 30]; // 30 digits for each constant !!!
 			tmp_cst_str[0] = 0;
 			for (int c = 0; c < num_constants; c++){
-				sprintf(tmp_s, "%lf", constants_double[c]);
+				sprintf(tmp_s, "%lg", constants_double[c]);
 				strcat(tmp_cst_str, tmp_s);
 				strcat(tmp_cst_str, " ");
 			}

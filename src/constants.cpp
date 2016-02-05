@@ -46,12 +46,12 @@ int t_constants::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("min_interval");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", min_constants_interval_double);
+	sprintf(tmp_str, "%lg", min_constants_interval_double);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("max_interval");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", max_constants_interval_double);
+	sprintf(tmp_str, "%lg", max_constants_interval_double);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("evolve");
@@ -61,7 +61,7 @@ int t_constants::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("stddev");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", constants_mutation_max_deviation);
+	sprintf(tmp_str, "%lg", constants_mutation_max_deviation);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_user_defined_constants");
@@ -80,7 +80,7 @@ int t_constants::to_xml(pugi::xml_node parent)
 			tmp_cst_str = new char[num_user_defined_constants * 30]; // 30 digits for each constant !!!
 			tmp_cst_str[0] = 0;
 			for (int c = 0; c < num_user_defined_constants; c++){
-				sprintf(tmp_s, "%lf", constants_double[c]);
+				sprintf(tmp_s, "%lg", constants_double[c]);
 				strcat(tmp_cst_str, tmp_s);
 				strcat(tmp_cst_str, " ");
 			}
@@ -136,7 +136,7 @@ int t_constants::from_xml(pugi::xml_node parent)
 	if (node)
 	{
 		const char *value_as_cstring = node.child_value();
-		constants_can_evolve = atoi(value_as_cstring);
+		constants_can_evolve = (bool)atoi(value_as_cstring);
 	}
 
 	node = parent.child("num_user_defined_constants");

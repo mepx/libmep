@@ -33,15 +33,15 @@ void t_parameters::init (void)
 //---------------------------------------------------------------------------
 int t_parameters::to_xml(pugi::xml_node parent)
 {
-    char tmp_str[10];
+    char tmp_str[30];
 	pugi::xml_node node = parent.append_child("mutation_probability");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", mutation_probability);
+	sprintf(tmp_str, "%lg", mutation_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("crossover_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", crossover_probability);
+	sprintf(tmp_str, "%lg", crossover_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("crossover_type");
@@ -86,17 +86,17 @@ int t_parameters::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("operators_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", operators_probability);
+	sprintf(tmp_str, "%lg", operators_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("variables_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", variables_probability);
+	sprintf(tmp_str, "%lg", variables_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("constants_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lf", constants_probability);
+	sprintf(tmp_str, "%lg", constants_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_runs");
