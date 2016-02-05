@@ -13,7 +13,7 @@
 
 #define MAX_ROW_CHARS 1000000
 
-char *possible_chars = "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|";
+char possible_chars[] = "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|";
 //-----------------------------------------------------------------
 t_data::t_data(void)
 {
