@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.01.19.0");
+	strcpy(version, "2016.02.05.0");
 
 	num_operators = 0;
 
@@ -46,7 +46,6 @@ t_mep::t_mep()
 //---------------------------------------------------------------------------
 t_mep::~t_mep()
 {
-	//	DeletePopulation();
 	if (actual_used_variables) {
 		delete[] actual_used_variables;
 		actual_used_variables = NULL;
@@ -1376,7 +1375,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 int t_mep::to_pugixml_node(pugi::xml_node parent)
 {
 	// utilized variables
-	char tmp_str[10000];
+
 
 	pugi::xml_node training_node = parent.append_child("training");
 	training_data.to_xml(training_node);
@@ -1386,6 +1385,9 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 	test_data.to_xml(testing_node);
 
 	if (variables_enabled) {
+        
+        	char *tmp_str = new char[training_data.num_cols * 2 + 10];
+        
 		pugi::xml_node utilized_variables_node = parent.append_child("variables_utilization");
 
 		tmp_str[0] = 0;
@@ -1397,13 +1399,15 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 		}
 		pugi::xml_node utilized_variables_data_node = utilized_variables_node.append_child(pugi::node_pcdata);
 		utilized_variables_data_node.set_value(tmp_str);
+        
+        delete [] tmp_str;
 	}
-
+/*
 	pugi::xml_node target_col_node = parent.append_child("target_col");
 	pugi::xml_node target_col_data_node = target_col_node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", target_col);
 	target_col_data_node.set_value(tmp_str);
-
+*/
 	pugi::xml_node parameters_node = parent.append_child("parameters");
 	parameters.to_xml(parameters_node);
 	pugi::xml_node operators_node = parent.append_child("operators");
