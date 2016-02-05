@@ -1133,6 +1133,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 //---------------------------------------------------------------------------
 int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run)
 {
+	_stopped = false;
 	pop = new t_sub_population[parameters.num_subpopulations];
 	for (int i = 0; i < parameters.num_subpopulations; i++)
 		allocate_sub_population(pop[i]);
@@ -1243,7 +1244,6 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation)       // Steady-State MEP
 {
 	srand(run + parameters.random_seed);
-	_stopped = false;
 
 	//clock_t start_time = clock();
 	time_t start_time;
