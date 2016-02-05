@@ -32,7 +32,7 @@ t_mep::t_mep()
 	_stopped = true;
 	last_run_index = -1;
 
-	variables_utilization = NULL;
+	variables_enabled = NULL;
 	actual_used_variables = NULL;
 	num_actual_variables = 0;
 	num_total_variables = 0;
@@ -51,9 +51,9 @@ t_mep::~t_mep()
 		delete[] actual_used_variables;
 		actual_used_variables = NULL;
 	}
-	if (variables_utilization) {
-		delete[] variables_utilization;
-		variables_utilization = NULL;
+	if (variables_enabled) {
+		delete[] variables_enabled;
+		variables_enabled = NULL;
 	}
 
 	if (stats) {
@@ -1385,13 +1385,13 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 	pugi::xml_node testing_node = parent.append_child("test");
 	test_data.to_xml(testing_node);
 
-	if (variables_utilization) {
+	if (variables_enabled) {
 		pugi::xml_node utilized_variables_node = parent.append_child("variables_utilization");
 
 		tmp_str[0] = 0;
 		for (int v = 0; v < training_data.num_cols - 1; v++) {
 			char tmp_s[30];
-			sprintf(tmp_s, "%d", variables_utilization[v]);
+			sprintf(tmp_s, "%d", variables_enabled[v]);
 			strcat(tmp_str, tmp_s);
 			strcat(tmp_str, " ");
 		}
@@ -1428,9 +1428,9 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	actual_used_variables = NULL;
 	}
 	*/
-	if (variables_utilization) {
-		delete[] variables_utilization;
-		variables_utilization = NULL;
+	if (variables_enabled) {
+		delete[] variables_enabled;
+		variables_enabled = NULL;
 	}
 
 	pugi::xml_node node = parent.child("training");
@@ -1441,7 +1441,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 
 	if (training_data.num_data) {
 		//actual_used_variables = new int[num_total_variables];
-		variables_utilization = new bool[num_total_variables];
+		variables_enabled = new bool[num_total_variables];
 
 		node = parent.child("variables_utilization");
 		if (node) {
@@ -1451,7 +1451,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 			int i = 0;
 
 			while (*(value_as_cstring + num_jumped_chars)) {
-				sscanf(value_as_cstring + num_jumped_chars, "%d", &variables_utilization[i]);
+				sscanf(value_as_cstring + num_jumped_chars, "%d", &variables_enabled[i]);
 				/*
 				if (variables_utilization[i]) {
 				actual_used_variables[num_actual_variables] = i;
@@ -1466,7 +1466,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		else {// not found, use everything
 			//num_actual_variables = num_total_variables;
 			for (int i = 0; i < num_total_variables; i++) {
-				variables_utilization[i] = 1;
+				variables_enabled[i] = 1;
 				//actual_used_variables[i] = i;
 			}
 		}
@@ -1813,7 +1813,7 @@ void t_mep::get_list_of_used_variables(void)
 	if (num_total_variables) {
 		actual_used_variables = new int[num_total_variables];
 		for (int i = 0; i < num_total_variables; i++)
-			if (variables_utilization[i]) {
+			if (variables_enabled[i]) {
 				actual_used_variables[num_actual_variables] = i;
 				num_actual_variables++;
 			}
@@ -2524,15 +2524,15 @@ int t_mep::load_training_data_from_csv(const char* file_name)
 			num_actual_variables = num_total_variables;
 
 
-			if (variables_utilization) {
-				delete[] variables_utilization;
-				variables_utilization = NULL;
+			if (variables_enabled) {
+				delete[] variables_enabled;
+				variables_enabled = NULL;
 			}
 
-			variables_utilization = new bool[num_total_variables];
+			variables_enabled = new bool[num_total_variables];
 
 			for (int i = 0; i < num_total_variables; i++)
-				variables_utilization[i] = 1;
+				variables_enabled[i] = 1;
 
 			if (actual_used_variables) {
 				delete[] actual_used_variables;
@@ -2728,16 +2728,16 @@ int t_mep::move_test_data_to_training(int count)
 		int result = test_data.move_to(&training_data, count);
 
 		if (training_data.num_data == count) { // means that it was empty before
-			if (variables_utilization) {
-				delete[] variables_utilization;
-				variables_utilization = NULL;
+			if (variables_enabled) {
+				delete[] variables_enabled;
+				variables_enabled = NULL;
 			}
 			num_total_variables = training_data.num_cols - 1;
 
-			variables_utilization = new bool[num_total_variables];
+			variables_enabled = new bool[num_total_variables];
 
 			for (int i = 0; i < num_total_variables; i++)
-				variables_utilization[i] = 1;
+				variables_enabled[i] = 1;
 		}
 		modified_project = true;
 
@@ -2753,16 +2753,16 @@ int t_mep::move_validation_data_to_training(int count)
 		int result = validation_data.move_to(&training_data, count);
 
 		if (training_data.num_data == count) { // means that it was empty before
-			if (variables_utilization) {
-				delete[] variables_utilization;
-				variables_utilization = NULL;
+			if (variables_enabled) {
+				delete[] variables_enabled;
+				variables_enabled = NULL;
 			}
 			num_total_variables = training_data.num_cols - 1;
 
-			variables_utilization = new bool[num_total_variables];
+			variables_enabled = new bool[num_total_variables];
 
 			for (int i = 0; i < num_total_variables; i++)
-				variables_utilization[i] = 1;
+				variables_enabled[i] = 1;
 		}
 		modified_project = true;
 		return result;
@@ -3095,9 +3095,9 @@ void t_mep::init(void)
 			delete[] actual_used_variables;
 			actual_used_variables = NULL;
 		}
-		if (variables_utilization) {
-			delete[] variables_utilization;
-			variables_utilization = NULL;
+		if (variables_enabled) {
+			delete[] variables_enabled;
+			variables_enabled = NULL;
 		}
 
 		num_actual_variables = 0;
@@ -3111,15 +3111,15 @@ int t_mep::get_num_actual_variables(void)
 	return num_actual_variables;
 }
 //---------------------------------------------------------------------------
-bool t_mep::is_variable_utilized(int index)
+bool t_mep::is_variable_enabled(int index)
 {
-	return variables_utilization[index];
+	return variables_enabled[index];
 }
 //---------------------------------------------------------------------------
-void t_mep::set_variable_utilization(int index, bool value)
+void t_mep::set_variable_enable(int index, bool new_state)
 {
 	if (_stopped) {
-		variables_utilization[index] = value;
+		variables_enabled[index] = new_state;
 		modified_project = true;
 	}
 }

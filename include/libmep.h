@@ -6,7 +6,6 @@
 
 #include "pugixml.hpp"
 
-
 #include "parameters_class.h"
 #include "data_class.h"
 #include "operators_class.h"
@@ -63,7 +62,7 @@ private:
 	int target_col;
 
 	int num_actual_variables;
-	bool *variables_utilization;
+	bool *variables_enabled;
 
 	int *actual_used_variables;
 
@@ -763,10 +762,10 @@ public:
 	int get_num_actual_variables(void);
 
 	// returns true if a particular variable is enable
-	bool is_variable_utilized(int index);
+	bool is_variable_enabled(int index);
 
 	// sets if a particular variable is enabled or not
-	void set_variable_utilization(int index, bool new_state);
+	void set_variable_enable(int index, bool new_state);
 
 	// returns true if the project has been modified
 	bool is_project_modified(void);
