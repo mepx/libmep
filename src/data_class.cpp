@@ -11,6 +11,8 @@
 #include <windows.h>
 #endif // WIN32
 
+#define MAX_ROW_CHARS 1000000
+
 char *possible_chars = "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|";
 //-----------------------------------------------------------------
 t_data::t_data(void)
@@ -82,7 +84,7 @@ bool get_next_field(char *start_sir, char list_separator, char* dest, int & size
 {
 	skipped = 0;
 	char *tmp_start = start_sir;
-	while (*tmp_start && (*tmp_start == ' ' || *tmp_start == '\t')) {
+	while (*tmp_start && (*tmp_start == ' ' || *tmp_start == '\t' || *tmp_start == list_separator)) {
 		tmp_start++;
 		skipped++;
 	}
@@ -199,7 +201,7 @@ int t_data::from_xml(pugi::xml_node parent)
 		for (pugi::xml_node row = node_data.child("row"); row; row = row.next_sibling("row"), r++) {
 			const char *value_as_cstring = row.child_value();
 			char *buf = (char*)value_as_cstring;
-			char tmp_str[10000];
+			char tmp_str[1000];
 			int size;
 			int c = 0;
 			int skipped;
@@ -225,7 +227,7 @@ int t_data::from_xml(pugi::xml_node parent)
 //-----------------------------------------------------------------
 int t_data::to_xml(pugi::xml_node parent)
 {
-	char tmp_str[10000];
+	char *tmp_str = new char[MAX_ROW_CHARS];
 
 	pugi::xml_node node = parent.append_child("num_data");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
@@ -291,7 +293,7 @@ int t_data::to_xml(pugi::xml_node parent)
 			}
 		}
 
-
+	delete[] tmp_str;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -317,7 +319,8 @@ bool my_fgets(char*buf, int max_n, FILE *f)
 		i++;
 	}
 	if (feof(f))
-		buf[i] = 0;
+		if (i)
+		  buf[i - 1] = 0;
 	return (i > 0);
 }
 //------------------------------------------------------------
@@ -365,35 +368,44 @@ bool t_data::detect_list_separator(const char *file_name)
 	if (!f)
 		return false;
 
-	char buf[10000];
+	char *buf = new char[MAX_ROW_CHARS];
 
-	my_fgets(buf, 10000, f);
-	if (strlen(buf) < 1)
+	my_fgets(buf, MAX_ROW_CHARS, f);
+	if (strlen(buf) < 1) {
+		delete[] buf;
 		return false;
+	}
 
 	// detect the ;
 	if (strchr(buf, ';')) {
 		list_separator = ';';
+		delete[] buf;
 		return true;
 	}
 	if (strchr(buf, ',')) {
 		list_separator = ',';
+		delete[] buf;
 		return true;
 	}
 	if (strchr(buf, ' ')) {
 		list_separator = ' ';
+		delete[] buf;
 		return true;
 	}
 	if (strchr(buf, '\t')) {
 		list_separator = '\t';
+		delete[] buf;
 		return true;
 	}
 
 	double x;
 	if (sscanf(buf, "%lf", &x) == 1) {// most likely there is only variable and no output
 		list_separator = ' ';
+		delete[] buf;
 		return true;
 	}
+
+	delete[] buf;
 	return false;
 }
 //-----------------------------------------------------------------
@@ -459,13 +471,13 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 
 	delete_data();
 
-	char *buf = new char[10000];
+	char *buf = new char[MAX_ROW_CHARS];
 	char * start_buf = buf;
 
 	data_type = MEP_DATA_STRING;
 	num_data = 0;
 
-	while (my_fgets(buf, 10000, f)) {
+	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
 		long len = strlen(buf);
 		if (len > 1)
 			num_data++;
@@ -473,16 +485,15 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 			num_cols = 0;
 			int skipped;
 
-			char tmp_str[10000];
+			char tmp_str[1000];
 			int size;
 			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 			while (result) {
 				num_cols++;
 				if (!buf[size + skipped])
 					break;
-				buf = buf + size + 1 + skipped;
+				buf = buf + size + skipped;
 				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-
 			}
 			buf = start_buf;
 		}
@@ -494,11 +505,11 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 	int count_data = 0;
 	//has_missing_values = 0;
 
-	while (my_fgets(buf, 10000, f)) {
+	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
 		long len = strlen(buf);
 		if (len > 1) {
 			int col = 0;
-			char tmp_str[10000];
+			char tmp_str[1000];
 			int size;
 			_data_string[count_data] = new char*[num_cols];
 			for (int c = 0; c < num_cols; c++)
@@ -514,9 +525,9 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 				else {
 					break;
 				}
-				buf = buf + size + 1 + skipped;
+				buf = buf + size + skipped;
 				//if (buf - start_buf >= len)
-				//	break;
+					//break;
 				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 
 				col++;
@@ -526,7 +537,8 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 		buf = start_buf;
 	}
 	fclose(f);
-	delete[]start_buf;
+	//delete[] start_buf;
+	delete[] buf;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -550,20 +562,20 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 
 	delete_data();
 
-	char *buf = new char[10000];
+	char *buf = new char[MAX_ROW_CHARS];
 	char * start_buf = buf;
 
 	num_data = 0;
 	data_type = MEP_DATA_DOUBLE;
 
-	while (my_fgets(buf, 10000, f)) {
+	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
 		long len = strlen(buf);
 		if (len > 1)
 			num_data++;
 		if (num_data == 1) {
 			num_cols = 0;
 
-			char tmp_str[10000];
+			char tmp_str[1000];
 			int size;
 			int skipped;
 			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
@@ -571,7 +583,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 				num_cols++;
 				if (!buf[size])
 					break;
-				buf = buf + size + 1 + skipped;
+				buf = buf + size + skipped;
 				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 
 			}
@@ -584,11 +596,11 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 	_data_double = new double*[num_data];
 	int count_data = 0;
 
-	while (my_fgets(buf, 10000, f)) {
+	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
 		long len = strlen(buf);
 		if (len > 1) {
 			int col = 0;
-			char tmp_str[10000];
+			char tmp_str[MAX_ROW_CHARS];
 			int size;
 			int skipped;
 			_data_double[count_data] = new double[num_cols];
@@ -599,9 +611,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 				else {
 					break;
 				}
-				buf = buf + size + 1 + skipped;
-				//if (buf - start_buf >= len)
-				//	break;
+				buf = buf + size + skipped;
 				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 
 				col++;
@@ -611,7 +621,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 		buf = start_buf;
 	}
 	fclose(f);
-	delete[]start_buf;
+	delete[] buf;
 	return true;
 }
 //-----------------------------------------------------------------
