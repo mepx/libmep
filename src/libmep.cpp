@@ -1806,7 +1806,10 @@ void t_mep::get_list_of_used_variables(void)
 	}
 
 	num_actual_variables = 0;
-	num_total_variables = training_data.num_cols - 1;
+	if (training_data.num_cols)
+		num_total_variables = training_data.num_cols - 1;
+	else
+		num_total_variables = 0;
 	if (num_total_variables) {
 		actual_used_variables = new int[num_total_variables];
 		for (int i = 0; i < num_total_variables; i++)
