@@ -1455,7 +1455,9 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 			int i = 0;
 
 			while (*(value_as_cstring + num_jumped_chars)) {
-				sscanf(value_as_cstring + num_jumped_chars, "%d", &variables_enabled[i]);
+                int int_read;
+				sscanf(value_as_cstring + num_jumped_chars, "%d", &int_read);
+                variables_enabled[i] = int_read;
 				/*
 				if (variables_utilization[i]) {
 				actual_used_variables[num_actual_variables] = i;
