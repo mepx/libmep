@@ -750,7 +750,8 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 
 			for (int i = 0; i < training_data.num_data; i++) {
 				int j = i + 1;
-				while (j < training_data.num_data && fabs(cached_eval_matrix_double[actual_used_variables[v]][i] - cached_eval_matrix_double[actual_used_variables[v]][j]) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				//while (j < training_data.num_data && fabs(cached_eval_matrix_double[actual_used_variables[v]][i] - cached_eval_matrix_double[actual_used_variables[v]][j]) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				while (j < training_data.num_data && fabs(array_value_class[i].value - array_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
 				// le verific pe toate intre i si j si le cataloghez ca apartinant la clasa 0
@@ -762,7 +763,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 							//	num_0_incorrect--;
 							num_1_incorrect++;
 						}
-				if (num_0_incorrect + num_1_incorrect < cached_sum_of_errors[v]) {
+				if (num_0_incorrect + num_1_incorrect < cached_sum_of_errors[actual_used_variables[v]]) {
 					cached_sum_of_errors[actual_used_variables[v]] = num_0_incorrect + num_1_incorrect;
 					cached_threashold[actual_used_variables[v]] = array_value_class[i].value;
 				}
