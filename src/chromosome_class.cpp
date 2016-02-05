@@ -678,7 +678,7 @@ void chromosome::mutation(t_parameters *parameters, int *actual_operators, int n
 	}
 	// lets see if I can evolve constants
 
-	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == PROGRAM_GENERATED_CONSTANTS)
+	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS)
 		for (int c = 0; c < num_constants; c++) {
 			p = rand() / (double)RAND_MAX;      // mutate the operator
 			double tmp_cst_d = rand() / double(RAND_MAX) * parameters->constants.constants_mutation_max_deviation;
@@ -715,7 +715,7 @@ void chromosome::one_cut_point_crossover(const chromosome &parent2, chromosome &
 		offspring2.prg[i] = prg[i];
 	}
 
-	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == PROGRAM_GENERATED_CONSTANTS) {
+	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS) {
 		pct = 1 + rand() % (num_constants - 2);
 		for (int c = 0; c < pct; c++) {
 			offspring1.constants_double[c] = constants_double[c];
@@ -747,7 +747,7 @@ void chromosome::uniform_crossover(const chromosome &parent2, chromosome &offspr
 			offspring2.prg[i] = prg[i];
 		}
 
-		if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == PROGRAM_GENERATED_CONSTANTS)
+		if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS)
 			for (int c = 0; c < num_constants; c++) {
 				offspring1.constants_double[c] = constants_double[c];
 				offspring2.constants_double[c] = parent2.constants_double[c];
