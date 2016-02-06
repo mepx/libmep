@@ -8,7 +8,9 @@ MEP introduced a unique feature: the ability to encode multiple solutions in the
 
 C++ 11 is required due to the use of c++ 11 threads.
 
-# To compile: create a new project and add all files from "src" and one file from "tests" folder (which contains the main function). Include paths must point to the "include" folder of this project.
+# To compile: 
+
+Create a new project and add all files from "src" and one file from "tests" folder (which contains the main function). Include paths must point to the "include" folder of this project.
 
 # API
 ## Setting parameters
