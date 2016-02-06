@@ -1,5 +1,12 @@
 #include "libmep.h"
 
+static int generation_index;
+//-----------------------------------------------------------------
+void on_generation(void)
+{
+	printf("Generation %d - done\n", generation_index);
+	generation_index++;
+}
 //-----------------------------------------------------------------
 int main(void)
 {
@@ -7,6 +14,7 @@ int main(void)
 
 	if (!mep.load_training_data_from_csv("building1.csv")) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
+		printf("Press Enter...");
 		getchar();
 		return 1;
 	}
@@ -19,12 +27,14 @@ int main(void)
 	mep.set_num_generations(50);
 	mep.set_code_length(20);
 	mep.set_problem_type(0); // regression
-	
-	mep.start(NULL, NULL, NULL);
+
+	printf("Evolving ... \n");
+	generation_index = 0;
+	mep.start(on_generation, NULL, NULL);
 
 	double error = mep.get_best_training_error(0, mep.get_num_generations() - 1);
 	
-	printf("Error = %lf\n", error);
+	printf("\nError = %lf\n", error);
 
 	printf("Program = \n%s\n", mep.program_as_C(0, 0, mep.get_training_data_row(0)));
 
