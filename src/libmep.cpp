@@ -34,7 +34,7 @@ t_mep::t_mep()
 	last_run_index = -1;
 
 	variables_enabled = NULL;
-	actual_used_variables = NULL;
+	actual_enabled_variables = NULL;
 	num_actual_variables = 0;
 	num_total_variables = 0;
 	target_col = -1;
@@ -47,9 +47,9 @@ t_mep::t_mep()
 //---------------------------------------------------------------------------
 t_mep::~t_mep()
 {
-	if (actual_used_variables) {
-		delete[] actual_used_variables;
-		actual_used_variables = NULL;
+	if (actual_enabled_variables) {
+		delete[] actual_enabled_variables;
+		actual_enabled_variables = NULL;
 	}
 	if (variables_enabled) {
 		delete[] variables_enabled;
@@ -80,7 +80,7 @@ void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value
 	for (int i = 0; i < num_total_variables; i++)
 		cached_eval_matrix_double[i] = NULL;
 	for (int i = 0; i < num_actual_variables; i++)
-		cached_eval_matrix_double[actual_used_variables[i]] = new double[training_data.num_data];
+		cached_eval_matrix_double[actual_enabled_variables[i]] = new double[training_data.num_data];
 
 	cached_sum_of_errors = new double[num_total_variables];
 	cached_threashold = new double[num_total_variables];
@@ -108,7 +108,7 @@ void t_mep::generate_random_individuals(void) // randomly initializes the indivi
 {
 	for (int i = 0; i < parameters.num_subpopulations; i++)
 		for (int j = 0; j < parameters.subpopulation_size; j++)
-			pop[i].individuals[j].generate_random(&parameters, actual_operators, num_operators, actual_used_variables, num_actual_variables);
+			pop[i].individuals[j].generate_random(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 }
 //---------------------------------------------------------------------------
 void t_mep::fitness_regression(chromosome &individual, double **eval_matrix)
@@ -727,31 +727,31 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 {
 	if (parameters.problem_type == PROBLEM_REGRESSION)
 		for (int v = 0; v < num_actual_variables; v++) {
-			cached_sum_of_errors[actual_used_variables[v]] = 0;
+			cached_sum_of_errors[actual_enabled_variables[v]] = 0;
 			for (int k = 0; k < training_data.num_data; k++) {
-				cached_eval_matrix_double[actual_used_variables[v]][k] = training_data._data_double[k][actual_used_variables[v]];
-				cached_sum_of_errors[actual_used_variables[v]] += fabs(cached_eval_matrix_double[actual_used_variables[v]][k] - training_data._data_double[k][num_total_variables]);
+				cached_eval_matrix_double[actual_enabled_variables[v]][k] = training_data._data_double[k][actual_enabled_variables[v]];
+				cached_sum_of_errors[actual_enabled_variables[v]] += fabs(cached_eval_matrix_double[actual_enabled_variables[v]][k] - training_data._data_double[k][num_total_variables]);
 			}
 		}
 	else
 		for (int v = 0; v < num_actual_variables; v++) {
 
-			cached_threashold[actual_used_variables[v]] = 0;
+			cached_threashold[actual_enabled_variables[v]] = 0;
 			for (int k = 0; k < training_data.num_data; k++) {
-				cached_eval_matrix_double[actual_used_variables[v]][k] = training_data._data_double[k][actual_used_variables[v]];
-				array_value_class[k].value = training_data._data_double[k][actual_used_variables[v]];
+				cached_eval_matrix_double[actual_enabled_variables[v]][k] = training_data._data_double[k][actual_enabled_variables[v]];
+				array_value_class[k].value = training_data._data_double[k][actual_enabled_variables[v]];
 				array_value_class[k].data_class = (int)training_data._data_double[k][num_total_variables];
 			}
 			qsort((void*)array_value_class, training_data.num_data, sizeof(s_value_class), sort_function_value_class);
 
 			int num_0_incorrect = training_data.num_class_0;
 			int num_1_incorrect = 0;
-			cached_threashold[actual_used_variables[v]] = array_value_class[0].value - 1;// all are classified to class 1 in this case
-			cached_sum_of_errors[actual_used_variables[v]] = num_0_incorrect;
+			cached_threashold[actual_enabled_variables[v]] = array_value_class[0].value - 1;// all are classified to class 1 in this case
+			cached_sum_of_errors[actual_enabled_variables[v]] = num_0_incorrect;
 
 			for (int i = 0; i < training_data.num_data; i++) {
 				int j = i + 1;
-				//while (j < training_data.num_data && fabs(cached_eval_matrix_double[actual_used_variables[v]][i] - cached_eval_matrix_double[actual_used_variables[v]][j]) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				//while (j < training_data.num_data && fabs(cached_eval_matrix_double[actual_enabled_variables[v]][i] - cached_eval_matrix_double[actual_enabled_variables[v]][j]) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 				while (j < training_data.num_data && fabs(array_value_class[i].value - array_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
@@ -764,9 +764,9 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 							//	num_0_incorrect--;
 							num_1_incorrect++;
 						}
-				if (num_0_incorrect + num_1_incorrect < cached_sum_of_errors[actual_used_variables[v]]) {
-					cached_sum_of_errors[actual_used_variables[v]] = num_0_incorrect + num_1_incorrect;
-					cached_threashold[actual_used_variables[v]] = array_value_class[i].value;
+				if (num_0_incorrect + num_1_incorrect < cached_sum_of_errors[actual_enabled_variables[v]]) {
+					cached_sum_of_errors[actual_enabled_variables[v]] = num_0_incorrect + num_1_incorrect;
+					cached_threashold[actual_enabled_variables[v]] = array_value_class[i].value;
 				}
 				i = j;
 				i--;
@@ -836,7 +836,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case  O_DIVISION:  //  /
 			for (int k = 0; k < num_training_data; k++)
 				if (fabs(arg2[k]) < DIVISION_PROTECT) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
 				else
@@ -846,7 +846,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			for (int k = 0; k < num_training_data; k++) {
 				eval[k] = pow(arg1[k], arg2[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 			}
@@ -854,7 +854,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_SQRT:
 			for (int k = 0; k < num_training_data; k++) {
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -865,7 +865,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			for (int k = 0; k < num_training_data; k++) {
 				eval[k] = exp(arg1[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 			}
@@ -875,7 +875,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			for (int k = 0; k < num_training_data; k++) {
 				eval[k] = pow(10, arg1[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 			}
@@ -883,7 +883,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_LN:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -893,7 +893,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_LOG10:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -903,7 +903,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_lOG2:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -953,7 +953,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_ASIN:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] < -1 || arg1[k] > 1) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -963,7 +963,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_ACOS:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] < -1 || arg1[k] > 1) {
-					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_enabled_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1098,7 +1098,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		for (int k = 0; k < parameters.num_subpopulations; k++) {
 			while (!compute_regression_error_on_double_data_return_error(pop[k].individuals[0], validation_data._data_double, validation_data.num_data, validation_data._data_double, &validation_error)) {
 				// I have to mutate that individual.
-				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_used_variables[my_rand() % num_actual_variables];
+				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
 				// recompute its fitness on training;
 				fitness_regression(pop[k].individuals[0], eval_double);
 				// resort the population
@@ -1117,7 +1117,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		if (parameters.problem_type == PROBLEM_CLASSIFICATION)
 			for (int k = 0; k < parameters.num_subpopulations; k++) {
 				while (!compute_classification_error_on_double_data_return_error(pop[k].individuals[0], validation_data._data_double, validation_data.num_data, validation_data._data_double, &validation_error)) {
-					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_used_variables[my_rand() % num_actual_variables];
+					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
 					// recompute its fitness on training;
 					fitness_regression(pop[k].individuals[0], eval_double);
 					// resort the population
@@ -1136,6 +1136,9 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run)
 {
 	_stopped = false;
+
+	compute_list_of_enabled_variables();
+
 	pop = new t_sub_population[parameters.num_subpopulations];
 	for (int i = 0; i < parameters.num_subpopulations; i++)
 		allocate_sub_population(pop[i]);
@@ -1216,13 +1219,13 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 					a_sub_population->offspring2 = a_sub_population->individuals[r2];
 				}
 				// mutate the result and move the mutant in the new population
-				a_sub_population->offspring1.mutation(&parameters, actual_operators, num_operators, actual_used_variables, num_actual_variables);
+				a_sub_population->offspring1.mutation(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 				if (parameters.problem_type == PROBLEM_REGRESSION)
 					fitness_regression(a_sub_population->offspring1, eval_double);
 				else
 					fitness_classification(a_sub_population->offspring1, eval_double, tmp_value_class);
 
-				a_sub_population->offspring2.mutation(&parameters, actual_operators, num_operators, actual_used_variables, num_actual_variables);
+				a_sub_population->offspring2.mutation(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 				if (parameters.problem_type == PROBLEM_REGRESSION)
 					fitness_regression(a_sub_population->offspring2, eval_double);
 				else
@@ -1429,9 +1432,9 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 {
 	//get the utilized variables first
 	/*
-	if (actual_used_variables){
-	delete[] actual_used_variables;
-	actual_used_variables = NULL;
+	if (actual_enabled_variables){
+	delete[] actual_enabled_variables;
+	actual_enabled_variables = NULL;
 	}
 	*/
 	if (variables_enabled) {
@@ -1446,7 +1449,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	num_total_variables = training_data.num_cols - 1;
 
 	if (training_data.num_data) {
-		//actual_used_variables = new int[num_total_variables];
+		//actual_enabled_variables = new int[num_total_variables];
 		variables_enabled = new bool[num_total_variables];
 
 		node = parent.child("variables_utilization");
@@ -1462,7 +1465,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
                 variables_enabled[i] = int_read;
 				/*
 				if (variables_utilization[i]) {
-				actual_used_variables[num_actual_variables] = i;
+				actual_enabled_variables[num_actual_variables] = i;
 				num_actual_variables++;
 				}
 				*/
@@ -1475,11 +1478,11 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 			//num_actual_variables = num_total_variables;
 			for (int i = 0; i < num_total_variables; i++) {
 				variables_enabled[i] = 1;
-				//actual_used_variables[i] = i;
+				//actual_enabled_variables[i] = i;
 			}
 		}
 
-		get_list_of_used_variables();
+		//get_list_of_used_variables();
 	}
 
 	node = parent.child("target_col");
@@ -1806,11 +1809,11 @@ void t_mep::sort_stats_by_test_error(bool ascending)
 		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), test_error_comparator_descending);
 }
 //---------------------------------------------------------------------------
-void t_mep::get_list_of_used_variables(void)
+void t_mep::compute_list_of_enabled_variables(void)
 {
-	if (actual_used_variables) {
-		delete[](actual_used_variables);
-		(actual_used_variables) = NULL;
+	if (actual_enabled_variables) {
+		delete[](actual_enabled_variables);
+		(actual_enabled_variables) = NULL;
 	}
 
 	num_actual_variables = 0;
@@ -1819,10 +1822,10 @@ void t_mep::get_list_of_used_variables(void)
 	else
 		num_total_variables = 0;
 	if (num_total_variables) {
-		actual_used_variables = new int[num_total_variables];
+		actual_enabled_variables = new int[num_total_variables];
 		for (int i = 0; i < num_total_variables; i++)
 			if (variables_enabled[i]) {
-				actual_used_variables[num_actual_variables] = i;
+				actual_enabled_variables[num_actual_variables] = i;
 				num_actual_variables++;
 			}
 	}
@@ -2542,12 +2545,12 @@ int t_mep::load_training_data_from_csv(const char* file_name)
 			for (int i = 0; i < num_total_variables; i++)
 				variables_enabled[i] = 1;
 
-			if (actual_used_variables) {
-				delete[] actual_used_variables;
-				actual_used_variables = NULL;
+			if (actual_enabled_variables) {
+				delete[] actual_enabled_variables;
+				actual_enabled_variables = NULL;
 			}
 
-			get_list_of_used_variables();
+//			get_list_of_used_variables();
 		}
 
 		modified_project = true;
@@ -3099,9 +3102,9 @@ void t_mep::init(void)
 		clear_test_data();
 
 
-		if (actual_used_variables) {
-			delete[] actual_used_variables;
-			actual_used_variables = NULL;
+		if (actual_enabled_variables) {
+			delete[] actual_enabled_variables;
+			actual_enabled_variables = NULL;
 		}
 		if (variables_enabled) {
 			delete[] variables_enabled;
@@ -3177,5 +3180,10 @@ long long t_mep::get_memory_consumption(void)
 	long long chromosomes_memory = 0;
 
 	return 0;
+}
+//---------------------------------------------------------------------------
+bool t_mep::validate_project(void)
+{
+	return true;
 }
 //---------------------------------------------------------------------------

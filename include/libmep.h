@@ -64,7 +64,7 @@ private:
 	int num_actual_variables;
 	bool *variables_enabled;
 
-	int *actual_used_variables;
+	int *actual_enabled_variables;
 
 	bool modified_project;
 
@@ -100,8 +100,6 @@ private:
 	bool compute_classification_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
 	bool compute_regression_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
 	bool compute_classification_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error);
-
-	void get_list_of_used_variables(void);
 
 	void delete_sub_population(t_sub_population &pop);
 
@@ -785,6 +783,11 @@ public:
 
 	// returns the memmory consumption in bytes
 	long long get_memory_consumption(void);
+
+	// returns true if parameters are correct
+	bool validate_project(void);
+
+	void compute_list_of_enabled_variables(void);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;
