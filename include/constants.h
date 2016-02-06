@@ -15,7 +15,7 @@ public:
 
 	double *constants_double;
 
-	long constants_type;
+	int constants_type;
 	bool constants_can_evolve;
 	double constants_mutation_max_deviation;
 

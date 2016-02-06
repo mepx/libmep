@@ -1,5 +1,6 @@
 #include "data_class.h"
 #include "utils_mep.h"
+#include "my_rand.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -175,7 +176,7 @@ int t_data::from_xml(pugi::xml_node parent)
 			_data_string = new char**[num_data];
 			for (int r = 0; r < num_data; r++) {
 				_data_string[r] = new char*[num_cols];
-				for (int v = 0; v < num_cols; v++) 
+				for (int v = 0; v < num_cols; v++)
 					_data_string[r][v] = NULL;
 			}
 		}
@@ -693,7 +694,7 @@ int t_data::to_interval_everywhere(double min, double max)
 //-----------------------------------------------------------------
 int t_data::to_interval_selected_col(double min, double max, int col)
 {
-	if (num_data)
+	if (num_data){
 		if (data_type == MEP_DATA_DOUBLE) {// double
 
 
@@ -718,12 +719,13 @@ int t_data::to_interval_selected_col(double min, double max, int col)
 		}
 		else
 			return 0;
+    }
 	return 1;
 }
 //-----------------------------------------------------------------
 int t_data::to_interval_all_variables(double min, double max)
 {
-	if (num_data)
+	if (num_data){
 		if (data_type == MEP_DATA_DOUBLE) {// double
 			for (int v = 0; v < num_cols; v++) {
 				//is this numeric or alpha ?
@@ -750,6 +752,7 @@ int t_data::to_interval_all_variables(double min, double max)
 		}
 		else
 			return 0;
+    }
 	return 1;
 }
 //-----------------------------------------------------------------
@@ -763,7 +766,7 @@ int t_data::move_to(t_data *dest, int count)
 			dest->num_cols = num_cols;
 			dest->num_targets = num_targets;
 		}
-        
+
 		if (data_type == MEP_DATA_DOUBLE) {// double
 
 			double** tmp_data_double = new double*[dest->num_data + count];
@@ -963,7 +966,7 @@ int t_data::find_symbol_from_all_variables(const char *s_find_what, bool use_reg
 			for (int t = 0; t < num_data; t++)
 				if (re_match(_data_string[t][col], s_find_what, use_regular)) {
 					// this is a missing value
-				
+
 					count_found++;
 				}
 	}
@@ -989,7 +992,7 @@ void t_data::shuffle(void)
 {
 	if (data_type == MEP_DATA_DOUBLE) { // double
 		for (int i = num_data - 1; i >= 1; i--){
-			int j = rand() % (i + 1);
+			int j = my_rand() % (i + 1);
 			double *row = _data_double[i];
 			_data_double[i] = _data_double[j];
 			_data_double[j] = row;
@@ -998,7 +1001,7 @@ void t_data::shuffle(void)
 	else{
 		// string
 		for (int i = num_data - 1; i >= 1; i--){
-			int j = rand() % (i + 1);
+			int j = my_rand() % (i + 1);
 			char**row = _data_string[i];
 			_data_string[i] = _data_string[j];
 			_data_string[j] = row;

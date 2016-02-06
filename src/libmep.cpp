@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "my_rand.h"
 #include "libmep.h"
 
 #include <errno.h>
@@ -19,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.05.0");
+	strcpy(version, "2016.02.06.0");
 
 	num_operators = 0;
 
@@ -835,7 +836,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case  O_DIVISION:  //  /
 			for (int k = 0; k < num_training_data; k++)
 				if (fabs(arg2[k]) < DIVISION_PROTECT) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
 				else
@@ -845,7 +846,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			for (int k = 0; k < num_training_data; k++) {
 				eval[k] = pow(arg1[k], arg2[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 			}
@@ -853,7 +854,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_SQRT:
 			for (int k = 0; k < num_training_data; k++) {
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -864,7 +865,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			for (int k = 0; k < num_training_data; k++) {
 				eval[k] = exp(arg1[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 			}
@@ -874,7 +875,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 			for (int k = 0; k < num_training_data; k++) {
 				eval[k] = pow(10, arg1[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 			}
@@ -882,7 +883,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_LN:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -892,7 +893,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_LOG10:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -902,7 +903,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_lOG2:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -952,7 +953,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_ASIN:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] < -1 || arg1[k] > 1) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -962,7 +963,7 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 		case O_ACOS:
 			for (int k = 0; k < num_training_data; k++)
 				if (arg1[k] < -1 || arg1[k] > 1) {
-					Individual.prg[i].op = actual_used_variables[rand() % num_actual_variables];   // the gene is mutated into a terminal
+					Individual.prg[i].op = actual_used_variables[my_rand() % num_actual_variables];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1060,9 +1061,9 @@ void t_mep::delete_values(double ****eval_double, s_value_class ***array_value_c
 long t_mep::tournament(t_sub_population &pop)     // Size is the size of the tournament
 {
 	long r, p;
-	p = rand() % parameters.subpopulation_size;
+	p = my_rand() % parameters.subpopulation_size;
 	for (int i = 1; i < parameters.tournament_size; i++) {
-		r = rand() % parameters.subpopulation_size;
+		r = my_rand() % parameters.subpopulation_size;
 		p = pop.individuals[r].fit < pop.individuals[p].fit ? r : p;
 	}
 	return p;
@@ -1097,7 +1098,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		for (int k = 0; k < parameters.num_subpopulations; k++) {
 			while (!compute_regression_error_on_double_data_return_error(pop[k].individuals[0], validation_data._data_double, validation_data.num_data, validation_data._data_double, &validation_error)) {
 				// I have to mutate that individual.
-				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_used_variables[rand() % num_actual_variables];
+				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_used_variables[my_rand() % num_actual_variables];
 				// recompute its fitness on training;
 				fitness_regression(pop[k].individuals[0], eval_double);
 				// resort the population
@@ -1116,7 +1117,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		if (parameters.problem_type == PROBLEM_CLASSIFICATION)
 			for (int k = 0; k < parameters.num_subpopulations; k++) {
 				while (!compute_classification_error_on_double_data_return_error(pop[k].individuals[0], validation_data._data_double, validation_data.num_data, validation_data._data_double, &validation_error)) {
-					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_used_variables[rand() % num_actual_variables];
+					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_used_variables[my_rand() % num_actual_variables];
 					// recompute its fitness on training;
 					fitness_regression(pop[k].individuals[0], eval_double);
 					// resort the population
@@ -1204,7 +1205,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 				long r1 = tournament(*a_sub_population);
 				long r2 = tournament(*a_sub_population);
 				// crossover
-				double p = rand() / (RAND_MAX + 1.0);
+				double p = my_rand() / (RAND_MAX + 1.0);
 				if (p < parameters.crossover_probability)
 					if (parameters.crossover_type == UNIFORM_CROSSOVER)
 						a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, &parameters);
@@ -1244,7 +1245,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 //-----------------------------------------------------------------------
 bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation)       // Steady-State MEP
 {
-	srand(run + parameters.random_seed);
+	my_srand(run + parameters.random_seed);
 
 	//clock_t start_time = clock();
 	time_t start_time;

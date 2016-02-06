@@ -2,7 +2,7 @@
 #include "chromosome_class.h"
 #include "operators_class.h"
 #include "data_class.h"
-
+#include "my_rand.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -603,33 +603,33 @@ void chromosome::generate_random(t_parameters *parameters, int *actual_operators
 		}
 		else {// automatic constants
 			for (int c = 0; c < num_constants; c++)
-				constants_double[c] = rand() / double(RAND_MAX) * (parameters->constants.max_constants_interval_double - parameters->constants.min_constants_interval_double) + parameters->constants.min_constants_interval_double;
+				constants_double[c] = my_rand() / double(RAND_MAX) * (parameters->constants.max_constants_interval_double - parameters->constants.min_constants_interval_double) + parameters->constants.min_constants_interval_double;
 		}
 	}
 
 	double sum = parameters->variables_probability + parameters->constants_probability;
-	double p = rand() / (double)RAND_MAX * sum;
+	double p = my_rand() / (double)RAND_MAX * sum;
 
 	if (p <= parameters->variables_probability)
-		prg[0].op = actual_variables[rand() % num_actual_variables];
+		prg[0].op = actual_variables[my_rand() % num_actual_variables];
 	else
-		prg[0].op = num_total_variables + rand() % num_constants;
+		prg[0].op = num_total_variables + my_rand() % num_constants;
 
 	for (int i = 1; i < parameters->code_length; i++) {
-		double p = rand() / (double)RAND_MAX;
+		double p = my_rand() / (double)RAND_MAX;
 
 		if (p <= parameters->operators_probability)
-			prg[i].op = actual_operators[rand() % num_actual_operators];
+			prg[i].op = actual_operators[my_rand() % num_actual_operators];
 		else
 			if (p <= parameters->operators_probability + parameters->variables_probability)
-				prg[i].op = actual_variables[rand() % num_actual_variables];
+				prg[i].op = actual_variables[my_rand() % num_actual_variables];
 			else
-				prg[i].op = num_total_variables + rand() % num_constants;
+				prg[i].op = num_total_variables + my_rand() % num_constants;
 
-		prg[i].adr1 = rand() % i;
-		prg[i].adr2 = rand() % i;
-		prg[i].adr3 = rand() % i;
-		prg[i].adr4 = rand() % i;
+		prg[i].adr1 = my_rand() % i;
+		prg[i].adr2 = my_rand() % i;
+		prg[i].adr3 = my_rand() % i;
+		prg[i].adr4 = my_rand() % i;
 	}
 }
 //---------------------------------------------------------------------------
@@ -637,54 +637,54 @@ void chromosome::mutation(t_parameters *parameters, int *actual_operators, int n
 {
 
 	// mutate each symbol with the same pm probability
-	double p = rand() / (double)RAND_MAX;
+	double p = my_rand() / (double)RAND_MAX;
 	if (p < parameters->mutation_probability) {
 		double sum = parameters->variables_probability + parameters->constants_probability;
-		double q = rand() / (double)RAND_MAX * sum;
+		double q = my_rand() / (double)RAND_MAX * sum;
 
 		if (q <= parameters->variables_probability)
-			prg[0].op = actual_variables[rand() % num_actual_variables];
+			prg[0].op = actual_variables[my_rand() % num_actual_variables];
 		else
-			prg[0].op = num_total_variables + rand() % num_constants;
+			prg[0].op = num_total_variables + my_rand() % num_constants;
 	}
 
 	for (int i = 1; i < code_length; i++) {
-		p = rand() / (double)RAND_MAX;      // mutate the operator
+		p = my_rand() / (double)RAND_MAX;      // mutate the operator
 		if (p < parameters->mutation_probability) {
-			double q = rand() / (double)RAND_MAX;
+			double q = my_rand() / (double)RAND_MAX;
 
 			if (q <= parameters->operators_probability)
-				prg[i].op = actual_operators[rand() % num_actual_operators];
+				prg[i].op = actual_operators[my_rand() % num_actual_operators];
 			else
 				if (q <= parameters->operators_probability + parameters->variables_probability)
-					prg[i].op = actual_variables[rand() % num_actual_variables];
+					prg[i].op = actual_variables[my_rand() % num_actual_variables];
 				else
-					prg[i].op = num_total_variables + rand() % num_constants;
+					prg[i].op = num_total_variables + my_rand() % num_constants;
 		}
 
-		p = rand() / (double)RAND_MAX;      // mutate the first address  (adr1)
+		p = my_rand() / (double)RAND_MAX;      // mutate the first address  (adr1)
 		if (p < parameters->mutation_probability)
-			prg[i].adr1 = rand() % i;
+			prg[i].adr1 = my_rand() % i;
 
-		p = rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
+		p = my_rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
 		if (p < parameters->mutation_probability)
-			prg[i].adr2 = rand() % i;
-		p = rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
+			prg[i].adr2 = my_rand() % i;
+		p = my_rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
 		if (p < parameters->mutation_probability)
-			prg[i].adr3 = rand() % i;
-		p = rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
+			prg[i].adr3 = my_rand() % i;
+		p = my_rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
 		if (p < parameters->mutation_probability)
-			prg[i].adr4 = rand() % i;
+			prg[i].adr4 = my_rand() % i;
 	}
 	// lets see if I can evolve constants
 
 	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS)
 		for (int c = 0; c < num_constants; c++) {
-			p = rand() / (double)RAND_MAX;      // mutate the operator
-			double tmp_cst_d = rand() / double(RAND_MAX) * parameters->constants.constants_mutation_max_deviation;
+			p = my_rand() / (double)RAND_MAX;      // mutate the operator
+			double tmp_cst_d = my_rand() / double(RAND_MAX) * parameters->constants.constants_mutation_max_deviation;
 
 			if (p < parameters->mutation_probability) {
-				if (rand() % 2) {// coin
+				if (my_rand() % 2) {// coin
 					if (constants_double[c] + tmp_cst_d <= parameters->constants.max_constants_interval_double)
 						constants_double[c] += tmp_cst_d;
 				}
@@ -705,7 +705,7 @@ void chromosome::one_cut_point_crossover(const chromosome &parent2, chromosome &
 	offspring2.num_total_variables = num_total_variables;
 
 	int pct, i;
-	pct = 1 + rand() % (code_length - 2);
+	pct = 1 + my_rand() % (code_length - 2);
 	for (i = 0; i < pct; i++) {
 		offspring1.prg[i] = prg[i];
 		offspring2.prg[i] = parent2.prg[i];
@@ -716,7 +716,7 @@ void chromosome::one_cut_point_crossover(const chromosome &parent2, chromosome &
 	}
 
 	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS) {
-		pct = 1 + rand() % (num_constants - 2);
+		pct = 1 + my_rand() % (num_constants - 2);
 		for (int c = 0; c < pct; c++) {
 			offspring1.constants_double[c] = constants_double[c];
 			offspring2.constants_double[c] = parent2.constants_double[c];
@@ -738,7 +738,7 @@ void chromosome::uniform_crossover(const chromosome &parent2, chromosome &offspr
 	offspring2.num_total_variables = num_total_variables;
 
 	for (int i = 0; i < code_length; i++)
-		if (rand() % 2) {
+		if (my_rand() % 2) {
 			offspring1.prg[i] = prg[i];
 			offspring2.prg[i] = parent2.prg[i];
 		}
