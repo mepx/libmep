@@ -38,7 +38,7 @@ private:
 	int best_individual_index_for_test;
 	int best_subpopulation_index_for_test;
 
-	t_operators operators;
+	t_mep_operators operators;
 
 	int num_operators;
 

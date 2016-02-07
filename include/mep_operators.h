@@ -47,7 +47,8 @@
 
 #define MAX_OPERATORS 26
 
-class t_operators
+//-----------------------------------------------------------------
+class t_mep_operators
 {
     public:
     bool use_addition, use_subtraction, use_multiplication, use_division, use_power, use_sqrt, use_exp, use_pow10, use_ln, use_log10, use_log2, use_floor, use_ceil, use_abs, use_inv, use_x2, use_min, use_max;
@@ -58,7 +59,7 @@ class t_operators
 	bool use_iflz;
 		bool use_ifalbcd;
 
-    t_operators(void);
+	t_mep_operators(void);
 
 	void init(void);
 

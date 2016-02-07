@@ -6,12 +6,12 @@
 //#include "data_class.h"
 
 //---------------------------------------------------------------------------
-t_operators::t_operators(void)
+t_mep_operators::t_mep_operators(void)
 {
 	init();
 }
 //---------------------------------------------------------------------------
-void t_operators::init(void)
+void t_mep_operators::init(void)
 {
 	use_addition = use_subtraction = use_multiplication = true;
 	use_division = use_power = use_sqrt = use_exp = use_pow10 = use_ln = use_log10 = use_log2 = use_floor = use_ceil = use_abs = use_inv = use_x2 = use_min = use_max = false;
@@ -25,7 +25,7 @@ void t_operators::init(void)
 
 }
 //---------------------------------------------------------------------------
-int t_operators::to_xml(pugi::xml_node parent)
+int t_mep_operators::to_xml(pugi::xml_node parent)
 {
     char tmp_str[10];
     pugi::xml_node node = parent.append_child("use_addition");
@@ -191,7 +191,7 @@ int t_operators::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_operators::from_xml(pugi::xml_node parent)
+int t_mep_operators::from_xml(pugi::xml_node parent)
 {
     pugi::xml_node node = parent.child("use_addition");
     if (node)
@@ -476,7 +476,7 @@ int t_operators::from_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_operators::get_list_of_operators(int *actual_operators)
+int t_mep_operators::get_list_of_operators(int *actual_operators)
 {
     int num_operators = 0;
     if (use_addition){
