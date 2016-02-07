@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "my_rand.h"
+#include "mep_rands.h"
 #include "libmep.h"
 
 #include <errno.h>
@@ -42,7 +42,6 @@ t_mep::t_mep()
 
 	problem_description = new char[100];
 	strcpy(problem_description, "Problem description here ...");
-
 }
 //---------------------------------------------------------------------------
 t_mep::~t_mep()

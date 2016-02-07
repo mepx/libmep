@@ -1,7 +1,7 @@
 #ifndef MEP_STATS_H
 #define MEP_STATS_H
 
-#include "chromosome_class.h"
+#include "mep_chromosome.h"
 
 
 //-----------------------------------------------------------------

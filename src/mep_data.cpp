@@ -1,6 +1,6 @@
-#include "data_class.h"
-#include "utils_mep.h"
-#include "my_rand.h"
+#include "mep_data.h"
+#include "mep_utils.h"
+#include "mep_rands.h"
 
 #include <stdio.h>
 #include <math.h>

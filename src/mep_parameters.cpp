@@ -1,4 +1,4 @@
-#include "parameters_class.h"
+#include "mep_parameters.h"
 
 #include <stdio.h>
 #include <stdlib.h>

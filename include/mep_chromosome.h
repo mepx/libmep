@@ -2,8 +2,8 @@
 #define CHROMOSOME_CLASS_H
 
 #include "pugixml.hpp"
-#include "constants.h"
-#include "parameters_class.h"
+#include "mep_constants.h"
+#include "mep_parameters.h"
 
 
 //-----------------------------------------------------------------
