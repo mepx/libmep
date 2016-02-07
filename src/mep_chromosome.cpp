@@ -21,7 +21,7 @@ t_mep_chromosome::t_mep_chromosome()
 	best_class_threshold = 0;
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::allocate_memory(long code_length, int num_vars, bool use_constants, t_constants *  constants)
+void t_mep_chromosome::allocate_memory(long code_length, int num_vars, bool use_constants, t_mep_constants *  constants)
 {
 	this->code_length = code_length;
 	prg = new code3[code_length];

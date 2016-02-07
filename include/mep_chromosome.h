@@ -39,7 +39,7 @@ public:
 	t_mep_chromosome& operator=(const t_mep_chromosome &source);
 
 	int compare(t_mep_chromosome *other, bool minimize_operations_count);
-	void allocate_memory(long code_length, int num_total_vars, bool use_constants, t_constants *constants);
+	void allocate_memory(long code_length, int num_total_vars, bool use_constants, t_mep_constants *constants);
     
     void generate_random(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
     

@@ -4,19 +4,19 @@
 #include <stdio.h>
 #include <string.h>
 
-t_constants::t_constants(void)
+t_mep_constants::t_mep_constants(void)
 {
 	init();
 }
 //---------------------------------------------------------------------------
-t_constants::~t_constants(void)
+t_mep_constants::~t_mep_constants(void)
 {
 	if (constants_double)
 		delete[] constants_double;
 	init();
 }
 //---------------------------------------------------------------------------
-void t_constants::init(void)
+void t_mep_constants::init(void)
 {
 	num_automatic_constants = 5;
 	num_user_defined_constants = 0;
@@ -30,7 +30,7 @@ void t_constants::init(void)
 	constants_mutation_max_deviation = 1;
 }
 //---------------------------------------------------------------------------
-int t_constants::to_xml(pugi::xml_node parent)
+int t_mep_constants::to_xml(pugi::xml_node parent)
 {
 	char tmp_str[30];
 
@@ -95,7 +95,7 @@ int t_constants::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_constants::from_xml(pugi::xml_node parent)
+int t_mep_constants::from_xml(pugi::xml_node parent)
 {
 	pugi::xml_node node = parent.child("type");
 	if (node)

@@ -35,7 +35,7 @@ public:
 
 	bool simplified_programs;
 
-	t_constants constants;
+	t_mep_constants constants;
 
     t_parameters(void);
     void init (void);
