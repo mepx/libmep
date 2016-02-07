@@ -6,12 +6,12 @@
 
 #include "pugixml.hpp"
 
-#include "parameters_class.h"
-#include "data_class.h"
-#include "operators_class.h"
-#include "chromosome_class.h"
+#include "mep_parameters.h"
+#include "mep_data.h"
+#include "mep_operators.h"
+#include "mep_chromosome.h"
 #include "mep_stats.h"
-#include "utils_mep.h"
+#include "mep_utils.h"
 
 //-----------------------------------------------------------------
 typedef void(*f_on_progress)(void);
