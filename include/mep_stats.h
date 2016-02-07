@@ -5,7 +5,7 @@
 
 
 //-----------------------------------------------------------------
-class t_mep_stat{
+class t_mep_statistics{
 public:
 	double running_time;
 	double *best_training_error;
@@ -17,8 +17,8 @@ public:
 
 	void allocate(long num_gen);
 
-	t_mep_stat(void);
-	~t_mep_stat();
+	t_mep_statistics(void);
+	~t_mep_statistics();
 
 	int to_xml(pugi::xml_node parent);
 	int from_xml(pugi::xml_node parent, int num_gens, int code_length);

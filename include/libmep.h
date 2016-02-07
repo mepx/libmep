@@ -52,7 +52,7 @@ private:
 	t_mep_data test_data;
 
 	char version[100];
-	t_mep_stat *stats;
+	t_mep_statistics *stats;
 
 	bool get_error_double(t_mep_chromosome &Individual, double *inputs, double *outputs);
 	bool evaluate_double(t_mep_chromosome &Individual, double *inputs, double *outputs);

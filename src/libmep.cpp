@@ -1155,7 +1155,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 
 	compute_cached_eval_matrix_double2(array_value_class[0]);
 
-	stats = new t_mep_stat[parameters.num_runs];
+	stats = new t_mep_statistics[parameters.num_runs];
 	for (int run_index = 0; run_index < parameters.num_runs; run_index++) {
 		stats[run_index].allocate(parameters.num_generations);
 		last_run_index++;
@@ -1514,7 +1514,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		for (pugi::xml_node row = node_results.child("run"); row; row = row.next_sibling("run"), last_run_index++);
 
 	if (last_run_index > -1) {
-		stats = new t_mep_stat[last_run_index + 1];
+		stats = new t_mep_statistics[last_run_index + 1];
 		last_run_index = 0;
 		for (pugi::xml_node row = node_results.child("run"); row; row = row.next_sibling("run"), last_run_index++)
 			stats[last_run_index].from_xml(row, parameters.num_generations, parameters.code_length);
@@ -1688,10 +1688,10 @@ int t_mep::stats_to_csv(const char *filename)
 //---------------------------------------------------------------------------
 int running_time_comparator_ascending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->running_time < ((t_mep_stat*)b)->running_time)
+	if (((t_mep_statistics*)a)->running_time < ((t_mep_statistics*)b)->running_time)
 		return -1;
 	else
-		if (((t_mep_stat*)a)->running_time > ((t_mep_stat*)b)->running_time)
+		if (((t_mep_statistics*)a)->running_time > ((t_mep_statistics*)b)->running_time)
 			return 1;
 		else
 			return 0;
@@ -1699,10 +1699,10 @@ int running_time_comparator_ascending(const void * a, const void * b)
 //---------------------------------------------------------------------------
 int running_time_comparator_descending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->running_time < ((t_mep_stat*)b)->running_time)
+	if (((t_mep_statistics*)a)->running_time < ((t_mep_statistics*)b)->running_time)
 		return 1;
 	else
-		if (((t_mep_stat*)a)->running_time > ((t_mep_stat*)b)->running_time)
+		if (((t_mep_statistics*)a)->running_time > ((t_mep_statistics*)b)->running_time)
 			return -1;
 		else
 			return 0;
@@ -1711,17 +1711,17 @@ int running_time_comparator_descending(const void * a, const void * b)
 void t_mep::sort_stats_by_running_time(bool ascending)
 {
 	if (ascending)
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), running_time_comparator_ascending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), running_time_comparator_ascending);
 	else
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), running_time_comparator_descending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), running_time_comparator_descending);
 }
 //---------------------------------------------------------------------------
 int training_error_comparator_ascending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->best_training_error[((t_mep_stat*)a)->last_gen] < ((t_mep_stat*)b)->best_training_error[((t_mep_stat*)b)->last_gen])
+	if (((t_mep_statistics*)a)->best_training_error[((t_mep_statistics*)a)->last_gen] < ((t_mep_statistics*)b)->best_training_error[((t_mep_statistics*)b)->last_gen])
 		return -1;
 	else
-		if (((t_mep_stat*)a)->best_training_error[((t_mep_stat*)a)->last_gen] > ((t_mep_stat*)b)->best_training_error[((t_mep_stat*)b)->last_gen])
+		if (((t_mep_statistics*)a)->best_training_error[((t_mep_statistics*)a)->last_gen] > ((t_mep_statistics*)b)->best_training_error[((t_mep_statistics*)b)->last_gen])
 			return 1;
 		else
 			return 0;
@@ -1729,10 +1729,10 @@ int training_error_comparator_ascending(const void * a, const void * b)
 //---------------------------------------------------------------------------
 int training_error_comparator_descending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->best_training_error[((t_mep_stat*)a)->last_gen] < ((t_mep_stat*)b)->best_training_error[((t_mep_stat*)b)->last_gen])
+	if (((t_mep_statistics*)a)->best_training_error[((t_mep_statistics*)a)->last_gen] < ((t_mep_statistics*)b)->best_training_error[((t_mep_statistics*)b)->last_gen])
 		return 1;
 	else
-		if (((t_mep_stat*)a)->best_training_error[((t_mep_stat*)a)->last_gen] > ((t_mep_stat*)b)->best_training_error[((t_mep_stat*)b)->last_gen])
+		if (((t_mep_statistics*)a)->best_training_error[((t_mep_statistics*)a)->last_gen] > ((t_mep_statistics*)b)->best_training_error[((t_mep_statistics*)b)->last_gen])
 			return -1;
 		else
 			return 0;
@@ -1741,18 +1741,18 @@ int training_error_comparator_descending(const void * a, const void * b)
 void t_mep::sort_stats_by_training_error(bool ascending)
 {
 	if (ascending)
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), training_error_comparator_ascending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), training_error_comparator_ascending);
 	else
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), training_error_comparator_descending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), training_error_comparator_descending);
 
 }
 //---------------------------------------------------------------------------
 int validation_error_comparator_ascending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->best_validation_error < ((t_mep_stat*)b)->best_validation_error)
+	if (((t_mep_statistics*)a)->best_validation_error < ((t_mep_statistics*)b)->best_validation_error)
 		return -1;
 	else
-		if (((t_mep_stat*)a)->best_validation_error > ((t_mep_stat*)b)->best_validation_error)
+		if (((t_mep_statistics*)a)->best_validation_error > ((t_mep_statistics*)b)->best_validation_error)
 			return 1;
 		else
 			return 0;
@@ -1760,10 +1760,10 @@ int validation_error_comparator_ascending(const void * a, const void * b)
 //---------------------------------------------------------------------------
 int validation_error_comparator_descending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->best_validation_error < ((t_mep_stat*)b)->best_validation_error)
+	if (((t_mep_statistics*)a)->best_validation_error < ((t_mep_statistics*)b)->best_validation_error)
 		return 1;
 	else
-		if (((t_mep_stat*)a)->best_validation_error > ((t_mep_stat*)b)->best_validation_error)
+		if (((t_mep_statistics*)a)->best_validation_error > ((t_mep_statistics*)b)->best_validation_error)
 			return -1;
 		else
 			return 0;
@@ -1772,18 +1772,18 @@ int validation_error_comparator_descending(const void * a, const void * b)
 void t_mep::sort_stats_by_validation_error(bool ascending)
 {
 	if (ascending)
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), validation_error_comparator_ascending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), validation_error_comparator_ascending);
 	else
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), validation_error_comparator_descending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), validation_error_comparator_descending);
 
 }
 //---------------------------------------------------------------------------
 int test_error_comparator_ascending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->test_error < ((t_mep_stat*)b)->test_error)
+	if (((t_mep_statistics*)a)->test_error < ((t_mep_statistics*)b)->test_error)
 		return -1;
 	else
-		if (((t_mep_stat*)a)->test_error > ((t_mep_stat*)b)->test_error)
+		if (((t_mep_statistics*)a)->test_error > ((t_mep_statistics*)b)->test_error)
 			return 1;
 		else
 			return 0;
@@ -1791,10 +1791,10 @@ int test_error_comparator_ascending(const void * a, const void * b)
 //---------------------------------------------------------------------------
 int test_error_comparator_descending(const void * a, const void * b)
 {
-	if (((t_mep_stat*)a)->test_error < ((t_mep_stat*)b)->test_error)
+	if (((t_mep_statistics*)a)->test_error < ((t_mep_statistics*)b)->test_error)
 		return 1;
 	else
-		if (((t_mep_stat*)a)->test_error > ((t_mep_stat*)b)->test_error)
+		if (((t_mep_statistics*)a)->test_error > ((t_mep_statistics*)b)->test_error)
 			return -1;
 		else
 			return 0;
@@ -1803,9 +1803,9 @@ int test_error_comparator_descending(const void * a, const void * b)
 void t_mep::sort_stats_by_test_error(bool ascending)
 {
 	if (ascending)
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), test_error_comparator_ascending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), test_error_comparator_ascending);
 	else
-		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_stat), test_error_comparator_descending);
+		qsort((void*)stats, last_run_index + 1, sizeof(t_mep_statistics), test_error_comparator_descending);
 }
 //---------------------------------------------------------------------------
 void t_mep::compute_list_of_enabled_variables(void)
