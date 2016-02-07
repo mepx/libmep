@@ -9,7 +9,7 @@
 #include <string.h>
 
 //---------------------------------------------------------------------------
-chromosome::chromosome()
+t_mep_chromosome::t_mep_chromosome()
 {
 	prg = NULL;
 	s_prg = NULL;
@@ -21,7 +21,7 @@ chromosome::chromosome()
 	best_class_threshold = 0;
 }
 //---------------------------------------------------------------------------
-void chromosome::allocate_memory(long code_length, int num_vars, bool use_constants, t_constants *  constants)
+void t_mep_chromosome::allocate_memory(long code_length, int num_vars, bool use_constants, t_constants *  constants)
 {
 	this->code_length = code_length;
 	prg = new code3[code_length];
@@ -43,12 +43,12 @@ void chromosome::allocate_memory(long code_length, int num_vars, bool use_consta
 		num_constants = 0;
 }
 //---------------------------------------------------------------------------
-chromosome::~chromosome()
+t_mep_chromosome::~t_mep_chromosome()
 {
 	clear();
 }
 //---------------------------------------------------------------------------
-void chromosome::clear(void)
+void t_mep_chromosome::clear(void)
 {
 	if (prg){
 		delete[] prg;
@@ -71,7 +71,7 @@ void chromosome::clear(void)
 	}
 }
 //---------------------------------------------------------------------------
-chromosome& chromosome::operator = (const chromosome &source)
+t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
 {
 	if (this != &source){
 		//		clear();
@@ -89,7 +89,7 @@ chromosome& chromosome::operator = (const chromosome &source)
 			//			s_prg[i] = source.s_prg[i];
 		}
 		fit = source.fit;        // the fitness
-		best = source.best;          // the index of the best expression in chromosome
+		best = source.best;          // the index of the best expression in t_mep_chromosome
 
 		num_constants = source.num_constants;
 		best_class_threshold = source.best_class_threshold;
@@ -189,7 +189,7 @@ void print_instruction(int op, int adr1, int adr2, int adr3, int adr4, char * tm
 	}
 }
 //---------------------------------------------------------------------------------
-char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
+char * t_mep_chromosome::to_C_double(bool simplified, double *data, int problem_type)
 {
 	char *prog = new char[(code_length + num_constants + num_total_variables) * 100 + 1000];
 	char tmp_s[100];
@@ -332,7 +332,7 @@ char * chromosome::to_C_double(bool simplified, double *data, int problem_type)
 	return prog;
 }
 //---------------------------------------------------------------------------
-int chromosome::to_xml(pugi::xml_node parent)
+int t_mep_chromosome::to_xml(pugi::xml_node parent)
 {
 	char tmp_str[100];
 
@@ -399,7 +399,7 @@ int chromosome::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int chromosome::from_xml(pugi::xml_node parent)
+int t_mep_chromosome::from_xml(pugi::xml_node parent)
 {
 	clear();
 
@@ -504,7 +504,7 @@ int chromosome::from_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-void chromosome::mark(int k, bool* marked)
+void t_mep_chromosome::mark(int k, bool* marked)
 {
 	if ((prg[k].op < 0) && !marked[k]){
 		mark(prg[k].adr1, marked);
@@ -545,7 +545,7 @@ void chromosome::mark(int k, bool* marked)
 	marked[k] = true;
 }
 //---------------------------------------------------------------------------
-void chromosome::simplify(void)
+void t_mep_chromosome::simplify(void)
 {
 	bool *marked = new bool[code_length];
 	for (int i = 0; i < code_length; marked[i++] = false);
@@ -582,7 +582,7 @@ void chromosome::simplify(void)
 	delete[] marked;
 }
 //---------------------------------------------------------------------------
-int chromosome::compare(chromosome *other, bool minimize_operations_count)
+int t_mep_chromosome::compare(t_mep_chromosome *other, bool minimize_operations_count)
 {
 	if (fit > other->fit)
 		return 1;
@@ -593,7 +593,7 @@ int chromosome::compare(chromosome *other, bool minimize_operations_count)
 
 }
 //---------------------------------------------------------------------------
-void chromosome::generate_random(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // randomly initializes the individuals
+void t_mep_chromosome::generate_random(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // randomly initializes the individuals
 {
 	// I have to generate the constants for this individuals
 	if (parameters->constants_probability > 1E-6) {
@@ -633,7 +633,7 @@ void chromosome::generate_random(t_parameters *parameters, int *actual_operators
 	}
 }
 //---------------------------------------------------------------------------
-void chromosome::mutation(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // mutate the individual
+void t_mep_chromosome::mutation(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // mutate the individual
 {
 
 	// mutate each symbol with the same pm probability
@@ -696,7 +696,7 @@ void chromosome::mutation(t_parameters *parameters, int *actual_operators, int n
 		}
 }
 //---------------------------------------------------------------------------
-void chromosome::one_cut_point_crossover(const chromosome &parent2, chromosome &offspring1, chromosome &offspring2, t_parameters *parameters)
+void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters)
 {
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;
@@ -729,7 +729,7 @@ void chromosome::one_cut_point_crossover(const chromosome &parent2, chromosome &
 
 }
 //---------------------------------------------------------------------------
-void chromosome::uniform_crossover(const chromosome &parent2, chromosome &offspring1, chromosome &offspring2, t_parameters *parameters)
+void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters)
 {
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;

@@ -13,8 +13,9 @@ struct code3
 	int adr1, adr2, adr3, adr4;    // pointers to arguments
 };
 //-----------------------------------------------------------------
-struct chromosome
+class t_mep_chromosome
 {
+public:
 	code3 *prg;        // a string of genes
 	code3 *s_prg;      // simplified prg
 	double fit;        // the fitness
@@ -27,24 +28,25 @@ struct chromosome
 	int num_total_variables;
 	long code_length;
 
-	chromosome();
-	~chromosome();
+
+	t_mep_chromosome();
+	~t_mep_chromosome();
 	void clear(void);
 	char * to_C_double(bool simplified, double *data, int problem_type);
 
 	void init_and_allocate_memory();
 
-	chromosome& operator=(const chromosome &source);
+	t_mep_chromosome& operator=(const t_mep_chromosome &source);
 
-	int compare(chromosome *other, bool minimize_operations_count);
+	int compare(t_mep_chromosome *other, bool minimize_operations_count);
 	void allocate_memory(long code_length, int num_total_vars, bool use_constants, t_constants *constants);
     
     void generate_random(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
     
     void generate_random_individual(t_parameters *parameters);
 	void mutation(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
-	void one_cut_point_crossover(const chromosome &parent2, chromosome &offspring1, chromosome &offspring2, t_parameters *parameters);
-	void uniform_crossover(const chromosome &parent2, chromosome &offspring1, chromosome &offspring2, t_parameters *parameters);
+	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters);
+	void uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters);
 
 	void simplify(void);
 	void mark(int k, bool* marked);

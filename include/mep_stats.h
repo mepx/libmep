@@ -12,7 +12,7 @@ public:
 	double best_validation_error;
 	double test_error;
 	double *average_training_error;
-	chromosome prg;
+	t_mep_chromosome prg;
 	int last_gen;
 
 	void allocate(long num_gen);

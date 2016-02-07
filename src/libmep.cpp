@@ -93,12 +93,12 @@ void t_mep::allocate_sub_population(t_sub_population &pop)
 {
 	pop.offspring1.allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
 	pop.offspring2.allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
-	pop.individuals = new chromosome[parameters.subpopulation_size];
+	pop.individuals = new t_mep_chromosome[parameters.subpopulation_size];
 	for (int j = 0; j < parameters.subpopulation_size; j++)
 		pop.individuals[j].allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
 }
 //---------------------------------------------------------------------------
-void t_mep::get_best(chromosome& dest)
+void t_mep::get_best(t_mep_chromosome& dest)
 {
 	dest = pop[best_subpopulation_index].individuals[best_individual_index];
 }
@@ -110,17 +110,17 @@ void t_mep::generate_random_individuals(void) // randomly initializes the indivi
 			pop[i].individuals[j].generate_random(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 }
 //---------------------------------------------------------------------------
-void t_mep::fitness_regression(chromosome &individual, double **eval_matrix)
+void t_mep::fitness_regression(t_mep_chromosome &individual, double **eval_matrix)
 {
 	fitness_regression_double_cache_all_training_data(individual, eval_matrix);
 }
 //---------------------------------------------------------------------------
-void t_mep::fitness_classification(chromosome &individual, double **eval, s_value_class *tmp_value_class)
+void t_mep::fitness_classification(t_mep_chromosome &individual, double **eval, s_value_class *tmp_value_class)
 {
 	fitness_classification_double_cache_all_training_data(individual, eval, tmp_value_class);
 }
 //---------------------------------------------------------------------------
-void t_mep::fitness_regression_double(chromosome &Individual, double* eval_vect, double *sum_of_errors_array)
+void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval_vect, double *sum_of_errors_array)
 {
 	Individual.fit = 1E+308;
 	Individual.best = -1;
@@ -128,8 +128,8 @@ void t_mep::fitness_regression_double(chromosome &Individual, double* eval_vect,
 	for (int i = 0; i < parameters.code_length; i++)
 		sum_of_errors_array[i] = 0;
 
-	for (int k = 0; k < training_data.num_data; k++) {   // read the chromosome from top to down
-		for (int i = 0; i < parameters.code_length; i++) {    // read the chromosome from top to down
+	for (int k = 0; k < training_data.num_data; k++) {   // read the t_mep_chromosome from top to down
+		for (int i = 0; i < parameters.code_length; i++) {    // read the t_mep_chromosome from top to down
 
 			errno = 0;
 			bool is_error_case = false;
@@ -256,7 +256,7 @@ void t_mep::fitness_regression_double(chromosome &Individual, double* eval_vect,
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep::fitness_regression_double_cache_all_training_data(chromosome &Individual, double** eval_matrix_double)
+void t_mep::fitness_regression_double_cache_all_training_data(t_mep_chromosome &Individual, double** eval_matrix_double)
 {
 	// evaluate Individual
 	// partial results are stored and used later in other sub-expressions
@@ -279,7 +279,7 @@ void t_mep::fitness_regression_double_cache_all_training_data(chromosome &Indivi
 
 	int num_training_data = training_data.num_data;
 
-	for (int i = 0; i < parameters.code_length; i++) {   // read the chromosome from top to down
+	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 
 
@@ -319,7 +319,7 @@ void t_mep::fitness_regression_double_cache_all_training_data(chromosome &Indivi
 }
 //---------------------------------------------------------------------------
 /*
-void t_mep::fitness_classification_double_cache_all_training_data(chromosome &, double **)
+void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromosome &, double **)
 {
 	
 	// evaluate Individual
@@ -337,7 +337,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(chromosome &, 
 
 	compute_eval_matrix_double(Individual, eval_double, line_of_constants);
 
-	for (int i = 0; i < parameters.code_length; i++) {   // read the chromosome from top to down
+	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
 	double sum_of_errors;
 	if (Individual.prg[i].op >= 0)
 	if (Individual.prg[i].op < training_data.num_vars) // a variable, which is cached already
@@ -373,7 +373,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(chromosome &, 
 }
 */
 //---------------------------------------------------------------------------
-void t_mep::fitness_classification_double_cache_all_training_data(chromosome &Individual, double **eval_matrix_double, s_value_class *tmp_value_class)
+void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromosome &Individual, double **eval_matrix_double, s_value_class *tmp_value_class)
 {
 	// evaluate Individual
 	// partial results are stored and used later in other sub-expressions
@@ -391,7 +391,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(chromosome &In
 	compute_eval_matrix_double(Individual, eval_matrix_double, line_of_constants);
 
 	double best_threshold;
-	for (int i = 0; i < parameters.code_length; i++) {   // read the chromosome from top to down
+	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 		if (Individual.prg[i].op >= 0)
 			if (Individual.prg[i].op < num_total_variables) { // a variable, which is cached already
@@ -457,7 +457,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(chromosome &In
 		delete[] line_of_constants;
 }
 //---------------------------------------------------------------------------
-bool t_mep::compute_regression_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error)
+bool t_mep::compute_regression_error_on_double_data(t_mep_chromosome &individual, double **inputs, int num_data, double ** data, double *error)
 {
 	*error = 0;
 	double actual_output_double[1];
@@ -476,7 +476,7 @@ bool t_mep::compute_regression_error_on_double_data(chromosome &individual, doub
 	return true;
 }
 //---------------------------------------------------------------------------
-bool t_mep::compute_classification_error_on_double_data(chromosome &individual, double **inputs, int num_data, double ** data, double *error)
+bool t_mep::compute_classification_error_on_double_data(t_mep_chromosome &individual, double **inputs, int num_data, double ** data, double *error)
 {
 	(*error) = 0;
 	double actual_output_double[1];
@@ -497,7 +497,7 @@ bool t_mep::compute_classification_error_on_double_data(chromosome &individual, 
 	return true;
 }
 //---------------------------------------------------------------------------
-bool t_mep::compute_regression_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error)
+bool t_mep::compute_regression_error_on_double_data_return_error(t_mep_chromosome &individual, double **inputs, int num_data, double ** data, double *error)
 {
 	*error = 0;
 	double actual_output_double[1];
@@ -516,7 +516,7 @@ bool t_mep::compute_regression_error_on_double_data_return_error(chromosome &ind
 	return true;
 }
 //---------------------------------------------------------------------------
-bool t_mep::compute_classification_error_on_double_data_return_error(chromosome &individual, double **inputs, int num_data, double ** data, double *error)
+bool t_mep::compute_classification_error_on_double_data_return_error(t_mep_chromosome &individual, double **inputs, int num_data, double ** data, double *error)
 {
 	(*error) = 0;
 	double actual_output_double[1];
@@ -555,7 +555,7 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 	return true;
 }
 //---------------------------------------------------------------------------
-bool t_mep::get_error_double(chromosome &Individual, double *inputs, double *outputs)
+bool t_mep::get_error_double(t_mep_chromosome &Individual, double *inputs, double *outputs)
 {
 	if (!evaluate_double(Individual, inputs, outputs))
 		return false;
@@ -569,13 +569,13 @@ bool t_mep::get_error_double(chromosome &Individual, double *inputs, double *out
 	return true;
 }
 //---------------------------------------------------------------------------
-bool t_mep::evaluate_double(chromosome &Individual, double *inputs, double *outputs)
+bool t_mep::evaluate_double(t_mep_chromosome &Individual, double *inputs, double *outputs)
 {
 	bool is_error_case;  // division by zero, other errors
 
 	double *eval_vect = new double[Individual.best + 1];
 
-	for (int i = 0; i <= Individual.best; i++)   // read the chromosome from top to down
+	for (int i = 0; i <= Individual.best; i++)   // read the t_mep_chromosome from top to down
 	{
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
@@ -773,11 +773,11 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 		}
 }
 //---------------------------------------------------------------------------
-void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_double, int *line_of_constants)
+void t_mep::compute_eval_matrix_double(t_mep_chromosome &Individual, double **eval_double, int *line_of_constants)
 {
 	//	bool is_error_case;  // division by zero, other errors
 
-	for (int i = 0; i < parameters.code_length; i++)   // read the chromosome from top to down
+	for (int i = 0; i < parameters.code_length; i++)   // read the t_mep_chromosome from top to down
 	{
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
@@ -998,13 +998,13 @@ void t_mep::compute_eval_matrix_double(chromosome &Individual, double **eval_dou
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep::compute_eval_vector_double(chromosome &)
+void t_mep::compute_eval_vector_double(t_mep_chromosome &)
 {
 }
 //---------------------------------------------------------------------------
 int sort_function_chromosomes(const void *a, const void *b)
 {
-	return ((chromosome *)a)->compare((chromosome *)b, false);
+	return ((t_mep_chromosome *)a)->compare((t_mep_chromosome *)b, false);
 }
 //---------------------------------------------------------------------------
 void t_mep::sort_by_fitness(t_sub_population &pop) // sort ascending the individuals in population
