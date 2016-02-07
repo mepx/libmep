@@ -28,7 +28,7 @@ class t_mep
 {
 
 private:
-	t_parameters parameters;
+	t_mep_parameters parameters;
 	t_sub_population* pop;
 	double **cached_eval_matrix_double;
 	double *cached_sum_of_errors, *cached_threashold;

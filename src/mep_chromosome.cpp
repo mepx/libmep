@@ -593,7 +593,7 @@ int t_mep_chromosome::compare(t_mep_chromosome *other, bool minimize_operations_
 
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::generate_random(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // randomly initializes the individuals
+void t_mep_chromosome::generate_random(t_mep_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // randomly initializes the individuals
 {
 	// I have to generate the constants for this individuals
 	if (parameters->constants_probability > 1E-6) {
@@ -633,7 +633,7 @@ void t_mep_chromosome::generate_random(t_parameters *parameters, int *actual_ope
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::mutation(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // mutate the individual
+void t_mep_chromosome::mutation(t_mep_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // mutate the individual
 {
 
 	// mutate each symbol with the same pm probability
@@ -696,7 +696,7 @@ void t_mep_chromosome::mutation(t_parameters *parameters, int *actual_operators,
 		}
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters)
+void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters)
 {
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;
@@ -729,7 +729,7 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, 
 
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters)
+void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters)
 {
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;

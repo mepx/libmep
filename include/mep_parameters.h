@@ -12,7 +12,7 @@
 #define ONE_CUTTING_POINT_CROSSOVER 1
 
 //-----------------------------------------------------------------
-class t_parameters
+class t_mep_parameters
 {
 public:
     double mutation_probability;                   // mutation probability
@@ -37,7 +37,7 @@ public:
 
 	t_mep_constants constants;
 
-    t_parameters(void);
+	t_mep_parameters(void);
     void init (void);
     int to_xml(pugi::xml_node parent);
     int from_xml(pugi::xml_node parent);

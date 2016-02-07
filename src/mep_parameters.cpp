@@ -4,12 +4,12 @@
 #include <stdlib.h>
 
 
-t_parameters::t_parameters(void)
+t_mep_parameters::t_mep_parameters(void)
 {
     init();
 }
 //---------------------------------------------------------------------------
-void t_parameters::init (void)
+void t_mep_parameters::init (void)
 {
 	mutation_probability = 0.01;                      // mutation probability
 	crossover_probability = 0.9;                   // crossover probability
@@ -31,7 +31,7 @@ void t_parameters::init (void)
 	constants.init();
 }
 //---------------------------------------------------------------------------
-int t_parameters::to_xml(pugi::xml_node parent)
+int t_mep_parameters::to_xml(pugi::xml_node parent)
 {
     char tmp_str[30];
 	pugi::xml_node node = parent.append_child("mutation_probability");
@@ -125,7 +125,7 @@ int t_parameters::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_parameters::from_xml(pugi::xml_node parent)
+int t_mep_parameters::from_xml(pugi::xml_node parent)
 {
 	pugi::xml_node node = parent.child("mutation_probability");
 	if (node)

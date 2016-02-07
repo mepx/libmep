@@ -41,12 +41,12 @@ public:
 	int compare(t_mep_chromosome *other, bool minimize_operations_count);
 	void allocate_memory(long code_length, int num_total_vars, bool use_constants, t_mep_constants *constants);
     
-    void generate_random(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
+    void generate_random(t_mep_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
     
-    void generate_random_individual(t_parameters *parameters);
-	void mutation(t_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
-	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters);
-	void uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_parameters *parameters);
+    void generate_random_individual(t_mep_parameters *parameters);
+	void mutation(t_mep_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
+	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters);
+	void uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters);
 
 	void simplify(void);
 	void mark(int k, bool* marked);
