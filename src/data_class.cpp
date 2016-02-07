@@ -16,17 +16,17 @@
 
 char possible_chars[] = "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|";
 //-----------------------------------------------------------------
-t_data::t_data(void)
+t_mep_data::t_mep_data(void)
 {
 	init();
 }
 //-----------------------------------------------------------------
-t_data::~t_data()
+t_mep_data::~t_mep_data()
 {
 	delete_data();
 }
 //-----------------------------------------------------------------
-void t_data::delete_double_data(void)
+void t_mep_data::delete_double_data(void)
 {
 	if (_data_double) {
 		for (int i = 0; i < num_data; i++)
@@ -36,7 +36,7 @@ void t_data::delete_double_data(void)
 	}
 }
 //-----------------------------------------------------------------
-void t_data::delete_string_data(void)
+void t_mep_data::delete_string_data(void)
 {
 	if (_data_string) {
 		for (int i = 0; i < num_data; i++) {
@@ -50,13 +50,13 @@ void t_data::delete_string_data(void)
 	}
 }
 //-----------------------------------------------------------------
-void t_data::delete_data(void)
+void t_mep_data::delete_data(void)
 {
 	delete_double_data();
 	delete_string_data();
 }
 //-----------------------------------------------------------------
-void t_data::clear_data(void)
+void t_mep_data::clear_data(void)
 {
 	delete_data();
 	num_data = 0;
@@ -65,7 +65,7 @@ void t_data::clear_data(void)
 	num_targets = 1;
 }
 //-----------------------------------------------------------------
-void t_data::init(void)
+void t_mep_data::init(void)
 {
 	num_data = 0;
 	num_cols = 0;
@@ -101,7 +101,7 @@ bool get_next_field(char *start_sir, char list_separator, char* dest, int & size
 	return true;
 }
 // ---------------------------------------------------------------------------
-int t_data::from_xml(pugi::xml_node parent)
+int t_mep_data::from_xml(pugi::xml_node parent)
 {
 	clear_data();
 
@@ -226,7 +226,7 @@ int t_data::from_xml(pugi::xml_node parent)
 	return true;
 }
 //-----------------------------------------------------------------
-int t_data::to_xml(pugi::xml_node parent)
+int t_mep_data::to_xml(pugi::xml_node parent)
 {
 	char *tmp_str = new char[MAX_ROW_CHARS];
 
@@ -327,7 +327,7 @@ bool my_fgets(char*buf, int max_n, FILE *f)
 	return (i > 0);
 }
 //------------------------------------------------------------
-bool t_data::to_csv(const char *filename, char list_separator)
+bool t_mep_data::to_csv(const char *filename, char list_separator)
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -353,7 +353,7 @@ bool t_data::to_csv(const char *filename, char list_separator)
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_data::detect_list_separator(const char *file_name)
+bool t_mep_data::detect_list_separator(const char *file_name)
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -412,7 +412,7 @@ bool t_data::detect_list_separator(const char *file_name)
 	return false;
 }
 //-----------------------------------------------------------------
-void t_data::count_0_class(int target_col)
+void t_mep_data::count_0_class(int target_col)
 {
 	num_class_0 = 0;
 	for (int i = 0; i < num_data; i++)
@@ -420,7 +420,7 @@ void t_data::count_0_class(int target_col)
 			num_class_0++;
 }
 //-----------------------------------------------------------------
-bool t_data::from_csv(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_mep_data::from_csv(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
 {
 
 	if (!detect_list_separator(filename))
@@ -454,7 +454,7 @@ bool t_data::from_csv(const char *filename) // extra_variable is used by test da
 
 }
 //-----------------------------------------------------------------
-bool t_data::from_csv_string(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_mep_data::from_csv_string(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -505,7 +505,7 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 	rewind(f);
 
 	_data_string = new char**[num_data];
-	int count_data = 0;
+	int count_mep_data = 0;
 	//has_missing_values = 0;
 
 	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
@@ -514,16 +514,16 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 			int col = 0;
 			char tmp_str[1000];
 			int size;
-			_data_string[count_data] = new char*[num_cols];
+			_data_string[count_mep_data] = new char*[num_cols];
 			for (int c = 0; c < num_cols; c++)
-				_data_string[count_data][col] = NULL;
+				_data_string[count_mep_data][col] = NULL;
 
 			int skipped = 0;
 			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 			while (result) {
 				if (col < num_cols) {
-					_data_string[count_data][col] = new char[strlen(tmp_str) + 1];
-					strcpy(_data_string[count_data][col], tmp_str);
+					_data_string[count_mep_data][col] = new char[strlen(tmp_str) + 1];
+					strcpy(_data_string[count_mep_data][col], tmp_str);
 				}
 				else {
 					break;
@@ -535,7 +535,7 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 
 				col++;
 			}
-			count_data++;
+			count_mep_data++;
 		}
 		buf = start_buf;
 	}
@@ -545,7 +545,7 @@ bool t_data::from_csv_string(const char *filename) // extra_variable is used by 
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_data::from_csv_double(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_mep_data::from_csv_double(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -597,7 +597,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 	rewind(f);
 
 	_data_double = new double*[num_data];
-	int count_data = 0;
+	int count_mep_data = 0;
 
 	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
 		long len = strlen(buf);
@@ -606,11 +606,11 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 			char tmp_str[MAX_ROW_CHARS];
 			int size;
 			int skipped;
-			_data_double[count_data] = new double[num_cols];
+			_data_double[count_mep_data] = new double[num_cols];
 			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 			while (result) {
 				if (col < num_cols)
-					_data_double[count_data][col] = atof(tmp_str);
+					_data_double[count_mep_data][col] = atof(tmp_str);
 				else {
 					break;
 				}
@@ -619,7 +619,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 
 				col++;
 			}
-			count_data++;
+			count_mep_data++;
 		}
 		buf = start_buf;
 	}
@@ -628,7 +628,7 @@ bool t_data::from_csv_double(const char *filename) // extra_variable is used by 
 	return true;
 }
 //-----------------------------------------------------------------
-void t_data::to_numeric(void)
+void t_mep_data::to_numeric(void)
 {
 	if (num_data) {
 		int *index_new_strings = new int[num_data];
@@ -682,7 +682,7 @@ void t_data::to_numeric(void)
 	data_type = MEP_DATA_DOUBLE;
 }
 //-----------------------------------------------------------------
-int t_data::to_interval_everywhere(double min, double max)
+int t_mep_data::to_interval_everywhere(double min, double max)
 {
     int result = to_interval_all_variables(min, max);
 	if (!result)
@@ -692,7 +692,7 @@ int t_data::to_interval_everywhere(double min, double max)
 	return 1;
 }
 //-----------------------------------------------------------------
-int t_data::to_interval_selected_col(double min, double max, int col)
+int t_mep_data::to_interval_selected_col(double min, double max, int col)
 {
 	if (num_data){
 		if (data_type == MEP_DATA_DOUBLE) {// double
@@ -723,7 +723,7 @@ int t_data::to_interval_selected_col(double min, double max, int col)
 	return 1;
 }
 //-----------------------------------------------------------------
-int t_data::to_interval_all_variables(double min, double max)
+int t_mep_data::to_interval_all_variables(double min, double max)
 {
 	if (num_data){
 		if (data_type == MEP_DATA_DOUBLE) {// double
@@ -756,7 +756,7 @@ int t_data::to_interval_all_variables(double min, double max)
 	return 1;
 }
 //-----------------------------------------------------------------
-int t_data::move_to(t_data *dest, int count)
+int t_mep_data::move_to(t_mep_data *dest, int count)
 {
 	if (!(data_type == dest->data_type || !dest->num_data))
 		return 1; // can move only of the same type
@@ -844,7 +844,7 @@ bool re_match(char *str, const char *pattern, bool use_regular)
 		}
 }
 //-----------------------------------------------------------------
-int t_data::replace_symbol_from_selected_col(const char *s_find_what, const char* s_replace_with, int col, bool use_regular)
+int t_mep_data::replace_symbol_from_selected_col(const char *s_find_what, const char* s_replace_with, int col, bool use_regular)
 {
 	int count_replaced = 0;
 	if (data_type == MEP_DATA_STRING) { // string
@@ -875,7 +875,7 @@ int t_data::replace_symbol_from_selected_col(const char *s_find_what, const char
 	return count_replaced;
 }
 //-----------------------------------------------------------------
-int  t_data::replace_symbol_everywhere(const char *s_find_what, const char* s_replace_with, bool use_regular)
+int  t_mep_data::replace_symbol_everywhere(const char *s_find_what, const char* s_replace_with, bool use_regular)
 {
     int tmp_count;
 	tmp_count = replace_symbol_from_all_variables(s_find_what, s_replace_with, use_regular);
@@ -886,7 +886,7 @@ int  t_data::replace_symbol_everywhere(const char *s_find_what, const char* s_re
 	return count_replaced;
 }
 //-----------------------------------------------------------------
-int  t_data::replace_symbol_from_all_variables(const char *s_find_what, const char* s_replace_with, bool use_regular)
+int  t_mep_data::replace_symbol_from_all_variables(const char *s_find_what, const char* s_replace_with, bool use_regular)
 {
 	int count_replaced = 0;
 	if (data_type == MEP_DATA_STRING) { // string
@@ -919,7 +919,7 @@ int  t_data::replace_symbol_from_all_variables(const char *s_find_what, const ch
 	return count_replaced;
 }
 //-----------------------------------------------------------------
-int t_data::find_symbol_from_selected_col(const char *s_find_what, int col, bool use_regular)
+int t_mep_data::find_symbol_from_selected_col(const char *s_find_what, int col, bool use_regular)
 {
 	int count_found = 0;
 	if (data_type == MEP_DATA_STRING) { // string
@@ -946,7 +946,7 @@ int t_data::find_symbol_from_selected_col(const char *s_find_what, int col, bool
 	return count_found;
 }
 //-----------------------------------------------------------------
-int t_data::find_symbol_everywhere(const char *s_find_what, bool use_regular)
+int t_mep_data::find_symbol_everywhere(const char *s_find_what, bool use_regular)
 {
 	int tmp_count;
 	tmp_count = find_symbol_from_all_variables(s_find_what, use_regular);
@@ -957,7 +957,7 @@ int t_data::find_symbol_everywhere(const char *s_find_what, bool use_regular)
 	return count_found;
 }
 //-----------------------------------------------------------------
-int t_data::find_symbol_from_all_variables(const char *s_find_what, bool use_regular)
+int t_mep_data::find_symbol_from_all_variables(const char *s_find_what, bool use_regular)
 {
 	int count_found;
 	count_found = 0;
@@ -988,7 +988,7 @@ int t_data::find_symbol_from_all_variables(const char *s_find_what, bool use_reg
 	return count_found;
 }
 //-----------------------------------------------------------------
-void t_data::shuffle(void)
+void t_mep_data::shuffle(void)
 {
 	if (data_type == MEP_DATA_DOUBLE) { // double
 		for (int i = num_data - 1; i >= 1; i--){
@@ -1009,7 +1009,7 @@ void t_data::shuffle(void)
 	}
 }
 //-----------------------------------------------------------------
-bool t_data::is_classification_problem(void)
+bool t_mep_data::is_classification_problem(void)
 {
 	for (int i = 0; i < num_data; i++)
 		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 &&  fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)

@@ -7,7 +7,7 @@
 #define MEP_DATA_STRING 1
 
 //-----------------------------------------------------------------
-class t_data
+class t_mep_data
 {
 private:
 	bool from_csv_double(const char *file_name);
@@ -22,9 +22,7 @@ public:
 
     double **_data_double;
     
-
 	char* **_data_string;
-	//char* *_target_string;
 
 	int num_targets;
 
@@ -34,8 +32,8 @@ public:
 
 	char list_separator;
 
-    t_data(void);
-    ~t_data();
+	t_mep_data(void);
+	~t_mep_data();
     void clear_data(void);
 	void delete_data(void);
     void init(void);
@@ -62,7 +60,7 @@ public:
 
 	bool detect_list_separator(const char *file_name);
 
-	int move_to(t_data *, int count);
+	int move_to(t_mep_data *, int count);
 
 	void count_0_class(int target_col);
 

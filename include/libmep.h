@@ -47,9 +47,9 @@ private:
 	bool _stopped;
 	int last_run_index;
 
-	t_data training_data;
-	t_data validation_data;
-	t_data test_data;
+	t_mep_data training_data;
+	t_mep_data validation_data;
+	t_mep_data test_data;
 
 	char version[100];
 	t_mep_stat *stats;
