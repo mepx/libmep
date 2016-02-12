@@ -11,14 +11,16 @@ void on_generation(void)
 int main(void)
 {
 	t_mep mep;
+	t_mep_data training_data;
 
-	if (!mep.load_training_data_from_csv("building1.csv")) {
+	if (!training_data.from_csv("building1.csv")) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
 		printf("Press Enter...");
 		getchar();
 		return 1;
 	}
 
+	mep.set_training_data(&training_data);
 	mep.set_addition(true);
 	mep.set_subtraction(true);
 	mep.set_multiplication(true);
@@ -36,7 +38,7 @@ int main(void)
 	
 	printf("\nError = %lf\n", error);
 
-	printf("Program = \n%s\n", mep.program_as_C(0, 0, mep.get_training_data_row(0)));
+	printf("Program = \n%s\n", mep.program_as_C(0, 0, training_data.get_row(0)));
 
 	printf("Press Enter...");
 	
