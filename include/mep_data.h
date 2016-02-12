@@ -16,6 +16,8 @@ private:
 	void delete_double_data(void);
 	void delete_string_data(void);
 
+	bool _modified;
+
 public:
     int num_cols;
     int num_data;
@@ -34,7 +36,17 @@ public:
 
 	t_mep_data(void);
 	~t_mep_data();
-    void clear_data(void);
+
+	int get_num_rows(void);
+	int get_num_cols(void);
+
+	int get_data_type(void);
+
+	double* get_row(int row);
+	double get_value_double(int row, int col);
+	char* get_value_string(int row, int col);
+
+	void clear_data(void);
 	void delete_data(void);
     void init(void);
 
@@ -65,6 +77,8 @@ public:
 	void count_0_class(int target_col);
 
 	bool is_classification_problem(void);
+
+	bool is_modified(void);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

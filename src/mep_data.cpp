@@ -63,6 +63,8 @@ void t_mep_data::clear_data(void)
 	num_cols = 0;
 	data_type = MEP_DATA_DOUBLE;// double
 	num_targets = 1;
+
+	_modified = false;
 }
 //-----------------------------------------------------------------
 void t_mep_data::init(void)
@@ -78,6 +80,8 @@ void t_mep_data::init(void)
 
 	data_type = MEP_DATA_DOUBLE;// double
 	num_targets = 1;
+
+	_modified = false;
 
 }
 //-----------------------------------------------------------------
@@ -223,6 +227,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 		}
 	}
 
+	_modified = true;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -446,6 +451,8 @@ bool t_mep_data::from_csv(const char *filename) // extra_variable is used by tes
 	// lets see what is there
 	fgets(buf, 1000, f);
 	fclose(f);
+
+	_modified = true;
 
 	if (strpbrk(buf, "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|"))
 		return from_csv_string(filename);
@@ -678,6 +685,8 @@ void t_mep_data::to_numeric(void)
 		}
 
 		delete[] index_new_strings;
+
+		_modified = true;
 	}
 	data_type = MEP_DATA_DOUBLE;
 }
@@ -685,6 +694,7 @@ void t_mep_data::to_numeric(void)
 int t_mep_data::to_interval_everywhere(double min, double max)
 {
     int result = to_interval_all_variables(min, max);
+	_modified = true;
 	if (!result)
 		return 0;
 	if (num_targets)
@@ -696,7 +706,7 @@ int t_mep_data::to_interval_selected_col(double min, double max, int col)
 {
 	if (num_data){
 		if (data_type == MEP_DATA_DOUBLE) {// double
-
+			_modified = true;
 
 			double min_col = _data_double[0][col];
 			double max_col = _data_double[0][col];
@@ -726,6 +736,8 @@ int t_mep_data::to_interval_selected_col(double min, double max, int col)
 int t_mep_data::to_interval_all_variables(double min, double max)
 {
 	if (num_data){
+		_modified = true;
+		
 		if (data_type == MEP_DATA_DOUBLE) {// double
 			for (int v = 0; v < num_cols; v++) {
 				//is this numeric or alpha ?
@@ -761,6 +773,8 @@ int t_mep_data::move_to(t_mep_data *dest, int count)
 	if (!(data_type == dest->data_type || !dest->num_data))
 		return 1; // can move only of the same type
 	if (num_data >= count) {
+
+		_modified = true;
 
         if (dest->num_data == 0) {
 			dest->num_cols = num_cols;
@@ -872,6 +886,8 @@ int t_mep_data::replace_symbol_from_selected_col(const char *s_find_what, const 
 					count_replaced++;
 				}
 		}
+
+	_modified = true;
 	return count_replaced;
 }
 //-----------------------------------------------------------------
@@ -882,6 +898,8 @@ int  t_mep_data::replace_symbol_everywhere(const char *s_find_what, const char* 
     int count_replaced = tmp_count;
 	tmp_count = replace_symbol_from_selected_col(s_find_what, s_replace_with, num_cols - 1, use_regular);
     count_replaced += tmp_count;
+
+	_modified = true;
 
 	return count_replaced;
 }
@@ -916,6 +934,8 @@ int  t_mep_data::replace_symbol_from_all_variables(const char *s_find_what, cons
 						count_replaced++;
 					}
 		}
+
+	_modified = true;
 	return count_replaced;
 }
 //-----------------------------------------------------------------
@@ -943,6 +963,7 @@ int t_mep_data::find_symbol_from_selected_col(const char *s_find_what, int col, 
 				}
 		}
 
+	_modified = true;
 	return count_found;
 }
 //-----------------------------------------------------------------
@@ -1007,6 +1028,7 @@ void t_mep_data::shuffle(void)
 			_data_string[j] = row;
 		}
 	}
+	_modified = true;
 }
 //-----------------------------------------------------------------
 bool t_mep_data::is_classification_problem(void)
@@ -1015,5 +1037,40 @@ bool t_mep_data::is_classification_problem(void)
 		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 &&  fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)
 			return false;
 	return true;
+}
+//-----------------------------------------------------------------
+int t_mep_data::get_num_rows(void)
+{
+	return num_data;
+}
+//-----------------------------------------------------------------
+int t_mep_data::get_num_cols(void)
+{
+	return num_cols;
+}
+//-----------------------------------------------------------------
+int t_mep_data::get_data_type(void)
+{
+	return data_type;
+}
+//-----------------------------------------------------------------
+double* t_mep_data::get_row(int row)
+{ 
+	return _data_double[row];
+}
+//-----------------------------------------------------------------
+double t_mep_data::get_value_double(int row, int col)
+{
+	return _data_double[row][col];
+}
+//-----------------------------------------------------------------
+char* t_mep_data::get_value_string(int row, int col)
+{
+	return _data_string[row][col];
+}
+//-----------------------------------------------------------------
+bool t_mep_data::is_modified(void)
+{
+	return _modified;
 }
 //-----------------------------------------------------------------
