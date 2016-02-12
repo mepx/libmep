@@ -267,10 +267,6 @@ public:
 	// gets the output obtaining by running the best program in a given run against in input
 	bool get_output(int run_index, double *inputs, double *outputs);
 
-	//void evolve_one_subpopulation_for_one_generation(t_sub_population &pop, double**, s_value_class *tmp_value_class);
-	//void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, t_parameters &params, double **training_data, int num_training_data, int num_variables, double ** eval_double, s_value_class *tmp_value_class);
-
-
 	void sort_stats_by_running_time(bool ascending);
 	void sort_stats_by_training_error(bool ascending);
 	void sort_stats_by_validation_error(bool ascending);
@@ -613,143 +609,8 @@ public:
 	// initialize operators
 	void init_operators();
 
-	// returns true if the training data is a classification problem (last column has only 0 and 1)
-	//bool is_training_data_a_classification_problem(void);
-
-	// returns true if the test data is a classification problem (last column has only 0 and 1)
-	//bool is_test_data_a_classification_problem(void);
-
-	// returns true if the validation data is a classification problem (last column has only 0 and 1)
-	//bool is_validation_data_a_classification_problem(void);
-
-	// scale all training data to [min, max] interval
-	//void training_data_scale_to_interval_everywhere(double min, double max);
-
-	// scale all training data variables to [min, max] interval
-	//void training_data_scale_to_interval_all_variables(double min, double max);
-
-	// scale the selected training data column to [min, max] interval
-	//void training_data_scale_to_interval_selected_col(double min, double max, int col);
-
-	// replace a given string in the training data column
-	// returns the number of replacements
-	//int training_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
-	
-	// replace a given string in all variables of the training data matrix
-	// returns the number of replacements
-	//int training_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
-
-	// replace a given string everywhere in the training data matrix
-	// returns the number of replacements
-	//int training_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
-
-	// searches for a string in a particular col of the training matrix
-	// returns the number of findings
-	//int training_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
-	
-	// searches for a string in all variables of the training matrix
-	// returns the number of findings
-	//int training_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
-	
-	// searches for a string in all training matrix
-	// returns the number of findings
-	//int training_data_find_symbol_everywhere(const char *find_what, bool use_regular);
-
-
-	// scale all validation data to [min, max] interval
-	//void validation_data_scale_to_interval_everywhere(double min, double max);
-
-	// scale all validation data variables to [min, max] interval
-	//void validation_data_scale_to_interval_all_variables(double min, double max);
-
-	// scale the selected validation data column to [min, max] interval
-	//void validation_data_scale_to_interval_selected_col(double min, double max, int col);
-
-	// replace a given string in the validation data column
-	// returns the number of replacements
-	//int validation_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
-
-	// replace a given string in all variables of the validation data matrix
-	// returns the number of replacements
-	//int validation_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
-
-	// replace a given string everywhere in the validation data matrix
-	// returns the number of replacements
-	//int validation_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
-
-	// searches for a string in a particular col of the validation matrix
-	// returns the number of findings
-	//int validation_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
-
-	// searches for a string in all variables of the validation matrix
-	// returns the number of findings
-	//int validation_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
-
-	// searches for a string in all validation matrix
-	// returns the number of findings
-	//int validation_data_find_symbol_everywhere(const char *find_what, bool use_regular);
-
-	// scale all test data to [min, max] interval
-	//void test_data_scale_to_interval_everywhere(double min, double max);
-
-	// scale all test data variables to [min, max] interval
-	//void test_data_scale_to_interval_all_variables(double min, double max);
-
-	// scale the selected test data column to [min, max] interval
-	//void test_data_scale_to_interval_selected_col(double min, double max, int col);
-
-	// replace a given string in the test data column
-	// returns the number of replacements
-	//int test_data_replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
-
-	// replace a given string in all variables of the test data matrix
-	// returns the number of replacements
-	//int test_data_replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
-
-	// replace a given string everywhere in the training data matrix
-	// returns the number of replacements
-	//int test_data_replace_symbol_everywhere(const char *find_what, const char* replace_with, bool use_regular);
-
-	// searches for a string in a particular col of the test matrix
-	// returns the number of findings
-	//int test_data_find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
-
-	// searches for a string in all variables of the test matrix
-	// returns the number of findings
-	//int test_data_find_symbol_from_all_variables(const char *find_what, bool use_regular);
-
-	// searches for a string in all test matrix
-	// returns the number of findings
-	//int test_data_find_symbol_everywhere(const char *find_what, bool use_regular);
-
-	// randomly re-arrange rows of the training matrix
-	//void training_data_shuffle(void);
-
-	// moves rows_count rows from training matrix to validation matrix
-	//int move_training_data_to_validation(int rows_count);
-	
-	// moves rows_count rows from training matrix to test matrix
-	//int move_training_data_to_test(int rows_count);
-	
-	// moves rows_count rows from test matrix to training matrix
-	//int move_test_data_to_training(int rows_count);
-	
-	// moves rows_count rows from validation matrix to training matrix
-	//int move_validation_data_to_training(int rows_count);
-
 	// clears everything
 	void clear_stats(void);
-
-	// returns an entire row of the training matrix
-	//double* get_training_data_row(int row);
-
-	// returns an entire row of the validation matrix
-	//double* get_validation_data_row(int row);
-
-	// returns an entire row of the test matrix
-	//double* get_test_data_row(int row);
-
-	//double** get_training_data_matrix(void);
 
 	// returns the chromosome as a C program
 	char* program_as_C(int run_index, bool simplified, double *inputs);
