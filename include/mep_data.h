@@ -10,20 +10,11 @@
 class t_mep_data
 {
 private:
-	bool from_csv_double(const char *file_name);
-	bool from_csv_string(const char *file_name);
+	int num_cols;
+	int num_data;
 
-	void delete_double_data(void);
-	void delete_string_data(void);
+	double **_data_double;
 
-	bool _modified;
-
-public:
-    int num_cols;
-    int num_data;
-
-    double **_data_double;
-    
 	char* **_data_string;
 
 	int num_targets;
@@ -34,6 +25,15 @@ public:
 
 	char list_separator;
 
+	bool _modified;
+
+	bool from_csv_double(const char *file_name);
+	bool from_csv_string(const char *file_name);
+
+	void delete_double_data(void);
+	void delete_string_data(void);
+public:
+
 	t_mep_data(void);
 	~t_mep_data();
 
@@ -42,7 +42,15 @@ public:
 
 	int get_data_type(void);
 
+	int get_num_targets(void);
+
+	double** get_data_matrix_double(void);
+	char*** get_data_matrix_string(void);
+	
+	// returns an entire row as a pointer to double
+	// data type must be 0,
 	double* get_row(int row);
+
 	double get_value_double(int row, int col);
 	char* get_value_string(int row, int col);
 
@@ -79,6 +87,8 @@ public:
 	bool is_classification_problem(void);
 
 	bool is_modified(void);
+
+	int get_num_items_class_0(void);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

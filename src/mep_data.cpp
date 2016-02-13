@@ -302,6 +302,7 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 		}
 
 	delete[] tmp_str;
+	_modified = false;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -349,12 +350,24 @@ bool t_mep_data::to_csv(const char *filename, char list_separator)
 
 	if (!f)
 		return false;
-	for (int d = 0; d < num_data; d++) {
+
+	if (_data_double)
+	  for (int d = 0; d < num_data; d++) {
 		for (int v = 0; v < num_cols; v++)
 			fprintf(f, "%lg%c", _data_double[d][v], list_separator);
+		fprintf(f, "\n");
 	}
+	else
+		if (_data_string)
+			for (int d = 0; d < num_data; d++) {
+				for (int v = 0; v < num_cols; v++)
+					fprintf(f, "%s%c", _data_string[d][v], list_separator);
+				fprintf(f, "\n");
+			}
 
 	fclose(f);
+
+	_modified = false;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -1072,5 +1085,25 @@ char* t_mep_data::get_value_string(int row, int col)
 bool t_mep_data::is_modified(void)
 {
 	return _modified;
+}
+//-----------------------------------------------------------------
+int t_mep_data::get_num_targets(void)
+{
+	return num_targets;
+}
+//-----------------------------------------------------------------
+double** t_mep_data::get_data_matrix_double(void)
+{
+	return _data_double;
+}
+//-----------------------------------------------------------------
+int t_mep_data::get_num_items_class_0(void)
+{
+	return num_class_0;
+}
+//-----------------------------------------------------------------
+char*** t_mep_data::get_data_matrix_string(void)
+{
+	return _data_string;
 }
 //-----------------------------------------------------------------
