@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.11.0");
+	strcpy(version, "2016.02.13.1");
 
 	num_operators = 0;
 
@@ -76,21 +76,21 @@ void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value
 	for (int c = 0; c < parameters.num_threads; c++) {
 		(*eval_double)[c] = new double*[parameters.code_length];
 		for (int i = 0; i < parameters.code_length; i++)
-			(*eval_double)[c][i] = new double[training_data->num_data];
+			(*eval_double)[c][i] = new double[training_data->get_num_rows()];
 	}
 
 	cached_eval_matrix_double = new double*[num_total_variables];
 	for (int i = 0; i < num_total_variables; i++)
 		cached_eval_matrix_double[i] = NULL;
 	for (int i = 0; i < num_actual_variables; i++)
-		cached_eval_matrix_double[actual_enabled_variables[i]] = new double[training_data->num_data];
+		cached_eval_matrix_double[actual_enabled_variables[i]] = new double[training_data->get_num_rows()];
 
 	cached_sum_of_errors = new double[num_total_variables];
 	cached_threashold = new double[num_total_variables];
 
 	*array_value_class = new s_value_class*[parameters.num_threads];
 	for (int c = 0; c < parameters.num_threads; c++)
-		(*array_value_class)[c] = new s_value_class[training_data->num_data];
+		(*array_value_class)[c] = new s_value_class[training_data->get_num_rows()];
 }
 //---------------------------------------------------------------------------
 void t_mep::allocate_sub_population(t_sub_population &pop)
@@ -126,13 +126,15 @@ void t_mep::fitness_classification(t_mep_chromosome &individual, double **eval, 
 //---------------------------------------------------------------------------
 void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval_vect, double *sum_of_errors_array)
 {
+	double **data = training_data->get_data_matrix_double();
+
 	Individual.fit = 1E+308;
 	Individual.best = -1;
 
 	for (int i = 0; i < parameters.code_length; i++)
 		sum_of_errors_array[i] = 0;
 
-	for (int k = 0; k < training_data->num_data; k++) {   // read the t_mep_chromosome from top to down
+	for (int k = 0; k < training_data->get_num_rows(); k++) {   // read the t_mep_chromosome from top to down
 		for (int i = 0; i < parameters.code_length; i++) {    // read the t_mep_chromosome from top to down
 
 			errno = 0;
@@ -237,7 +239,7 @@ void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval
 
 			default:  // a variable
 				if (Individual.prg[i].op < Individual.num_total_variables)
-					eval_vect[i] = training_data->_data_double[k][Individual.prg[i].op];
+					eval_vect[i] = data[k][Individual.prg[i].op];
 				else
 					eval_vect[i] = Individual.constants_double[Individual.prg[i].op - Individual.num_total_variables];
 				break;
@@ -248,13 +250,13 @@ void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval
 			}
 			else
 				// everything ok - I must compute the difference between what I obtained and what I should obtain
-				sum_of_errors_array[i] += fabs(eval_vect[i] - training_data->_data_double[k][num_total_variables]);
+				sum_of_errors_array[i] += fabs(eval_vect[i] - data[k][num_total_variables]);
 		}
 	}
 
 	for (int i = 0; i < parameters.code_length; i++) {    // find the best gene
-		if (Individual.fit > sum_of_errors_array[i] / training_data->num_data) {
-			Individual.fit = sum_of_errors_array[i] / training_data->num_data;
+		if (Individual.fit > sum_of_errors_array[i] / training_data->get_num_rows()) {
+			Individual.fit = sum_of_errors_array[i] / training_data->get_num_rows();
 			Individual.best = i;
 		}
 	}
@@ -262,6 +264,8 @@ void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval
 //---------------------------------------------------------------------------
 void t_mep::fitness_regression_double_cache_all_training_data(t_mep_chromosome &Individual, double** eval_matrix_double)
 {
+	double **data = training_data->get_data_matrix_double();
+
 	// evaluate Individual
 	// partial results are stored and used later in other sub-expressions
 
@@ -281,7 +285,7 @@ void t_mep::fitness_regression_double_cache_all_training_data(t_mep_chromosome &
 
 	compute_eval_matrix_double(Individual, eval_matrix_double, line_of_constants);
 
-	int num_training_data = training_data->num_data;
+	int num_training_data = training_data->get_num_rows();
 
 	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
@@ -297,7 +301,7 @@ void t_mep::fitness_regression_double_cache_all_training_data(t_mep_chromosome &
 				if (cached_sum_of_errors_for_constants[cst_index] < -0.5) {
 					double *eval = eval_matrix_double[line_of_constants[cst_index]];
 					for (int k = 0; k < num_training_data; k++)
-						sum_of_errors += fabs(eval[k] - training_data->_data_double[k][num_total_variables]);
+						sum_of_errors += fabs(eval[k] - data[k][num_total_variables]);
 				}
 				else
 					sum_of_errors = cached_sum_of_errors_for_constants[cst_index];
@@ -307,10 +311,10 @@ void t_mep::fitness_regression_double_cache_all_training_data(t_mep_chromosome &
 			double *eval = eval_matrix_double[i];
 			sum_of_errors = 0;
 			for (int k = 0; k < num_training_data; k++)
-				sum_of_errors += fabs(eval[k] - training_data->_data_double[k][num_total_variables]);
+				sum_of_errors += fabs(eval[k] - data[k][num_total_variables]);
 		}
-		if (Individual.fit > sum_of_errors / training_data->num_data) {
-			Individual.fit = sum_of_errors / training_data->num_data;
+		if (Individual.fit > sum_of_errors / training_data->get_num_rows()) {
+			Individual.fit = sum_of_errors / training_data->get_num_rows();
 			Individual.best = i;
 		}
 	}
@@ -349,7 +353,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 	else {// a constant
 	double *eval = eval_double[line_of_constants[Individual.prg[i].op - training_data.num_vars]];
 	sum_of_errors = 0;
-	for (int k = 0; k < training_data->num_data; k++)
+	for (int k = 0; k < training_data->get_num_rows(); k++)
 	if (eval[k] <= parameters.classification_threshold)
 	sum_of_errors += training_data._target_double[k];
 	else
@@ -358,15 +362,15 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 	else {
 	double *eval = eval_double[i];
 	sum_of_errors = 0;
-	for (int k = 0; k < training_data->num_data; k++)
+	for (int k = 0; k < training_data->get_num_rows(); k++)
 	if (eval[k] <= parameters.classification_threshold)
 	sum_of_errors += training_data._target_double[k];
 	else
 	sum_of_errors += 1 - training_data._target_double[k];
 	}
 
-	if (Individual.fit > sum_of_errors / training_data->num_data) {
-	Individual.fit = sum_of_errors / training_data->num_data;
+	if (Individual.fit > sum_of_errors / training_data->get_num_rows()) {
+	Individual.fit = sum_of_errors / training_data->get_num_rows();
 	Individual.best = i;
 	}
 	}
@@ -379,8 +383,11 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 //---------------------------------------------------------------------------
 void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromosome &Individual, double **eval_matrix_double, s_value_class *tmp_value_class)
 {
+
 	// evaluate Individual
 	// partial results are stored and used later in other sub-expressions
+
+	double **data = training_data->get_data_matrix_double();
 
 	Individual.fit = 1E+308;
 	Individual.best = -1;
@@ -403,12 +410,12 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 				best_threshold = cached_threashold[Individual.prg[i].op];
 			}
 			else {// a constant
-				if (training_data->num_class_0 < training_data->num_data - training_data->num_class_0) {// i must classify everything as 1
-					sum_of_errors = training_data->num_class_0;
+				if (training_data->get_num_items_class_0() < training_data->get_num_rows() - training_data->get_num_items_class_0()) {// i must classify everything as 1
+					sum_of_errors = training_data->get_num_items_class_0();
 					best_threshold = eval_matrix_double[line_of_constants[Individual.prg[i].op - num_total_variables]][0] - 1;
 				}
 				else {// less of 1, I must classify everything as class 0
-					sum_of_errors = training_data->num_data - training_data->num_class_0;
+					sum_of_errors = training_data->get_num_rows() - training_data->get_num_items_class_0();
 					best_threshold = eval_matrix_double[line_of_constants[Individual.prg[i].op - num_total_variables]][0];
 				}
 			}
@@ -416,20 +423,20 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 			double *eval = eval_matrix_double[i];
 
 
-			for (int k = 0; k < training_data->num_data; k++) {
+			for (int k = 0; k < training_data->get_num_rows(); k++) {
 				tmp_value_class[k].value = eval[k];
-				tmp_value_class[k].data_class = (int)training_data->_data_double[k][num_total_variables];
+				tmp_value_class[k].data_class = (int)data[k][num_total_variables];
 			}
-			qsort((void*)tmp_value_class, training_data->num_data, sizeof(s_value_class), sort_function_value_class);
+			qsort((void*)tmp_value_class, training_data->get_num_rows(), sizeof(s_value_class), sort_function_value_class);
 
-			int num_0_incorrect = training_data->num_class_0;
+			int num_0_incorrect = training_data->get_num_items_class_0();
 			int num_1_incorrect = 0;
 			best_threshold = tmp_value_class[0].value - 1;// all are classified to class 1 in this case
 			sum_of_errors = num_0_incorrect;
 
-			for (int t = 0; t < training_data->num_data; t++) {
+			for (int t = 0; t < training_data->get_num_rows(); t++) {
 				int j = t + 1;
-				while (j < training_data->num_data && fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				while (j < training_data->get_num_rows() && fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
 				// le verific pe toate intre i si j si le cataloghez ca apartinant la clasa 0
@@ -450,8 +457,8 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 			}
 		}
 
-		if (Individual.fit > sum_of_errors / training_data->num_data) {
-			Individual.fit = sum_of_errors / training_data->num_data;
+		if (Individual.fit > sum_of_errors / training_data->get_num_rows()) {
+			Individual.fit = sum_of_errors / training_data->get_num_rows();
 			Individual.best = i;
 			Individual.best_class_threshold = best_threshold;
 		}
@@ -707,7 +714,7 @@ void t_mep::compute_cached_eval_matrix_double(void)
 	if (parameters.problem_type == PROBLEM_REGRESSION)
 	for (int v = 0; v < training_data.num_vars; v++) {
 	cached_sum_of_errors[v] = 0;
-	for (int k = 0; k < training_data->num_data; k++) {
+	for (int k = 0; k < training_data->get_num_rows(); k++) {
 	cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
 	cached_sum_of_errors[v] += fabs(cached_eval_matrix_double[v][k] - training_data._target_double[k]);
 	}
@@ -715,7 +722,7 @@ void t_mep::compute_cached_eval_matrix_double(void)
 	else
 	for (int v = 0; v < training_data.num_vars; v++) {
 	cached_sum_of_errors[v] = 0;
-	for (int k = 0; k < training_data->num_data; k++) {
+	for (int k = 0; k < training_data->get_num_rows(); k++) {
 	cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
 	if (cached_eval_matrix_double[v][k] <= parameters.classification_threshold)
 	cached_sum_of_errors[v] += training_data._target_double[k];
@@ -728,34 +735,36 @@ void t_mep::compute_cached_eval_matrix_double(void)
 //---------------------------------------------------------------------------
 void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 {
+	double **data = training_data->get_data_matrix_double();
+
 	if (parameters.problem_type == PROBLEM_REGRESSION)
 		for (int v = 0; v < num_actual_variables; v++) {
 			cached_sum_of_errors[actual_enabled_variables[v]] = 0;
-			for (int k = 0; k < training_data->num_data; k++) {
-				cached_eval_matrix_double[actual_enabled_variables[v]][k] = training_data->_data_double[k][actual_enabled_variables[v]];
-				cached_sum_of_errors[actual_enabled_variables[v]] += fabs(cached_eval_matrix_double[actual_enabled_variables[v]][k] - training_data->_data_double[k][num_total_variables]);
+			for (int k = 0; k < training_data->get_num_rows(); k++) {
+				cached_eval_matrix_double[actual_enabled_variables[v]][k] = data[k][actual_enabled_variables[v]];
+				cached_sum_of_errors[actual_enabled_variables[v]] += fabs(cached_eval_matrix_double[actual_enabled_variables[v]][k] - data[k][num_total_variables]);
 			}
 		}
 	else
 		for (int v = 0; v < num_actual_variables; v++) {
 
 			cached_threashold[actual_enabled_variables[v]] = 0;
-			for (int k = 0; k < training_data->num_data; k++) {
-				cached_eval_matrix_double[actual_enabled_variables[v]][k] = training_data->_data_double[k][actual_enabled_variables[v]];
-				array_value_class[k].value = training_data->_data_double[k][actual_enabled_variables[v]];
-				array_value_class[k].data_class = (int)training_data->_data_double[k][num_total_variables];
+			for (int k = 0; k < training_data->get_num_rows(); k++) {
+				cached_eval_matrix_double[actual_enabled_variables[v]][k] = data[k][actual_enabled_variables[v]];
+				array_value_class[k].value = data[k][actual_enabled_variables[v]];
+				array_value_class[k].data_class = (int)data[k][num_total_variables];
 			}
-			qsort((void*)array_value_class, training_data->num_data, sizeof(s_value_class), sort_function_value_class);
+			qsort((void*)array_value_class, training_data->get_num_rows(), sizeof(s_value_class), sort_function_value_class);
 
-			int num_0_incorrect = training_data->num_class_0;
+			int num_0_incorrect = training_data->get_num_items_class_0();
 			int num_1_incorrect = 0;
 			cached_threashold[actual_enabled_variables[v]] = array_value_class[0].value - 1;// all are classified to class 1 in this case
 			cached_sum_of_errors[actual_enabled_variables[v]] = num_0_incorrect;
 
-			for (int i = 0; i < training_data->num_data; i++) {
+			for (int i = 0; i < training_data->get_num_rows(); i++) {
 				int j = i + 1;
-				//while (j < training_data->num_data && fabs(cached_eval_matrix_double[actual_enabled_variables[v]][i] - cached_eval_matrix_double[actual_enabled_variables[v]][j]) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
-				while (j < training_data->num_data && fabs(array_value_class[i].value - array_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				//while (j < training_data->get_num_rows() && fabs(cached_eval_matrix_double[actual_enabled_variables[v]][i] - cached_eval_matrix_double[actual_enabled_variables[v]][j]) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				while (j < training_data->get_num_rows() && fabs(array_value_class[i].value - array_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
 				// le verific pe toate intre i si j si le cataloghez ca apartinant la clasa 0
@@ -787,7 +796,7 @@ void t_mep::compute_eval_matrix_double(t_mep_chromosome &Individual, double **ev
 		errno = 0;
 		double *arg1, *arg2, *arg3, *arg4;
 		double *eval = eval_double[i];
-		int num_training_data = training_data->num_data;
+		int num_training_data = training_data->get_num_rows();
 
 		if (Individual.prg[i].op < 0) {// an operator
 			if (Individual.prg[Individual.prg[i].adr1].op >= 0)
@@ -1099,7 +1108,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 
 	if (parameters.problem_type == PROBLEM_REGRESSION) {
 		for (int k = 0; k < parameters.num_subpopulations; k++) {
-			while (!compute_regression_error_on_double_data_return_error(pop[k].individuals[0], validation_data->_data_double, validation_data->num_data, validation_data->_data_double, &validation_error)) {
+			while (!compute_regression_error_on_double_data_return_error(pop[k].individuals[0], validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_data_matrix_double(), &validation_error)) {
 				// I have to mutate that individual.
 				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
 				// recompute its fitness on training;
@@ -1119,7 +1128,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 	else
 		if (parameters.problem_type == PROBLEM_CLASSIFICATION)
 			for (int k = 0; k < parameters.num_subpopulations; k++) {
-				while (!compute_classification_error_on_double_data_return_error(pop[k].individuals[0], validation_data->_data_double, validation_data->num_data, validation_data->_data_double, &validation_error)) {
+				while (!compute_classification_error_on_double_data_return_error(pop[k].individuals[0], validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_data_matrix_double(), &validation_error)) {
 					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
 					// recompute its fitness on training;
 					fitness_regression(pop[k].individuals[0], eval_double);
@@ -1281,7 +1290,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 
 	stats[run].best_validation_error = -1;
 
-	if (parameters.use_validation_data && validation_data->num_data > 0) {
+	if (parameters.use_validation_data && validation_data->get_num_rows() > 0) {
 		// I must run all solutions for the validation data and choose the best one
 		stats[run].best_validation_error = compute_validation_error(&best_subpopulation_index_for_test, &best_individual_index_for_test, eval_double[0]);
 		stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
@@ -1320,7 +1329,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		for (int d = 0; d < parameters.num_subpopulations; d++) // din d in d+1
 			sort_by_fitness(pop[d]);
 
-		if (parameters.use_validation_data && validation_data->num_data > 0) {
+		if (parameters.use_validation_data && validation_data->get_num_rows() > 0) {
 			// I must run all solutions for the validation data and choose the best one
 			int best_index_on_validation, best_subpop_index_on_validation;
 			double validation_error = compute_validation_error(&best_subpop_index_on_validation, &best_index_on_validation, eval_double[0]);
@@ -1352,18 +1361,18 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	if (parameters.problem_type == PROBLEM_CLASSIFICATION)
 	fitness_classification(pop[0].individuals[0], eval_double[0], array_value_class[0]);
 	*/
-	if (!(parameters.use_validation_data && validation_data->num_data > 0)) // if no validation data, the test is the best from all
+	if (!(parameters.use_validation_data && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
 		stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
 	stats[run].prg.simplify();
 
-	if (test_data && test_data->num_data && test_data->num_targets) {// has target
+	if (test_data && test_data->get_num_rows() && test_data->get_num_targets()) {// has target
 		// I must run all solutions for the test data and choose the best one
 		if (parameters.problem_type == PROBLEM_REGRESSION) {
-			if (compute_regression_error_on_double_data(stats[run].prg, test_data->_data_double, test_data->num_data, test_data->_data_double, &stats[run].test_error));
+			if (compute_regression_error_on_double_data(stats[run].prg, test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_data_matrix_double(), &stats[run].test_error));
 		}
 		else
 			if (parameters.problem_type == PROBLEM_CLASSIFICATION) {
-				if (compute_classification_error_on_double_data(stats[run].prg, test_data->_data_double, test_data->num_data, test_data->_data_double, &stats[run].test_error));
+				if (compute_classification_error_on_double_data(stats[run].prg, test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_data_matrix_double(), &stats[run].test_error));
 			}
 	}
 
@@ -1394,12 +1403,12 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 
 	if (variables_enabled) {
         
-        	char *tmp_str = new char[training_data->num_cols * 2 + 10];
+        	char *tmp_str = new char[training_data->get_num_cols() * 2 + 10];
         
 		pugi::xml_node utilized_variables_node = parent.append_child("variables_utilization");
 
 		tmp_str[0] = 0;
-		for (int v = 0; v < training_data->num_cols - 1; v++) {
+		for (int v = 0; v < training_data->get_num_cols() - 1; v++) {
 			char tmp_s[30];
 			sprintf(tmp_s, "%d", variables_enabled[v]);
 			strcat(tmp_str, tmp_s);
@@ -1444,7 +1453,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		pugi::xml_node node = parent.child("training");
 		if (node) {
 			training_data->from_xml(node);
-			num_total_variables = training_data->num_cols - 1;
+			num_total_variables = training_data->get_num_cols() - 1;
 		}
 		else
 			num_total_variables = 0;
@@ -1453,7 +1462,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		num_total_variables = 0;
 	
 
-	if (training_data->num_data) {
+	if (training_data->get_num_rows()) {
 		//actual_enabled_variables = new int[num_total_variables];
 		variables_enabled = new bool[num_total_variables];
 
@@ -1494,7 +1503,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		target_col = atoi(value_as_cstring);
 	}
 	else
-		target_col = training_data->num_cols - 1;
+		target_col = training_data->get_num_cols() - 1;
 
 	if (validation_data) {
 		node = parent.child("validation");
@@ -1824,8 +1833,8 @@ void t_mep::compute_list_of_enabled_variables(void)
 	}
 
 	num_actual_variables = 0;
-	if (training_data->num_cols)
-		num_total_variables = training_data->num_cols - 1;
+	if (training_data->get_num_cols())
+		num_total_variables = training_data->get_num_cols() - 1;
 	else
 		num_total_variables = 0;
 	if (num_total_variables) {
@@ -2682,7 +2691,7 @@ void t_mep::set_training_data(t_mep_data *_data)
 		}
 
 		if (training_data) {
-			num_total_variables = training_data->num_cols;
+			num_total_variables = training_data->get_num_cols();
 			num_actual_variables = num_total_variables;
 
 			variables_enabled = new bool[num_total_variables];
