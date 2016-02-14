@@ -62,7 +62,7 @@ void t_mep_data::clear_data(void)
 	num_data = 0;
 	num_cols = 0;
 	data_type = MEP_DATA_DOUBLE;// double
-	num_targets = 1;
+	num_outputs = 1;
 
 	_modified = false;
 }
@@ -79,7 +79,7 @@ void t_mep_data::init(void)
 	list_separator = ' ';
 
 	data_type = MEP_DATA_DOUBLE;// double
-	num_targets = 1;
+	num_outputs = 1;
 
 	_modified = false;
 
@@ -136,13 +136,13 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 			num_cols = 0;
 	}
 
-	node = parent.child("num_targets");
+	node = parent.child("num_outputs");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_targets = atoi(value_as_cstring);
+		num_outputs = atoi(value_as_cstring);
 	}
 	else
-		num_targets = 1;
+		num_outputs = 1;
 
 	node = parent.child("data_type");
 	if (node) {
@@ -245,9 +245,9 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 	sprintf(tmp_str, "%d", num_cols);
 	data.set_value(tmp_str);
 
-	node = parent.append_child("num_targets");
+	node = parent.append_child("num_outputs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_targets);
+	sprintf(tmp_str, "%d", num_outputs);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("data_type");
@@ -710,7 +710,7 @@ int t_mep_data::to_interval_everywhere(double min, double max)
 	_modified = true;
 	if (!result)
 		return 0;
-	if (num_targets)
+	if (num_outputs)
       return to_interval_selected_col(min, max, num_cols - 1);
 	return 1;
 }
@@ -795,7 +795,7 @@ int t_mep_data::move_to(t_mep_data *dest, int count)
 
 			if (dest->num_data == 0) {
 				dest->num_cols = num_cols;
-				dest->num_targets = num_targets;
+				dest->num_outputs = num_outputs;
 			}
 
 			if (data_type == MEP_DATA_DOUBLE) {// double
@@ -1093,9 +1093,9 @@ bool t_mep_data::is_modified(void)
 	return _modified;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_num_targets(void)
+int t_mep_data::get_num_outputs(void)
 {
-	return num_targets;
+	return num_outputs;
 }
 //-----------------------------------------------------------------
 double** t_mep_data::get_data_matrix_double(void)

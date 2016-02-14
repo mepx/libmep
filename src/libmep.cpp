@@ -1365,7 +1365,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
 	stats[run].prg.simplify();
 
-	if (test_data && test_data->get_num_rows() && test_data->get_num_targets()) {// has target
+	if (test_data && test_data->get_num_rows() && test_data->get_num_outputs()) {// has target
 		// I must run all solutions for the test data and choose the best one
 		if (parameters.problem_type == PROBLEM_REGRESSION) {
 			if (compute_regression_error_on_double_data(stats[run].prg, test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_data_matrix_double(), &stats[run].test_error));

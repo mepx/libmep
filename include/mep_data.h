@@ -23,7 +23,7 @@ private:
 
 	char* **_data_string;
 
-	int num_targets;
+	int num_outputs;
 
 	int num_class_0;
 
@@ -48,7 +48,7 @@ public:
 
 	int get_data_type(void);
 
-	int get_num_targets(void);
+	int get_num_outputs(void);
 
 	double** get_data_matrix_double(void);
 	char*** get_data_matrix_string(void);
