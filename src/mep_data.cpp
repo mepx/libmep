@@ -784,78 +784,84 @@ int t_mep_data::to_interval_all_variables(double min, double max)
 int t_mep_data::move_to(t_mep_data *dest, int count)
 {
 	if (!(data_type == dest->data_type || !dest->num_data))
-		return 1; // can move only of the same type
-	if (num_data >= count) {
+		return E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES; // can move only of the same type
+	
+	if (num_data && dest->num_data && num_cols != dest->num_cols)
+		return E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS; // 
 
-		_modified = true;
+		if (num_data >= count) {
 
-        if (dest->num_data == 0) {
-			dest->num_cols = num_cols;
-			dest->num_targets = num_targets;
+			_modified = true;
+
+			if (dest->num_data == 0) {
+				dest->num_cols = num_cols;
+				dest->num_targets = num_targets;
+			}
+
+			if (data_type == MEP_DATA_DOUBLE) {// double
+
+				double** tmp_data_double = new double*[dest->num_data + count];
+				for (int i = 0; i < dest->num_data; i++)
+					tmp_data_double[i] = dest->_data_double[i];
+
+				for (int i = 0; i < count; i++)
+					tmp_data_double[i + dest->num_data] = _data_double[num_data - count + i];
+
+				if (dest->_data_double)
+					delete[] dest->_data_double;
+				dest->_data_double = tmp_data_double;
+
+				if (num_data - count > 0) {
+					tmp_data_double = new double*[num_data - count];
+					for (int i = 0; i < num_data - count; i++)
+						tmp_data_double[i] = _data_double[i];
+
+					delete[] _data_double;
+					_data_double = tmp_data_double;
+				}
+				else {// no more data left in the source
+					delete[] _data_double;
+					_data_double = NULL;
+				}
+
+				dest->data_type = MEP_DATA_DOUBLE;
+			}
+			else {// string
+				char*** tmp_data_string = new char**[dest->num_data + count];
+				for (int i = 0; i < dest->num_data; i++)
+					tmp_data_string[i] = dest->_data_string[i];
+
+				for (int i = 0; i < count; i++)
+					tmp_data_string[i + dest->num_data] = _data_string[num_data - count + i];
+
+				if (dest->_data_string)
+					delete[] dest->_data_string;
+				dest->_data_string = tmp_data_string;
+
+				if (num_data - count > 0) {
+					tmp_data_string = new char**[num_data - count];
+					for (int i = 0; i < num_data - count; i++)
+						tmp_data_string[i] = _data_string[i];
+
+					delete[] _data_string;
+					_data_string = tmp_data_string;
+				}
+				else {// no more data left in the source
+					delete[] _data_string;
+					_data_string = NULL;
+				}
+
+				dest->data_type = MEP_DATA_STRING;
+			}
+
+
+			num_data -= count;
+			dest->num_data += count;
+
 		}
-
-		if (data_type == MEP_DATA_DOUBLE) {// double
-
-			double** tmp_data_double = new double*[dest->num_data + count];
-			for (int i = 0; i < dest->num_data; i++)
-				tmp_data_double[i] = dest->_data_double[i];
-
-			for (int i = 0; i < count; i++)
-				tmp_data_double[i + dest->num_data] = _data_double[num_data - count + i];
-
-			if (dest->_data_double)
-				delete[] dest->_data_double;
-			dest->_data_double = tmp_data_double;
-
-			if (num_data - count > 0) {
-				tmp_data_double = new double*[num_data - count];
-				for (int i = 0; i < num_data - count; i++)
-					tmp_data_double[i] = _data_double[i];
-
-				delete[] _data_double;
-				_data_double = tmp_data_double;
-			}
-			else {// no more data left in the source
-				delete[] _data_double;
-				_data_double = NULL;
-			}
-
-			dest->data_type = MEP_DATA_DOUBLE;
-		}
-		else {// string
-			char*** tmp_data_string = new char**[dest->num_data + count];
-			for (int i = 0; i < dest->num_data; i++)
-				tmp_data_string[i] = dest->_data_string[i];
-
-			for (int i = 0; i < count; i++)
-				tmp_data_string[i + dest->num_data] = _data_string[num_data - count + i];
-
-			if (dest->_data_string)
-				delete[] dest->_data_string;
-			dest->_data_string = tmp_data_string;
-
-			if (num_data - count > 0) {
-				tmp_data_string = new char**[num_data - count];
-				for (int i = 0; i < num_data - count; i++)
-					tmp_data_string[i] = _data_string[i];
-
-				delete[] _data_string;
-				_data_string = tmp_data_string;
-			}
-			else {// no more data left in the source
-				delete[] _data_string;
-				_data_string = NULL;
-			}
-
-			dest->data_type = MEP_DATA_STRING;
-		}
-
-
-		num_data -= count;
-		dest->num_data += count;
-
-	}
-	return 0;
+		else
+			return E_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
+	return E_OK;
 }
 //-----------------------------------------------------------------
 bool re_match(char *str, const char *pattern, bool use_regular)

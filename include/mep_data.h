@@ -6,6 +6,12 @@
 #define MEP_DATA_DOUBLE 0
 #define MEP_DATA_STRING 1
 
+#define E_OK 0
+#define E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
+#define E_NOT_ENOUGH_DATA_TO_MOVE 2
+#define E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
+
+
 //-----------------------------------------------------------------
 class t_mep_data
 {
