@@ -157,10 +157,10 @@ void print_instruction(int op, int adr1, int adr2, int adr3, int adr4, char * tm
 		sprintf(tmp_s, "prg[%d] * prg[%d];", adr1, adr1);
 		break;
 	case O_MIN:
-		sprintf(tmp_s, "prg[%d] < prg[%d]?prg[%d] : prg[%d];", adr1, adr2, adr1, adr2);
+		sprintf(tmp_s, "prg[%d] < prg[%d]?prg[%d] : prg[%d]; // min", adr1, adr2, adr1, adr2);
 		break;
 	case O_MAX:
-		sprintf(tmp_s, "prg[%d] > prg[%d]?prg[%d] : prg[%d];", adr1, adr2, adr1, adr2);
+		sprintf(tmp_s, "prg[%d] > prg[%d]?prg[%d] : prg[%d]; // max", adr1, adr2, adr1, adr2);
 		break;
 	case O_SIN:
 		sprintf(tmp_s, "sin(prg[%d]);", adr1);
@@ -181,10 +181,10 @@ void print_instruction(int op, int adr1, int adr2, int adr3, int adr4, char * tm
 		sprintf(tmp_s, "atan(prg[%d]);", adr1);
 		break;
 	case O_IFLZ:
-		sprintf(tmp_s, "prg[%d] < 0?prg[%d] : prg[%d];", adr1, adr2, adr3);
+		sprintf(tmp_s, "prg[%d] < 0?prg[%d] : prg[%d]; // ifalzbc", adr1, adr2, adr3);
 		break;
 	case O_IFALBCD:
-		sprintf(tmp_s, "prg[%d] < prg[%d]?prg[%d] : prg[%d];", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "prg[%d] < prg[%d]?prg[%d] : prg[%d]; // ifalbcd", adr1, adr2, adr3, adr4);
 		break;
 	}
 }
