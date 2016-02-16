@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.13.1");
+	strcpy(version, "2016.02.16.0-beta");
 
 	num_operators = 0;
 
@@ -1449,6 +1449,8 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		variables_enabled = NULL;
 	}
 
+	training_data->clear_data();
+
 	if (training_data) {
 		pugi::xml_node node = parent.child("training");
 		if (node) {
@@ -1505,16 +1507,23 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	else
 		target_col = training_data->get_num_cols() - 1;
 
+	validation_data->clear_data();
+
 	if (validation_data) {
 		node = parent.child("validation");
 		if (node)
 			validation_data->from_xml(node);
 	}
 
+	test_data->clear_data();
+
 	if (test_data) {
 		node = parent.child("test");
-		if (node)
+		if (node) {
 			test_data->from_xml(node);
+			if (test_data->get_num_cols() < training_data->get_num_cols())
+				test_data->set_num_outputs(0);
+		}
 	}
 
 	node = parent.child("parameters");

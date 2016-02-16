@@ -49,6 +49,7 @@ public:
 	int get_data_type(void);
 
 	int get_num_outputs(void);
+	void set_num_outputs(int new_num);
 
 	double** get_data_matrix_double(void);
 	char*** get_data_matrix_string(void);

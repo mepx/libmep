@@ -1113,3 +1113,8 @@ char*** t_mep_data::get_data_matrix_string(void)
 	return _data_string;
 }
 //-----------------------------------------------------------------
+void t_mep_data::set_num_outputs(int new_num)
+{
+	num_outputs = new_num;
+}
+//-----------------------------------------------------------------
