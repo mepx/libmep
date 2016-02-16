@@ -24,4 +24,14 @@ Create a new project and add all files from "src" and one file from "tests" fold
 ## Reading the results
 ...
 
-#More info at: http://www.mep.cs.ubbcluj.ro
+#More info:
+
+http://www.mep.cs.ubbcluj.ro
+
+#Discussion Group:
+
+https://groups.google.com/d/forum/mepx
+
+#Contact author:
+
+mihai.oltean@gmail.com
