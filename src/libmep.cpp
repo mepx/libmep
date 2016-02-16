@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.16.0-beta");
+	strcpy(version, "2016.02.16.1-beta");
 
 	num_operators = 0;
 
@@ -2707,6 +2707,8 @@ void t_mep::set_training_data(t_mep_data *_data)
 
 			for (int i = 0; i < num_total_variables; i++)
 				variables_enabled[i] = 1;
+
+			target_col = training_data->get_num_cols() - 1;
 		}
 	}
 }
