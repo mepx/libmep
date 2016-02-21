@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.16.1-beta");
+	strcpy(version, "2016.02.21.0-beta");
 
 	num_operators = 0;
 
@@ -1346,7 +1346,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		stats[run].average_training_error[gen_index] = mean_error_on_training;
 		stats[run].last_gen = gen_index;
 #ifdef _DEBUG
-		//	wxLogDebug(wxString() << gen_index << " " << best_error_on_training << " " << pop[best_subpopulation_index].individuals[best_individual_index].best_class_threshold);
+		
 #endif
 		if (on_generation)
 			on_generation();
