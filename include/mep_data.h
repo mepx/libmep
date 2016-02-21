@@ -43,15 +43,26 @@ public:
 	t_mep_data(void);
 	~t_mep_data();
 
+	// returns the number of rows training data
 	int get_num_rows(void);
+
+	// returns the number of columns of the training data
 	int get_num_cols(void);
 
+	// returns the data type of the data: 
+	// 0 for real
+	// 1 for string
 	int get_data_type(void);
 
 	int get_num_outputs(void);
 	void set_num_outputs(int new_num);
 
+	// returns a training data as double (if data type is 0)
+	// assumes that row and col are valid; no test for out of range are performed
 	double** get_data_matrix_double(void);
+
+	// returns a training data as string (if data type is 1)
+	// assumes that row and col are valid; no test for out of range are performed
 	char*** get_data_matrix_string(void);
 	
 	// returns an entire row as a pointer to double
@@ -61,40 +72,59 @@ public:
 	double get_value_double(int row, int col);
 	char* get_value_string(int row, int col);
 
+	// clears the training data internal structures
 	void clear_data(void);
 	void delete_data(void);
+
+	// init data
     void init(void);
 
     int from_xml(pugi::xml_node parent);
     int to_xml(pugi::xml_node parent);
+
+	// saves the training data to a csv files
 	bool to_csv(const char *file_name, char ListSeparator);
+	// loads the data from a csv file
 	bool from_csv(const char *filename);
 
+	// transform string values to real values
 	void to_numeric(void);
+
+	// scale to interval in the entire matrix
 	int to_interval_everywhere(double min, double max);
+	// scale to interval in all variables
 	int to_interval_all_variables(double min, double max);
+	// scale to interval in the selected column
 	int to_interval_selected_col(double min, double max, int col);
     
+	// replace a given string with another string; returns the number of replacements
 	int replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
 	int replace_symbol_from_all_variables(const char *find_what, const char* replace_with, bool use_regular);
 	int replace_symbol_everywhere(const char *s_find_what, const char* s_replace_with, bool use_regular);
 
+	// returns the number of occurences of a given string
 	int find_symbol_from_selected_col(const char *find_what, int col, bool use_regular);
 	int find_symbol_from_all_variables(const char *find_what, bool use_regular);
 	int find_symbol_everywhere(const char *s_find_what, bool use_regular);
 
+	// randomly changes the rows of the data
 	void shuffle(void);
 
 	bool detect_list_separator(const char *file_name);
 
+	// moves last count rows to another t_mep_data object
 	int move_to(t_mep_data *, int count);
 
+	// computes how many row belong to the first class
 	void count_0_class(int target_col);
 
+	// returns true if the problem is a classification problem
 	bool is_classification_problem(void);
 
+	// returns true if data have been modified
 	bool is_modified(void);
 
+	// returns the number of items belonging to class 0
 	int get_num_items_class_0(void);
 };
 //-----------------------------------------------------------------
