@@ -20,10 +20,10 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.21.0-beta");
+	strcpy(version, "2016.02.22.0-beta");
 
 	num_operators = 0;
-
+	
 
 	cached_eval_matrix_double = NULL;
 	cached_sum_of_errors = NULL;
@@ -72,10 +72,10 @@ t_mep::~t_mep()
 //---------------------------------------------------------------------------
 void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value_class)
 {
-	*eval_double = new double**[parameters.num_threads];
-	for (int c = 0; c < parameters.num_threads; c++) {
-		(*eval_double)[c] = new double*[parameters.code_length];
-		for (int i = 0; i < parameters.code_length; i++)
+	*eval_double = new double**[mep_parameters->get_num_threads()];
+	for (int c = 0; c < mep_parameters->get_num_threads(); c++) {
+		(*eval_double)[c] = new double*[mep_parameters->get_code_length()];
+		for (int i = 0; i < mep_parameters->get_code_length(); i++)
 			(*eval_double)[c][i] = new double[training_data->get_num_rows()];
 	}
 
@@ -88,18 +88,18 @@ void t_mep::allocate_values(double ****eval_double, s_value_class ***array_value
 	cached_sum_of_errors = new double[num_total_variables];
 	cached_threashold = new double[num_total_variables];
 
-	*array_value_class = new s_value_class*[parameters.num_threads];
-	for (int c = 0; c < parameters.num_threads; c++)
+	*array_value_class = new s_value_class*[mep_parameters->get_num_threads()];
+	for (int c = 0; c < mep_parameters->get_num_threads(); c++)
 		(*array_value_class)[c] = new s_value_class[training_data->get_num_rows()];
 }
 //---------------------------------------------------------------------------
 void t_mep::allocate_sub_population(t_sub_population &pop)
 {
-	pop.offspring1.allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
-	pop.offspring2.allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
-	pop.individuals = new t_mep_chromosome[parameters.subpopulation_size];
-	for (int j = 0; j < parameters.subpopulation_size; j++)
-		pop.individuals[j].allocate_memory(parameters.code_length, num_total_variables, parameters.constants_probability > 1E-6, &parameters.constants);
+	pop.offspring1.allocate_memory(mep_parameters->get_code_length(), num_total_variables, mep_parameters->get_constants_probability() > 1E-6, mep_constants);
+	pop.offspring2.allocate_memory(mep_parameters->get_code_length(), num_total_variables, mep_parameters->get_constants_probability() > 1E-6, mep_constants);
+	pop.individuals = new t_mep_chromosome[mep_parameters->get_subpopulation_size()];
+	for (int j = 0; j < mep_parameters->get_subpopulation_size(); j++)
+		pop.individuals[j].allocate_memory(mep_parameters->get_code_length(), num_total_variables, mep_parameters->get_constants_probability() > 1E-6, mep_constants);
 }
 //---------------------------------------------------------------------------
 void t_mep::get_best(t_mep_chromosome& dest)
@@ -109,9 +109,9 @@ void t_mep::get_best(t_mep_chromosome& dest)
 //---------------------------------------------------------------------------
 void t_mep::generate_random_individuals(void) // randomly initializes the individuals
 {
-	for (int i = 0; i < parameters.num_subpopulations; i++)
-		for (int j = 0; j < parameters.subpopulation_size; j++)
-			pop[i].individuals[j].generate_random(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
+	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
+		for (int j = 0; j < mep_parameters->get_subpopulation_size(); j++)
+			pop[i].individuals[j].generate_random(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 }
 //---------------------------------------------------------------------------
 void t_mep::fitness_regression(t_mep_chromosome &individual, double **eval_matrix)
@@ -131,11 +131,11 @@ void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval
 	Individual.fit = 1E+308;
 	Individual.best = -1;
 
-	for (int i = 0; i < parameters.code_length; i++)
+	for (int i = 0; i < mep_parameters->get_code_length(); i++)
 		sum_of_errors_array[i] = 0;
 
 	for (int k = 0; k < training_data->get_num_rows(); k++) {   // read the t_mep_chromosome from top to down
-		for (int i = 0; i < parameters.code_length; i++) {    // read the t_mep_chromosome from top to down
+		for (int i = 0; i < mep_parameters->get_code_length(); i++) {    // read the t_mep_chromosome from top to down
 
 			errno = 0;
 			bool is_error_case = false;
@@ -254,7 +254,7 @@ void t_mep::fitness_regression_double(t_mep_chromosome &Individual, double* eval
 		}
 	}
 
-	for (int i = 0; i < parameters.code_length; i++) {    // find the best gene
+	for (int i = 0; i < mep_parameters->get_code_length(); i++) {    // find the best gene
 		if (Individual.fit > sum_of_errors_array[i] / training_data->get_num_rows()) {
 			Individual.fit = sum_of_errors_array[i] / training_data->get_num_rows();
 			Individual.best = i;
@@ -287,7 +287,7 @@ void t_mep::fitness_regression_double_cache_all_training_data(t_mep_chromosome &
 
 	int num_training_data = training_data->get_num_rows();
 
-	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
+	for (int i = 0; i < mep_parameters->get_code_length(); i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 
 
@@ -345,7 +345,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 
 	compute_eval_matrix_double(Individual, eval_double, line_of_constants);
 
-	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
+	for (int i = 0; i < mep_parameters->get_code_length(); i++) {   // read the t_mep_chromosome from top to down
 	double sum_of_errors;
 	if (Individual.prg[i].op >= 0)
 	if (Individual.prg[i].op < training_data.num_vars) // a variable, which is cached already
@@ -354,7 +354,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 	double *eval = eval_double[line_of_constants[Individual.prg[i].op - training_data.num_vars]];
 	sum_of_errors = 0;
 	for (int k = 0; k < training_data->get_num_rows(); k++)
-	if (eval[k] <= parameters.classification_threshold)
+	if (eval[k] <= mep_parameters->classification_threshold)
 	sum_of_errors += training_data._target_double[k];
 	else
 	sum_of_errors += 1 - training_data._target_double[k];
@@ -363,7 +363,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 	double *eval = eval_double[i];
 	sum_of_errors = 0;
 	for (int k = 0; k < training_data->get_num_rows(); k++)
-	if (eval[k] <= parameters.classification_threshold)
+	if (eval[k] <= mep_parameters->classification_threshold)
 	sum_of_errors += training_data._target_double[k];
 	else
 	sum_of_errors += 1 - training_data._target_double[k];
@@ -402,7 +402,7 @@ void t_mep::fitness_classification_double_cache_all_training_data(t_mep_chromoso
 	compute_eval_matrix_double(Individual, eval_matrix_double, line_of_constants);
 
 	double best_threshold;
-	for (int i = 0; i < parameters.code_length; i++) {   // read the t_mep_chromosome from top to down
+	for (int i = 0; i < mep_parameters->get_code_length(); i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 		if (Individual.prg[i].op >= 0)
 			if (Individual.prg[i].op < num_total_variables) { // a variable, which is cached already
@@ -553,7 +553,7 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 	if (run_index > -1) {
 		if (!evaluate_double(stats[run_index].prg, inputs, outputs))
 			return false;
-		if (parameters.problem_type == PROBLEM_CLASSIFICATION) {
+		if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION) {
 			if (outputs[0] <= stats[run_index].prg.best_class_threshold)
 				outputs[0] = 0;
 			else
@@ -570,7 +570,7 @@ bool t_mep::get_error_double(t_mep_chromosome &Individual, double *inputs, doubl
 {
 	if (!evaluate_double(Individual, inputs, outputs))
 		return false;
-	if (parameters.problem_type == PROBLEM_CLASSIFICATION) {
+	if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION) {
 		if (outputs[0] <= Individual.best_class_threshold)
 			outputs[0] = 0;
 		else
@@ -711,7 +711,7 @@ bool t_mep::evaluate_double(t_mep_chromosome &Individual, double *inputs, double
 void t_mep::compute_cached_eval_matrix_double(void)
 {
 	/*
-	if (parameters.problem_type == PROBLEM_REGRESSION)
+	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
 	for (int v = 0; v < training_data.num_vars; v++) {
 	cached_sum_of_errors[v] = 0;
 	for (int k = 0; k < training_data->get_num_rows(); k++) {
@@ -724,7 +724,7 @@ void t_mep::compute_cached_eval_matrix_double(void)
 	cached_sum_of_errors[v] = 0;
 	for (int k = 0; k < training_data->get_num_rows(); k++) {
 	cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
-	if (cached_eval_matrix_double[v][k] <= parameters.classification_threshold)
+	if (cached_eval_matrix_double[v][k] <= mep_parameters->classification_threshold)
 	cached_sum_of_errors[v] += training_data._target_double[k];
 	else
 	cached_sum_of_errors[v] += 1 - training_data._target_double[k];
@@ -737,7 +737,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 {
 	double **data = training_data->get_data_matrix_double();
 
-	if (parameters.problem_type == PROBLEM_REGRESSION)
+	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
 		for (int v = 0; v < num_actual_variables; v++) {
 			cached_sum_of_errors[actual_enabled_variables[v]] = 0;
 			for (int k = 0; k < training_data->get_num_rows(); k++) {
@@ -790,7 +790,7 @@ void t_mep::compute_eval_matrix_double(t_mep_chromosome &Individual, double **ev
 {
 	//	bool is_error_case;  // division by zero, other errors
 
-	for (int i = 0; i < parameters.code_length; i++)   // read the t_mep_chromosome from top to down
+	for (int i = 0; i < mep_parameters->get_code_length(); i++)   // read the t_mep_chromosome from top to down
 	{
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
@@ -1022,7 +1022,7 @@ int sort_function_chromosomes(const void *a, const void *b)
 //---------------------------------------------------------------------------
 void t_mep::sort_by_fitness(t_sub_population &pop) // sort ascending the individuals in population
 {
-	qsort((void *)pop.individuals, parameters.subpopulation_size, sizeof(pop.individuals[0]), sort_function_chromosomes);
+	qsort((void *)pop.individuals, mep_parameters->get_subpopulation_size(), sizeof(pop.individuals[0]), sort_function_chromosomes);
 }
 //---------------------------------------------------------------------------
 void t_mep::delete_sub_population(t_sub_population &pop)
@@ -1037,8 +1037,8 @@ void t_mep::delete_sub_population(t_sub_population &pop)
 void t_mep::delete_values(double ****eval_double, s_value_class ***array_value_class)
 {
 	if (*eval_double) {
-		for (int c = 0; c < parameters.num_threads; c++) {
-			for (int i = 0; i < parameters.code_length; i++)
+		for (int c = 0; c < mep_parameters->get_num_threads(); c++) {
+			for (int i = 0; i < mep_parameters->get_code_length(); i++)
 				delete[](*eval_double)[c][i];
 			delete[](*eval_double)[c];
 		}
@@ -1063,7 +1063,7 @@ void t_mep::delete_values(double ****eval_double, s_value_class ***array_value_c
 	}
 
 	if (*array_value_class) {
-		for (int c = 0; c < parameters.num_threads; c++)
+		for (int c = 0; c < mep_parameters->get_num_threads(); c++)
 			delete[](*array_value_class)[c];
 		delete[] * array_value_class;
 		*array_value_class = NULL;
@@ -1073,9 +1073,9 @@ void t_mep::delete_values(double ****eval_double, s_value_class ***array_value_c
 long t_mep::tournament(t_sub_population &pop)     // Size is the size of the tournament
 {
 	long r, p;
-	p = my_rand() % parameters.subpopulation_size;
-	for (int i = 1; i < parameters.tournament_size; i++) {
-		r = my_rand() % parameters.subpopulation_size;
+	p = my_rand() % mep_parameters->get_subpopulation_size();
+	for (int i = 1; i < mep_parameters->get_tournament_size(); i++) {
+		r = my_rand() % mep_parameters->get_subpopulation_size();
 		p = pop.individuals[r].fit < pop.individuals[p].fit ? r : p;
 	}
 	return p;
@@ -1087,18 +1087,18 @@ void t_mep::compute_best_and_average_error(double &best_error, double &mean_erro
 	best_error = pop[0].individuals[0].fit;
 	best_individual_index = 0;
 	best_subpopulation_index = 0;
-	for (int i = 0; i < parameters.num_subpopulations; i++)
+	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
 		if (best_error > pop[i].individuals[0].fit) {
 			best_error = pop[i].individuals[0].fit;
 			best_individual_index = 0;
 			best_subpopulation_index = i;
 		}
 
-	for (int i = 0; i < parameters.num_subpopulations; i++)
-		for (int k = 0; k < parameters.subpopulation_size; k++)
+	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
+		for (int k = 0; k < mep_parameters->get_subpopulation_size(); k++)
 			mean_error += pop[i].individuals[k].fit;
 
-	mean_error /= parameters.num_subpopulations * parameters.subpopulation_size;
+	mean_error /= mep_parameters->get_num_subpopulations() * mep_parameters->get_subpopulation_size();
 }
 //---------------------------------------------------------------------------
 double t_mep::compute_validation_error(int *best_subpopulation_index_for_validation, int *best_individual_index_for_validation, double **eval_double)
@@ -1106,8 +1106,8 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 	double best_validation_error = -1;
 	double validation_error;
 
-	if (parameters.problem_type == PROBLEM_REGRESSION) {
-		for (int k = 0; k < parameters.num_subpopulations; k++) {
+	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION) {
+		for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 			while (!compute_regression_error_on_double_data_return_error(pop[k].individuals[0], validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_data_matrix_double(), &validation_error)) {
 				// I have to mutate that individual.
 				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
@@ -1126,8 +1126,8 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		}
 	}
 	else
-		if (parameters.problem_type == PROBLEM_CLASSIFICATION)
-			for (int k = 0; k < parameters.num_subpopulations; k++) {
+		if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION)
+			for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 				while (!compute_classification_error_on_double_data_return_error(pop[k].individuals[0], validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_data_matrix_double(), &validation_error)) {
 					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
 					// recompute its fitness on training;
@@ -1151,11 +1151,11 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 
 	compute_list_of_enabled_variables();
 
-	pop = new t_sub_population[parameters.num_subpopulations];
-	for (int i = 0; i < parameters.num_subpopulations; i++)
+	pop = new t_sub_population[mep_parameters->get_num_subpopulations()];
+	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
 		allocate_sub_population(pop[i]);
 
-	num_operators = operators.get_list_of_operators(actual_operators);
+	num_operators = operators->get_list_of_operators(actual_operators);
 
 	double ***eval_double;           // an array where the values of each expression are stored
 
@@ -1163,14 +1163,14 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 
 	allocate_values(&eval_double, &array_value_class);
 
-	if (parameters.problem_type == PROBLEM_CLASSIFICATION)
+	if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION)
 		training_data->count_0_class(target_col);
 
 	compute_cached_eval_matrix_double2(array_value_class[0]);
 
-	stats = new t_mep_statistics[parameters.num_runs];
-	for (int run_index = 0; run_index < parameters.num_runs; run_index++) {
-		stats[run_index].allocate(parameters.num_generations);
+	stats = new t_mep_statistics[mep_parameters->get_num_runs()];
+	for (int run_index = 0; run_index < mep_parameters->get_num_runs(); run_index++) {
+		stats[run_index].allocate(mep_parameters->get_num_generations());
 		last_run_index++;
 		start_steady_state(run_index, eval_double, array_value_class, on_generation, on_new_evaluation);
 		if (on_complete_run)
@@ -1180,7 +1180,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 	}
 
 	delete_values(&eval_double, &array_value_class);
-	for (int i = 0; i < parameters.num_subpopulations; i++)
+	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
 		delete_sub_population(pop[i]);
 	delete[] pop;
 
@@ -1191,7 +1191,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class)
 {
 	int pop_index = 0;
-	while (*current_subpop_index < parameters.num_subpopulations) {
+	while (*current_subpop_index < mep_parameters->get_num_subpopulations()) {
 		// still more subpopulations to evolve?
 
 		while (!mutex->try_lock()) {}// create a lock so that multiple threads will not evolve the same sub population
@@ -1204,53 +1204,53 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 		t_sub_population *a_sub_population = &sub_populations[pop_index];
 
 		if (generation_index == 0) {
-			if (parameters.problem_type == PROBLEM_REGRESSION)
-				for (int i = 0; i < parameters.subpopulation_size; i++)
+			if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
+				for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
 					fitness_regression(pop[pop_index].individuals[i], eval_double);
 			else
-				if (parameters.problem_type == PROBLEM_CLASSIFICATION)
-					for (int i = 0; i < parameters.subpopulation_size; i++)
+				if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION)
+					for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
 						fitness_classification(pop[pop_index].individuals[i], eval_double, tmp_value_class);
 
 			sort_by_fitness(pop[pop_index]);
 		}
 		else // other generations, after initial
-			for (int k = 0; k < parameters.subpopulation_size; k += 2) {
+			for (int k = 0; k < mep_parameters->get_subpopulation_size(); k += 2) {
 				// choose the parents using binary tournament
 				long r1 = tournament(*a_sub_population);
 				long r2 = tournament(*a_sub_population);
 				// crossover
 				double p = my_rand() / (RAND_MAX + 1.0);
-				if (p < parameters.crossover_probability)
-					if (parameters.crossover_type == UNIFORM_CROSSOVER)
-						a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, &parameters);
+				if (p < mep_parameters->get_crossover_probability())
+					if (mep_parameters->get_crossover_type() == UNIFORM_CROSSOVER)
+						a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
 					else
-						a_sub_population->individuals[r1].one_cut_point_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, &parameters);
+						a_sub_population->individuals[r1].one_cut_point_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
 				else {
 					a_sub_population->offspring1 = a_sub_population->individuals[r1];
 					a_sub_population->offspring2 = a_sub_population->individuals[r2];
 				}
 				// mutate the result and move the mutant in the new population
-				a_sub_population->offspring1.mutation(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-				if (parameters.problem_type == PROBLEM_REGRESSION)
+				a_sub_population->offspring1.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
+				if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
 					fitness_regression(a_sub_population->offspring1, eval_double);
 				else
 					fitness_classification(a_sub_population->offspring1, eval_double, tmp_value_class);
 
-				a_sub_population->offspring2.mutation(&parameters, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-				if (parameters.problem_type == PROBLEM_REGRESSION)
+				a_sub_population->offspring2.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
+				if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
 					fitness_regression(a_sub_population->offspring2, eval_double);
 				else
 					fitness_classification(a_sub_population->offspring2, eval_double, tmp_value_class);
 
 				if (a_sub_population->offspring1.fit < a_sub_population->offspring2.fit)   // the best offspring replaces the worst individual in the population
-					if (a_sub_population->offspring1.fit < a_sub_population->individuals[parameters.subpopulation_size - 1].fit) {
-						a_sub_population->individuals[parameters.subpopulation_size - 1] = a_sub_population->offspring1;
+					if (a_sub_population->offspring1.fit < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].fit) {
+						a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring1;
 						sort_by_fitness(*a_sub_population);
 					}
 					else;
-				else if (a_sub_population->offspring2.fit < a_sub_population->individuals[parameters.subpopulation_size - 1].fit) {
-					a_sub_population->individuals[parameters.subpopulation_size - 1] = a_sub_population->offspring2;
+				else if (a_sub_population->offspring2.fit < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].fit) {
+					a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring2;
 					sort_by_fitness(*a_sub_population);
 				}
 			}
@@ -1260,7 +1260,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 //-----------------------------------------------------------------------
 bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation)       // Steady-State MEP
 {
-	my_srand(run + parameters.random_seed);
+	my_srand(run + mep_parameters->get_random_seed());
 
 	//clock_t start_time = clock();
 	time_t start_time;
@@ -1270,18 +1270,18 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 
 	//wxLogDebug(wxString() << "generation " << gen_index << " ");
 	// an array of threads. Each sub population is evolved by a thread
-	std::thread **mep_threads = new std::thread*[parameters.num_threads];
+	std::thread **mep_threads = new std::thread*[mep_parameters->get_num_threads()];
 	// we create a fixed number of threads and each thread will take and evolve one subpopulation, then it will take another one
 	std::mutex mutex;
 	// we need a mutex to make sure that the same subpopulation will not be evolved twice by different threads
 
 	// initial population (generation 0)
 	int current_subpop_index = 0;
-	for (int t = 0; t < parameters.num_threads; t++)
+	for (int t = 0; t < mep_parameters->get_num_threads(); t++)
 		mep_threads[t] = new std::thread(&t_mep::evolve_one_subpopulation_for_one_generation, this, &current_subpop_index, &mutex, pop, 0, eval_double[t], array_value_class[t]);
 
 
-	for (int t = 0; t < parameters.num_threads; t++) {
+	for (int t = 0; t < mep_parameters->get_num_threads(); t++) {
 		mep_threads[t]->join(); // wait for all threads to execute
 		delete mep_threads[t];
 	}
@@ -1290,7 +1290,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 
 	stats[run].best_validation_error = -1;
 
-	if (parameters.use_validation_data && validation_data->get_num_rows() > 0) {
+	if (mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0) {
 		// I must run all solutions for the validation data and choose the best one
 		stats[run].best_validation_error = compute_validation_error(&best_subpopulation_index_for_test, &best_individual_index_for_test, eval_double[0]);
 		stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
@@ -1306,30 +1306,30 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	if (on_generation)
 		on_generation();
 
-	for (int gen_index = 1; gen_index < parameters.num_generations; gen_index++) {
+	for (int gen_index = 1; gen_index < mep_parameters->get_num_generations(); gen_index++) {
 		if (_stopped)
 			break;
 
 		int current_subpop_index = 0;
-		for (int t = 0; t < parameters.num_threads; t++)
+		for (int t = 0; t < mep_parameters->get_num_threads(); t++)
 			mep_threads[t] = new std::thread(&t_mep::evolve_one_subpopulation_for_one_generation, this, &current_subpop_index, &mutex, pop, gen_index, eval_double[t], array_value_class[t]);
 
-		for (int t = 0; t < parameters.num_threads; t++) {
+		for (int t = 0; t < mep_parameters->get_num_threads(); t++) {
 			mep_threads[t]->join(); // wait for all threads to execute
 			delete mep_threads[t];
 		}
 
 		// now copy the best from each deme to the next one
-		for (int d = 0; d < parameters.num_subpopulations; d++) { // din d in d+1
+		for (int d = 0; d < mep_parameters->get_num_subpopulations(); d++) { // din d in d+1
 			// aleg unul din dema d
 			long w = tournament(pop[d]);
-			if (pop[d].individuals[w].compare(&pop[(d + 1) % parameters.num_subpopulations].individuals[parameters.subpopulation_size - 1], false))
-				pop[(d + 1) % parameters.num_subpopulations].individuals[parameters.subpopulation_size - 1] = pop[d].individuals[w];
+			if (pop[d].individuals[w].compare(&pop[(d + 1) % mep_parameters->get_num_subpopulations()].individuals[mep_parameters->get_subpopulation_size() - 1], false))
+				pop[(d + 1) % mep_parameters->get_num_subpopulations()].individuals[mep_parameters->get_subpopulation_size() - 1] = pop[d].individuals[w];
 		}
-		for (int d = 0; d < parameters.num_subpopulations; d++) // din d in d+1
+		for (int d = 0; d < mep_parameters->get_num_subpopulations(); d++) // din d in d+1
 			sort_by_fitness(pop[d]);
 
-		if (parameters.use_validation_data && validation_data->get_num_rows() > 0) {
+		if (mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0) {
 			// I must run all solutions for the validation data and choose the best one
 			int best_index_on_validation, best_subpop_index_on_validation;
 			double validation_error = compute_validation_error(&best_subpop_index_on_validation, &best_index_on_validation, eval_double[0]);
@@ -1355,23 +1355,23 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	// DEBUG ONLY
 	//	fitness_regression(pop[best_individual_index]);
 	/*
-	if (parameters.problem_type == PROBLEM_REGRESSION)
+	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
 	fitness_regression(pop[0].individuals[0], eval_double[0]);
 	else
-	if (parameters.problem_type == PROBLEM_CLASSIFICATION)
+	if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION)
 	fitness_classification(pop[0].individuals[0], eval_double[0], array_value_class[0]);
 	*/
-	if (!(parameters.use_validation_data && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
+	if (!(mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
 		stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
 	stats[run].prg.simplify();
 
 	if (test_data && test_data->get_num_rows() && test_data->get_num_outputs()) {// has target
 		// I must run all solutions for the test data and choose the best one
-		if (parameters.problem_type == PROBLEM_REGRESSION) {
+		if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION) {
 			if (compute_regression_error_on_double_data(stats[run].prg, test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_data_matrix_double(), &stats[run].test_error));
 		}
 		else
-			if (parameters.problem_type == PROBLEM_CLASSIFICATION) {
+			if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION) {
 				if (compute_classification_error_on_double_data(stats[run].prg, test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_data_matrix_double(), &stats[run].test_error));
 			}
 	}
@@ -1426,9 +1426,13 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 	target_col_data_node.set_value(tmp_str);
 */
 	pugi::xml_node parameters_node = parent.append_child("parameters");
-	parameters.to_xml(parameters_node);
+	mep_parameters->to_xml(parameters_node);
+
+	pugi::xml_node constants_node = parent.append_child("constants");
+	mep_constants->to_xml(constants_node);
+
 	pugi::xml_node operators_node = parent.append_child("operators");
-	operators.to_xml(operators_node);
+	operators->to_xml(operators_node);
 
 	pugi::xml_node results_node = parent.append_child("results");
 
@@ -1528,11 +1532,21 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 
 	node = parent.child("parameters");
 	if (node)
-		parameters.from_xml(node);
+		mep_parameters->from_xml(node);
+	else
+		mep_parameters->init();
 
 	node = parent.child("operators");
 	if (node)
-		operators.from_xml(node);
+		operators->from_xml(node);
+	else
+		operators->init();
+
+	node = parent.child("constants");
+	if (node)
+		mep_constants->from_xml(node);
+	else
+		mep_constants->init();
 
 	last_run_index = -1;
 	pugi::xml_node node_results = parent.child("results");
@@ -1543,7 +1557,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		stats = new t_mep_statistics[last_run_index + 1];
 		last_run_index = 0;
 		for (pugi::xml_node row = node_results.child("run"); row; row = row.next_sibling("run"), last_run_index++)
-			stats[last_run_index].from_xml(row, parameters.num_generations, parameters.code_length);
+			stats[last_run_index].from_xml(row, mep_parameters->get_num_generations(), mep_parameters->get_code_length());
 		last_run_index--;
 	}
 
@@ -1706,7 +1720,7 @@ int t_mep::stats_to_csv(const char *filename)
 		return false;
 	fprintf(f, "running time; training error; validation error\n");
 	for (int r = 0; r <= last_run_index; r++)
-		fprintf(f, "%lf;%lf;%lf\n", stats[r].running_time, stats[r].best_training_error[parameters.num_generations - 1], stats[r].best_validation_error);
+		fprintf(f, "%lf;%lf;%lf\n", stats[r].running_time, stats[r].best_training_error[mep_parameters->get_num_generations() - 1], stats[r].best_validation_error);
 
 	fclose(f);
 	return true;
@@ -1856,695 +1870,6 @@ void t_mep::compute_list_of_enabled_variables(void)
 	}
 }
 //---------------------------------------------------------------------------
-double t_mep::get_mutation_probability(void)
-{
-	return parameters.mutation_probability;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_crossover_probability(void)
-{
-	return parameters.crossover_probability;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_code_length(void)
-{
-	return parameters.code_length;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_subpopulation_size(void)
-{
-	return parameters.subpopulation_size;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_num_threads(void)
-{
-	return parameters.num_threads;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_tournament_size(void)
-{
-	return parameters.tournament_size;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_num_generations(void)
-{
-	return parameters.num_generations;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_problem_type(void)
-{
-	return parameters.problem_type;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_num_subpopulations(void)
-{
-	return parameters.num_subpopulations;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_operators_probability(void)
-{
-	return parameters.operators_probability;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_variables_probability(void)
-{
-	return parameters.variables_probability;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_constants_probability(void)
-{
-	return parameters.constants_probability;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_use_validation_data(void)
-{
-	return parameters.use_validation_data;
-}
-//---------------------------------------------------------------------------
-int t_mep::get_crossover_type(void)
-{
-	return parameters.crossover_type;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_random_seed(void)
-{
-	return parameters.random_seed;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_num_runs(void)
-{
-	return parameters.num_runs;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_simplified_programs(void)
-{
-	return parameters.simplified_programs;
-}
-//---------------------------------------------------------------------------
-void t_mep::set_mutation_probability(double value)
-{
-	if (_stopped) {
-		parameters.mutation_probability = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_crossover_probability(double value)
-{
-	if (_stopped) {
-		parameters.crossover_probability = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_code_length(long value)
-{
-	if (_stopped) {
-		parameters.code_length = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-
-void t_mep::set_subpopulation_size(long value)
-{
-	if (_stopped) {
-		parameters.subpopulation_size = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_num_threads(long value)
-{
-	if (_stopped) {
-		parameters.num_threads = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_tournament_size(long value)
-{
-	if (_stopped) {
-		parameters.tournament_size = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_num_generations(long value)
-{
-	if (_stopped) {
-		parameters.num_generations = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_problem_type(long value)
-{
-	if (_stopped) {
-		parameters.problem_type = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_num_subpopulations(long value)
-{
-	if (_stopped) {
-		parameters.num_subpopulations = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_operators_probability(double value)
-{
-	if (_stopped) {
-		parameters.operators_probability = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_variables_probability(double value)
-{
-	if (_stopped) {
-		parameters.variables_probability = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_constants_probability(double value)
-{
-	if (_stopped) {
-		parameters.constants_probability = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_use_validation_data(bool value)
-{
-	if (_stopped) {
-		parameters.use_validation_data = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_crossover_type(int value)
-{
-	if (_stopped) {
-		parameters.crossover_type = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_random_seed(long value)
-{
-	if (_stopped) {
-		parameters.random_seed = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_num_runs(long value)
-{
-	if (_stopped) {
-		parameters.num_runs = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_simplified_programs(bool value)
-{
-	if (_stopped) {
-		parameters.simplified_programs = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-long t_mep::get_num_automatic_constants(void)
-{
-	return parameters.constants.num_automatic_constants;
-}
-//---------------------------------------------------------------------------
-long t_mep::get_num_user_defined_constants(void)
-{
-	return parameters.constants.num_user_defined_constants;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_min_constants_interval_double(void)
-{
-	return parameters.constants.min_constants_interval_double;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_max_constants_interval_double(void)
-{
-	return parameters.constants.max_constants_interval_double;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_constants_double(long index)
-{
-	return parameters.constants.constants_double[index];
-}
-//---------------------------------------------------------------------------
-long t_mep::get_constants_type(void)
-{
-	return parameters.constants.constants_type;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_constants_can_evolve(void)
-{
-	return parameters.constants.constants_can_evolve;
-}
-//---------------------------------------------------------------------------
-double t_mep::get_constants_mutation_max_deviation(void)
-{
-	return parameters.constants.constants_mutation_max_deviation;
-}
-//---------------------------------------------------------------------------
-void t_mep::set_num_automatic_constants(long value)
-{
-	if (_stopped) {
-		parameters.constants.num_automatic_constants = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_num_user_defined_constants(long value)
-{
-	if (_stopped) {
-		if (parameters.constants.constants_double)
-			delete[]parameters.constants.constants_double;
-
-		parameters.constants.num_user_defined_constants = value;
-
-		if (parameters.constants.num_user_defined_constants)
-			parameters.constants.constants_double = new double[parameters.constants.num_user_defined_constants];
-		else
-			parameters.constants.constants_double = NULL;
-
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_min_constants_interval_double(double value)
-{
-	if (_stopped) {
-		parameters.constants.min_constants_interval_double = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_max_constants_interval_double(double value)
-{
-	if (_stopped) {
-		parameters.constants.max_constants_interval_double = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_constants_double(long index, double value)
-{
-	if (_stopped) {
-		parameters.constants.constants_double[index] = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_constants_type(long value)
-{
-	if (_stopped) {
-		parameters.constants.constants_type = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_constants_can_evolve(bool value)
-{
-	if (_stopped) {
-		parameters.constants.constants_can_evolve = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_constants_mutation_max_deviation(double value)
-{
-	if (_stopped) {
-		parameters.constants.constants_mutation_max_deviation = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::init_parameters(void)
-{
-	if (_stopped) {
-		parameters.init();
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_addition(void)
-{
-	return operators.use_addition;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_subtraction(void)
-{
-	return operators.use_subtraction;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_multiplication(void)
-{
-	return operators.use_multiplication;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_division(void)
-{
-	return operators.use_division;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_power(void)
-{
-	return operators.use_power;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_sqrt(void)
-{
-	return operators.use_sqrt;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_exp(void)
-{
-	return operators.use_exp;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_pow10(void)
-{
-	return operators.use_pow10;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_ln(void)
-{
-	return operators.use_ln;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_log10(void)
-{
-	return operators.use_log10;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_log2(void)
-{
-	return operators.use_log2;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_floor(void)
-{
-	return operators.use_floor;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_ceil(void)
-{
-	return operators.use_ceil;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_abs(void)
-{
-	return operators.use_abs;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_inv(void)
-{
-	return operators.use_inv;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_x2(void)
-{
-	return operators.use_x2;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_min(void)
-{
-	return operators.use_min;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_max(void)
-{
-	return operators.use_max;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_sin(void)
-{
-	return operators.use_sin;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_cos(void)
-{
-	return operators.use_cos;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_tan(void)
-{
-	return operators.use_tan;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_asin(void)
-{
-	return operators.use_asin;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_acos(void)
-{
-	return operators.use_acos;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_atan(void)
-{
-	return operators.use_atan;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_iflz(void)
-{
-	return operators.use_iflz;
-}
-//---------------------------------------------------------------------------
-bool t_mep::get_ifalbcd(void)
-{
-	return operators.use_ifalbcd;
-}
-//---------------------------------------------------------------------------
-void t_mep::set_addition(bool value)
-{
-	if (_stopped) {
-		operators.use_addition = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_subtraction(bool value)
-{
-	if (_stopped) {
-		operators.use_subtraction = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_multiplication(bool value)
-{
-	if (_stopped) {
-		operators.use_multiplication = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_division(bool value)
-{
-	if (_stopped) {
-		operators.use_division = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_power(bool value)
-{
-	if (_stopped) {
-		operators.use_power = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_sqrt(bool value)
-{
-	if (_stopped) {
-		operators.use_sqrt = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_exp(bool value)
-{
-	if (_stopped) {
-		operators.use_exp = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_pow10(bool value)
-{
-	if (_stopped) {
-		operators.use_pow10 = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_ln(bool value)
-{
-	if (_stopped) {
-		operators.use_ln = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_log10(bool value)
-{
-	if (_stopped) {
-		operators.use_log10 = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_log2(bool value)
-{
-	if (_stopped) {
-		operators.use_log2 = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_floor(bool value)
-{
-	if (_stopped) {
-		operators.use_floor = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_ceil(bool value)
-{
-	if (_stopped) {
-		operators.use_ceil = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_abs(bool value)
-{
-	if (_stopped) {
-		operators.use_abs = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_inv(bool value)
-{
-	if (_stopped) {
-		operators.use_inv = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_x2(bool value)
-{
-	if (_stopped) {
-		operators.use_x2 = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_min(bool value)
-{
-	if (_stopped) {
-		operators.use_min = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_max(bool value)
-{
-	if (_stopped) {
-		operators.use_max = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_sin(bool value)
-{
-	if (_stopped) {
-		operators.use_sin = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_cos(bool value)
-{
-	if (_stopped) {
-		operators.use_cos = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_tan(bool value)
-{
-	if (_stopped) {
-		operators.use_tan = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_asin(bool value)
-{
-	if (_stopped) {
-		operators.use_asin = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_acos(bool value)
-{
-	if (_stopped) {
-		operators.use_acos = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_atan(bool value)
-{
-	if (_stopped) {
-		operators.use_atan = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_iflz(bool value)
-{
-	if (_stopped) {
-		operators.use_iflz = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::set_ifalbcd(bool value)
-{
-	if (_stopped) {
-		operators.use_ifalbcd = value;
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
-void t_mep::init_operators()
-{
-	if (_stopped) {
-		operators.init();
-		modified_project = true;
-	}
-}
-//---------------------------------------------------------------------------
 bool t_mep::is_running(void)
 {
 	return !_stopped;
@@ -2570,7 +1895,7 @@ void t_mep::clear_stats(void)
 //---------------------------------------------------------------------------
 char* t_mep::program_as_C(int run_index, bool simplified, double *inputs)
 {
-	return stats[run_index].prg.to_C_double(simplified, inputs, parameters.problem_type);
+	return stats[run_index].prg.to_C_double(simplified, inputs, mep_parameters->get_problem_type());
 }
 //---------------------------------------------------------------------------
 int t_mep::get_num_outputs(void)
@@ -2595,9 +1920,9 @@ void t_mep::set_num_total_variables(int value)
 void t_mep::init(void)
 {
 	if (_stopped) {
-		init_parameters();
-		init_operators();
-
+		mep_parameters->init();
+		operators->init();
+		mep_constants->init();
 
 		if (actual_enabled_variables) {
 			delete[] actual_enabled_variables;
@@ -2710,18 +2035,47 @@ void t_mep::set_training_data(t_mep_data *_data)
 
 			target_col = training_data->get_num_cols() - 1;
 		}
+		modified_project = true;
 	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_validation_data(t_mep_data *_data)
 {
-	if (_stopped)
+	if (_stopped) {
 		validation_data = _data;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------
 void t_mep::set_test_data(t_mep_data *_data)
 {
-	if (_stopped)
+	if (_stopped) {
 		test_data = _data;
+		modified_project = true;
+	}
+}
+//---------------------------------------------------------------------------
+void t_mep::set_operators(t_mep_operators *_mep_operators)
+{
+	if (_stopped) {
+		operators = _mep_operators;
+		modified_project = true;
+	}
+}
+//---------------------------------------------------------------------------
+void t_mep::set_constants(t_mep_constants *_mep_constants)
+{
+	if (_stopped) {
+		mep_constants = _mep_constants;
+		modified_project = true;
+	}
+}
+//---------------------------------------------------------------------------
+void t_mep::set_parameters(t_mep_parameters *_mep_parameters)
+{
+	if (_stopped) {
+		mep_parameters = _mep_parameters;
+		modified_project = true;
+	}
 }
 //---------------------------------------------------------------------------

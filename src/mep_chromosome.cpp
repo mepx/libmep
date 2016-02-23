@@ -1,6 +1,7 @@
 
 #include "mep_chromosome.h"
 #include "mep_operators.h"
+#include "mep_constants.h"
 #include "mep_data.h"
 #include "mep_rands.h"
 
@@ -29,12 +30,12 @@ void t_mep_chromosome::allocate_memory(long code_length, int num_vars, bool use_
 	this->num_total_variables = num_vars;
 
 	if (use_constants) {
-		if (constants->constants_type == USER_DEFINED_CONSTANTS) {
-			num_constants = constants->num_user_defined_constants;
+		if (constants->get_constants_type() == USER_DEFINED_CONSTANTS) {
+			num_constants = constants->get_num_user_defined_constants();
 			constants_double = new double[num_constants];
 		}
 		else {// automatic constants
-			num_constants = constants->num_automatic_constants;
+			num_constants = constants->get_num_automatic_constants();
 			if (num_constants)
 				constants_double = new double[num_constants];
 		}
@@ -593,35 +594,35 @@ int t_mep_chromosome::compare(t_mep_chromosome *other, bool minimize_operations_
 
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::generate_random(t_mep_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // randomly initializes the individuals
+void t_mep_chromosome::generate_random(t_mep_parameters *parameters, t_mep_constants * mep_constants, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // randomly initializes the individuals
 {
 	// I have to generate the constants for this individuals
-	if (parameters->constants_probability > 1E-6) {
-		if (parameters->constants.constants_type == USER_DEFINED_CONSTANTS) {
+	if (parameters->get_constants_probability() > 1E-6) {
+		if (mep_constants->get_constants_type() == USER_DEFINED_CONSTANTS) {
 			for (int c = 0; c < num_constants; c++)
-				constants_double[c] = parameters->constants.constants_double[c];
+				constants_double[c] = mep_constants->get_constants_double(c);
 		}
 		else {// automatic constants
 			for (int c = 0; c < num_constants; c++)
-				constants_double[c] = my_rand() / double(RAND_MAX) * (parameters->constants.max_constants_interval_double - parameters->constants.min_constants_interval_double) + parameters->constants.min_constants_interval_double;
+				constants_double[c] = my_rand() / double(RAND_MAX) * (mep_constants->get_max_constants_interval_double() - mep_constants->get_min_constants_interval_double()) + mep_constants->get_min_constants_interval_double();
 		}
 	}
 
-	double sum = parameters->variables_probability + parameters->constants_probability;
+	double sum = parameters->get_variables_probability() + parameters->get_constants_probability();
 	double p = my_rand() / (double)RAND_MAX * sum;
 
-	if (p <= parameters->variables_probability)
+	if (p <= parameters->get_variables_probability())
 		prg[0].op = actual_variables[my_rand() % num_actual_variables];
 	else
 		prg[0].op = num_total_variables + my_rand() % num_constants;
 
-	for (int i = 1; i < parameters->code_length; i++) {
+	for (int i = 1; i < parameters->get_code_length(); i++) {
 		double p = my_rand() / (double)RAND_MAX;
 
-		if (p <= parameters->operators_probability)
+		if (p <= parameters->get_operators_probability())
 			prg[i].op = actual_operators[my_rand() % num_actual_operators];
 		else
-			if (p <= parameters->operators_probability + parameters->variables_probability)
+			if (p <= parameters->get_operators_probability() + parameters->get_variables_probability())
 				prg[i].op = actual_variables[my_rand() % num_actual_variables];
 			else
 				prg[i].op = num_total_variables + my_rand() % num_constants;
@@ -633,16 +634,16 @@ void t_mep_chromosome::generate_random(t_mep_parameters *parameters, int *actual
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::mutation(t_mep_parameters *parameters, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // mutate the individual
+void t_mep_chromosome::mutation(t_mep_parameters *parameters, t_mep_constants * mep_constants, int *actual_operators, int num_actual_operators, int *actual_variables, int num_actual_variables) // mutate the individual
 {
 
 	// mutate each symbol with the same pm probability
 	double p = my_rand() / (double)RAND_MAX;
-	if (p < parameters->mutation_probability) {
-		double sum = parameters->variables_probability + parameters->constants_probability;
+	if (p < parameters->get_mutation_probability()) {
+		double sum = parameters->get_variables_probability() + parameters->get_constants_probability();
 		double q = my_rand() / (double)RAND_MAX * sum;
 
-		if (q <= parameters->variables_probability)
+		if (q <= parameters->get_variables_probability())
 			prg[0].op = actual_variables[my_rand() % num_actual_variables];
 		else
 			prg[0].op = num_total_variables + my_rand() % num_constants;
@@ -650,53 +651,53 @@ void t_mep_chromosome::mutation(t_mep_parameters *parameters, int *actual_operat
 
 	for (int i = 1; i < code_length; i++) {
 		p = my_rand() / (double)RAND_MAX;      // mutate the operator
-		if (p < parameters->mutation_probability) {
+		if (p < parameters->get_mutation_probability()) {
 			double q = my_rand() / (double)RAND_MAX;
 
-			if (q <= parameters->operators_probability)
+			if (q <= parameters->get_operators_probability())
 				prg[i].op = actual_operators[my_rand() % num_actual_operators];
 			else
-				if (q <= parameters->operators_probability + parameters->variables_probability)
+				if (q <= parameters->get_operators_probability() + parameters->get_variables_probability())
 					prg[i].op = actual_variables[my_rand() % num_actual_variables];
 				else
 					prg[i].op = num_total_variables + my_rand() % num_constants;
 		}
 
 		p = my_rand() / (double)RAND_MAX;      // mutate the first address  (adr1)
-		if (p < parameters->mutation_probability)
+		if (p < parameters->get_mutation_probability())
 			prg[i].adr1 = my_rand() % i;
 
 		p = my_rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
-		if (p < parameters->mutation_probability)
+		if (p < parameters->get_mutation_probability())
 			prg[i].adr2 = my_rand() % i;
 		p = my_rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
-		if (p < parameters->mutation_probability)
+		if (p < parameters->get_mutation_probability())
 			prg[i].adr3 = my_rand() % i;
 		p = my_rand() / (double)RAND_MAX;      // mutate the second address   (adr2)
-		if (p < parameters->mutation_probability)
+		if (p < parameters->get_mutation_probability())
 			prg[i].adr4 = my_rand() % i;
 	}
 	// lets see if I can evolve constants
 
-	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS)
+	if (mep_constants->get_constants_can_evolve() && mep_constants->get_constants_type() == AUTOMATIC_CONSTANTS)
 		for (int c = 0; c < num_constants; c++) {
 			p = my_rand() / (double)RAND_MAX;      // mutate the operator
-			double tmp_cst_d = my_rand() / double(RAND_MAX) * parameters->constants.constants_mutation_max_deviation;
+			double tmp_cst_d = my_rand() / double(RAND_MAX) * mep_constants->get_constants_mutation_max_deviation();
 
-			if (p < parameters->mutation_probability) {
+			if (p < parameters->get_mutation_probability()) {
 				if (my_rand() % 2) {// coin
-					if (constants_double[c] + tmp_cst_d <= parameters->constants.max_constants_interval_double)
+					if (constants_double[c] + tmp_cst_d <= mep_constants->get_max_constants_interval_double())
 						constants_double[c] += tmp_cst_d;
 				}
 				else
-					if (constants_double[c] - tmp_cst_d >= parameters->constants.min_constants_interval_double)
+					if (constants_double[c] - tmp_cst_d >= mep_constants->get_min_constants_interval_double())
 						constants_double[c] -= tmp_cst_d;
 				break;
 			}
 		}
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters)
+void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters, t_mep_constants * mep_constants)
 {
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;
@@ -715,7 +716,7 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, 
 		offspring2.prg[i] = prg[i];
 	}
 
-	if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS) {
+	if (mep_constants->get_constants_can_evolve() && mep_constants->get_constants_type() == AUTOMATIC_CONSTANTS) {
 		pct = 1 + my_rand() % (num_constants - 2);
 		for (int c = 0; c < pct; c++) {
 			offspring1.constants_double[c] = constants_double[c];
@@ -729,7 +730,7 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, 
 
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters)
+void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters, t_mep_constants * mep_constants)
 {
 	offspring1.code_length = code_length;
 	offspring2.code_length = code_length;
@@ -747,7 +748,7 @@ void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_
 			offspring2.prg[i] = prg[i];
 		}
 
-		if (parameters->constants.constants_can_evolve && parameters->constants.constants_type == AUTOMATIC_CONSTANTS)
+		if (mep_constants->get_constants_can_evolve() && mep_constants->get_constants_type() == AUTOMATIC_CONSTANTS)
 			for (int c = 0; c < num_constants; c++) {
 				offspring1.constants_double[c] = constants_double[c];
 				offspring2.constants_double[c] = parent2.constants_double[c];
