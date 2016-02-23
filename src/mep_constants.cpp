@@ -28,6 +28,8 @@ void t_mep_constants::init(void)
 	constants_type = 1; // automatically generated
 	constants_can_evolve = true;
 	constants_mutation_max_deviation = 1;
+
+	modified = false;
 }
 //---------------------------------------------------------------------------
 int t_mep_constants::to_xml(pugi::xml_node parent)
@@ -90,7 +92,7 @@ int t_mep_constants::to_xml(pugi::xml_node parent)
 		delete[] tmp_cst_str;
 
 	}
-
+	modified = false;
 
 	return true;
 }
@@ -164,6 +166,118 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 		}
 	}
 
+	modified = false;
 	return true;
+}
+//---------------------------------------------------------------------------
+long t_mep_constants::get_num_automatic_constants(void)
+{
+	return num_automatic_constants;
+}
+//---------------------------------------------------------------------------
+long t_mep_constants::get_num_user_defined_constants(void)
+{
+	return num_user_defined_constants;
+}
+//---------------------------------------------------------------------------
+double t_mep_constants::get_min_constants_interval_double(void)
+{
+	return min_constants_interval_double;
+}
+//---------------------------------------------------------------------------
+double t_mep_constants::get_max_constants_interval_double(void)
+{
+	return max_constants_interval_double;
+}
+//---------------------------------------------------------------------------
+double t_mep_constants::get_constants_double(long index)
+{
+	return constants_double[index];
+}
+//---------------------------------------------------------------------------
+long t_mep_constants::get_constants_type(void)
+{
+	return constants_type;
+}
+//---------------------------------------------------------------------------
+bool t_mep_constants::get_constants_can_evolve(void)
+{
+	return constants_can_evolve;
+}
+//---------------------------------------------------------------------------
+double t_mep_constants::get_constants_mutation_max_deviation(void)
+{
+	return constants_mutation_max_deviation;
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_num_automatic_constants(long value)
+{
+	
+		num_automatic_constants = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_num_user_defined_constants(long value)
+{
+	
+		if (constants_double)
+			delete[] constants_double;
+
+		num_user_defined_constants = value;
+
+		if (num_user_defined_constants)
+			constants_double = new double[num_user_defined_constants];
+		else
+			constants_double = NULL;
+
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_min_constants_interval_double(double value)
+{
+		min_constants_interval_double = value;
+		modified = true;
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_max_constants_interval_double(double value)
+{
+	
+		max_constants_interval_double = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_constants_double(long index, double value)
+{
+	
+		constants_double[index] = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_constants_type(long value)
+{
+	
+		constants_type = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_constants_can_evolve(bool value)
+{
+	
+		constants_can_evolve = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_constants_mutation_max_deviation(double value)
+{
+	
+		constants_mutation_max_deviation = value;
+		modified = true;
+	
 }
 //---------------------------------------------------------------------------
