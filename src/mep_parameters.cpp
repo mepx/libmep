@@ -28,7 +28,8 @@ void t_mep_parameters::init (void)
 	crossover_type = 0;
 	simplified_programs = 0;
     num_threads = 1;
-	constants.init();
+
+	modified = false;
 }
 //---------------------------------------------------------------------------
 int t_mep_parameters::to_xml(pugi::xml_node parent)
@@ -119,8 +120,7 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	sprintf(tmp_str, "%ld", num_threads);
 	data.set_value(tmp_str);
 
-	node = parent.append_child("constants");
-	constants.to_xml(node);
+	modified = false;
 
 	return true;
 }
@@ -256,14 +256,230 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	else
 		num_threads = 1;
 
-	node = parent.child("constants");
-	if (node)
-	{
-		constants.from_xml(node);
-	}
-	else
-		constants.init();
+	modified = false;
 
-		return true;
+	return true;
+}
+//---------------------------------------------------------------------------
+double t_mep_parameters::get_mutation_probability(void)
+{
+	return mutation_probability;
+}
+//---------------------------------------------------------------------------
+double t_mep_parameters::get_crossover_probability(void)
+{
+	return crossover_probability;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_code_length(void)
+{
+	return code_length;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_subpopulation_size(void)
+{
+	return subpopulation_size;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_num_threads(void)
+{
+	return num_threads;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_tournament_size(void)
+{
+	return tournament_size;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_num_generations(void)
+{
+	return num_generations;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_problem_type(void)
+{
+	return problem_type;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_num_subpopulations(void)
+{
+	return num_subpopulations;
+}
+//---------------------------------------------------------------------------
+double t_mep_parameters::get_operators_probability(void)
+{
+	return operators_probability;
+}
+//---------------------------------------------------------------------------
+double t_mep_parameters::get_variables_probability(void)
+{
+	return variables_probability;
+}
+//---------------------------------------------------------------------------
+double t_mep_parameters::get_constants_probability(void)
+{
+	return constants_probability;
+}
+//---------------------------------------------------------------------------
+bool t_mep_parameters::get_use_validation_data(void)
+{
+	return use_validation_data;
+}
+//---------------------------------------------------------------------------
+int t_mep_parameters::get_crossover_type(void)
+{
+	return crossover_type;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_random_seed(void)
+{
+	return random_seed;
+}
+//---------------------------------------------------------------------------
+long t_mep_parameters::get_num_runs(void)
+{
+	return num_runs;
+}
+//---------------------------------------------------------------------------
+bool t_mep_parameters::get_simplified_programs(void)
+{
+	return simplified_programs;
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_mutation_probability(double value)
+{
+	
+		mutation_probability = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_crossover_probability(double value)
+{
+	
+		crossover_probability = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_code_length(long value)
+{
+	
+		code_length = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+
+void t_mep_parameters::set_subpopulation_size(long value)
+{
+	
+		subpopulation_size = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_num_threads(long value)
+{
+	
+		num_threads = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_tournament_size(long value)
+{
+	
+		tournament_size = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_num_generations(long value)
+{
+	
+		num_generations = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_problem_type(long value)
+{
+	
+		problem_type = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_num_subpopulations(long value)
+{
+	
+		num_subpopulations = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_operators_probability(double value)
+{
+	
+		operators_probability = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_variables_probability(double value)
+{
+	
+		variables_probability = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_constants_probability(double value)
+{
+	
+		constants_probability = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_use_validation_data(bool value)
+{
+	
+		use_validation_data = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_crossover_type(int value)
+{
+	
+		crossover_type = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_random_seed(long value)
+{
+	
+		random_seed = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_num_runs(long value)
+{
+	
+		num_runs = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_simplified_programs(bool value)
+{
+	
+		simplified_programs = value;
+		modified = true;
+	
 }
 //---------------------------------------------------------------------------
