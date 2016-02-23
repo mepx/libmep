@@ -57,7 +57,9 @@ class t_mep_operators
     bool use_sin, use_cos, use_tan, use_asin, use_acos, use_atan;
 	// if lower than 0 then
 	bool use_iflz;
-		bool use_ifalbcd;
+	bool use_ifalbcd;
+
+	bool modified;
 
 	t_mep_operators(void);
 
@@ -67,6 +69,167 @@ class t_mep_operators
     int from_xml(pugi::xml_node parent);
 
     int get_list_of_operators(int *actual_operators);
+
+	// returns true if the addition operator is enabled
+	bool get_addition(void);
+
+	// returns true if the subtraction operator is enabled
+	bool get_subtraction(void);
+
+	// returns true if the multiplication operator is enabled
+	bool get_multiplication(void);
+
+	// returns true if the division operator is enabled
+	bool get_division(void);
+
+	// returns true if the power operator is enabled
+	bool get_power(void);
+
+	// returns true if the sqrt operator is enabled
+	bool get_sqrt(void);
+
+	// returns true if the exp operator is enabled
+	bool get_exp(void);
+
+	// returns true if the pow10 operator is enabled
+	bool get_pow10(void);
+
+	// returns true if the ln (natural logarithm) operator is enabled
+	bool get_ln(void);
+
+	// returns true if the log10 (log in base 10) operator is enabled
+	bool get_log10(void);
+
+	// returns true if the log2 (log in base 2) operator is enabled
+	bool get_log2(void);
+
+	// returns true if the floor operator is enabled
+	bool get_floor(void);
+
+	// returns true if the ceil operator is enabled
+	bool get_ceil(void);
+
+	// returns true if the absolute operator is enabled
+	bool get_abs(void);
+
+	// returns true if the inv (1/x) operator is enabled
+	bool get_inv(void);
+
+	// returns true if the x^2 operator is enabled
+	bool get_x2(void);
+
+	// returns true if the min (x, y) operator is enabled
+	bool get_min(void);
+
+	// returns true if the max(x, y) operator is enabled
+	bool get_max(void);
+
+	// returns true if the sin operator is enabled
+	bool get_sin(void);
+
+	// returns true if the cos operator is enabled
+	bool get_cos(void);
+
+	// returns true if the tan operator is enabled
+	bool get_tan(void);
+
+	// returns true if the asin operator is enabled
+	bool get_asin(void);
+
+	// returns true if the acos operator is enabled
+	bool get_acos(void);
+
+	// returns true if the atan operator is enabled
+	bool get_atan(void);
+
+	// returns true if the "if lower than zero" operator is enabled
+	bool get_iflz(void);
+
+	// returns true if the "if a lower than b returns c else returns d" operator is enabled
+	bool get_ifalbcd(void);
+
+
+	// sets if the addition operator is enabled or not
+	void set_addition(bool value);
+
+	// sets if the subtraction operator is enabled or not
+	void set_subtraction(bool value);
+
+	// sets if the multiplication operator is enabled or not
+	void set_multiplication(bool value);
+
+	// sets if the division operator is enabled or not
+	void set_division(bool value);
+
+	// sets if the power operator is enabled or not
+	void set_power(bool value);
+
+	// sets if the sqrt operator is enabled or not
+	void set_sqrt(bool value);
+
+	// sets if the exp operator is enabled or not
+	void set_exp(bool value);
+
+	// sets if the pow10 operator is enabled or not
+	void set_pow10(bool value);
+
+	// sets if the ln operator is enabled or not
+	void set_ln(bool value);
+
+	// sets if the log10 operator is enabled or not
+	void set_log10(bool value);
+
+	// sets if the log2 operator is enabled or not
+	void set_log2(bool value);
+
+	// sets if the floor operator is enabled or not
+	void set_floor(bool value);
+
+	// sets if the ceil operator is enabled or not
+	void set_ceil(bool value);
+
+	// sets if the abs operator is enabled or not
+	void set_abs(bool value);
+
+	// sets if the inv (1/x) operator is enabled or not
+	void set_inv(bool value);
+
+	// sets if the x^2 operator is enabled or not
+	void set_x2(bool value);
+
+	// sets if the min operator is enabled or not
+	void set_min(bool value);
+
+	// sets if the max operator is enabled or not
+	void set_max(bool value);
+
+	// sets if the sin operator is enabled or not
+	void set_sin(bool value);
+
+	// sets if the cos operator is enabled or not
+	void set_cos(bool value);
+
+	// sets if the tan operator is enabled or not
+	void set_tan(bool value);
+
+	// sets if the asin operator is enabled or not
+	void set_asin(bool value);
+
+	// sets if the acos operator is enabled or not
+	void set_acos(bool value);
+
+	// sets if the atan operator is enabled or not
+	void set_atan(bool value);
+
+	// sets if the "if less than zero" operator is enabled or not
+	void set_iflz(bool value);
+
+	// sets if the "if a lower than b returns c else returns d" operator is enabled or not
+	void set_ifalbcd(bool value);
+
+	// returns true if the state of some operator is modified
+	bool is_modified(void);
+
 };
 //-----------------------------------------------------------------
 

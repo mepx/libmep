@@ -22,7 +22,7 @@ void t_mep_operators::init(void)
 
 	use_iflz = use_ifalbcd = false;
 
-
+	modified = false;
 }
 //---------------------------------------------------------------------------
 int t_mep_operators::to_xml(pugi::xml_node parent)
@@ -187,6 +187,8 @@ int t_mep_operators::to_xml(pugi::xml_node parent)
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", use_ifalbcd);
 	data.set_value(tmp_str);
+
+	modified = false;
 
 	return true;
 }
@@ -473,6 +475,8 @@ int t_mep_operators::from_xml(pugi::xml_node parent)
 	else
 		use_ifalbcd = false;
 
+	modified = false;
+
 	return true;
 }
 //---------------------------------------------------------------------------
@@ -586,3 +590,347 @@ int t_mep_operators::get_list_of_operators(int *actual_operators)
 	return num_operators;
 }
 //---------------------------------------------------------------------------
+bool t_mep_operators::get_addition(void)
+{
+	return use_addition;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_subtraction(void)
+{
+	return use_subtraction;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_multiplication(void)
+{
+	return use_multiplication;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_division(void)
+{
+	return use_division;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_power(void)
+{
+	return use_power;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_sqrt(void)
+{
+	return use_sqrt;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_exp(void)
+{
+	return use_exp;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_pow10(void)
+{
+	return use_pow10;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_ln(void)
+{
+	return use_ln;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_log10(void)
+{
+	return use_log10;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_log2(void)
+{
+	return use_log2;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_floor(void)
+{
+	return use_floor;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_ceil(void)
+{
+	return use_ceil;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_abs(void)
+{
+	return use_abs;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_inv(void)
+{
+	return use_inv;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_x2(void)
+{
+	return use_x2;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_min(void)
+{
+	return use_min;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_max(void)
+{
+	return use_max;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_sin(void)
+{
+	return use_sin;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_cos(void)
+{
+	return use_cos;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_tan(void)
+{
+	return use_tan;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_asin(void)
+{
+	return use_asin;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_acos(void)
+{
+	return use_acos;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_atan(void)
+{
+	return use_atan;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_iflz(void)
+{
+	return use_iflz;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_ifalbcd(void)
+{
+	return use_ifalbcd;
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_addition(bool value)
+{
+	
+		use_addition = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_subtraction(bool value)
+{
+	
+		use_subtraction = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_multiplication(bool value)
+{
+	
+		use_multiplication = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_division(bool value)
+{
+	
+		use_division = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_power(bool value)
+{
+	
+		use_power = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_sqrt(bool value)
+{
+	
+		use_sqrt = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_exp(bool value)
+{
+	
+		use_exp = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_pow10(bool value)
+{
+	
+		use_pow10 = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_ln(bool value)
+{
+	
+		use_ln = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_log10(bool value)
+{
+	
+		use_log10 = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_log2(bool value)
+{
+	
+		use_log2 = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_floor(bool value)
+{
+	
+		use_floor = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_ceil(bool value)
+{
+	
+		use_ceil = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_abs(bool value)
+{
+	
+		use_abs = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_inv(bool value)
+{
+	
+		use_inv = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_x2(bool value)
+{
+	
+		use_x2 = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_min(bool value)
+{
+	
+		use_min = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_max(bool value)
+{
+	
+		use_max = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_sin(bool value)
+{
+	
+		use_sin = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_cos(bool value)
+{
+	
+		use_cos = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_tan(bool value)
+{
+	
+		use_tan = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_asin(bool value)
+{
+	
+		use_asin = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_acos(bool value)
+{
+	
+		use_acos = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_atan(bool value)
+{
+	
+		use_atan = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_iflz(bool value)
+{
+	
+		use_iflz = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_ifalbcd(bool value)
+{
+	
+		use_ifalbcd = value;
+		modified = true;
+	
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::is_modified(void)
+{
+	return modified;
+}
+//---------------------------------------------------------------------------
+
