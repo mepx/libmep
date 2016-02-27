@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.27.0-beta");
+	strcpy(version, "2016.02.27.1-beta");
 
 	num_operators = 0;
 	
@@ -277,7 +277,7 @@ long t_mep::tournament(t_sub_population &pop)     // Size is the size of the tou
 	p = my_rand() % mep_parameters->get_subpopulation_size();
 	for (int i = 1; i < mep_parameters->get_tournament_size(); i++) {
 		r = my_rand() % mep_parameters->get_subpopulation_size();
-		p = pop.individuals[r].fit < pop.individuals[p].fit ? r : p;
+		p = pop.individuals[r].get_fitness() < pop.individuals[p].get_fitness() ? r : p;
 	}
 	return p;
 }
@@ -285,19 +285,19 @@ long t_mep::tournament(t_sub_population &pop)     // Size is the size of the tou
 void t_mep::compute_best_and_average_error(double &best_error, double &mean_error)
 {
 	mean_error = 0;
-	best_error = pop[0].individuals[0].fit;
+	best_error = pop[0].individuals[0].get_fitness();
 	best_individual_index = 0;
 	best_subpopulation_index = 0;
 	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
-		if (best_error > pop[i].individuals[0].fit) {
-			best_error = pop[i].individuals[0].fit;
+		if (best_error > pop[i].individuals[0].get_fitness()) {
+			best_error = pop[i].individuals[0].get_fitness();
 			best_individual_index = 0;
 			best_subpopulation_index = i;
 		}
 
 	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
 		for (int k = 0; k < mep_parameters->get_subpopulation_size(); k++)
-			mean_error += pop[i].individuals[k].fit;
+			mean_error += pop[i].individuals[k].get_fitness();
 
 	mean_error /= mep_parameters->get_num_subpopulations() * mep_parameters->get_subpopulation_size();
 }
@@ -444,13 +444,13 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 				else
 					a_sub_population->offspring2.fitness_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 
-				if (a_sub_population->offspring1.fit < a_sub_population->offspring2.fit)   // the best offspring replaces the worst a_chromosome in the population
-					if (a_sub_population->offspring1.fit < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].fit) {
+				if (a_sub_population->offspring1.get_fitness() < a_sub_population->offspring2.get_fitness())   // the best offspring replaces the worst a_chromosome in the population
+					if (a_sub_population->offspring1.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
 						a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring1;
 						sort_by_fitness(*a_sub_population);
 					}
 					else;
-				else if (a_sub_population->offspring2.fit < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].fit) {
+				else if (a_sub_population->offspring2.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
 					a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring2;
 					sort_by_fitness(*a_sub_population);
 				}

@@ -1669,3 +1669,8 @@ bool t_mep_chromosome::get_error_double(double *inputs, double *outputs)
 }
 //---------------------------------------------------------------------------
 */
+double t_mep_chromosome::get_fitness(void)
+{
+	return fit;
+}
+//---------------------------------------------------------------------------
