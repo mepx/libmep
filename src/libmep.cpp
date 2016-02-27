@@ -311,7 +311,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 			while (!pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, &validation_error)) {
 				// I have to mutate that a_chromosome.
-				pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
+				pop[k].individuals[0].prg[pop[k].individuals[0].index_best_gene].op = actual_enabled_variables[my_rand() % num_actual_variables];
 				// recompute its fitness on training;
 				pop[k].individuals[0].fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 				// resort the population
@@ -330,7 +330,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION)
 			for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 				while (!pop[k].individuals[0].compute_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, &validation_error)) {
-					pop[k].individuals[0].prg[pop[k].individuals[0].best].op = actual_enabled_variables[my_rand() % num_actual_variables];
+					pop[k].individuals[0].prg[pop[k].individuals[0].index_best_gene].op = actual_enabled_variables[my_rand() % num_actual_variables];
 					// recompute its fitness on training;
 					pop[k].individuals[0].fitness_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					// resort the population

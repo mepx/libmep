@@ -29,13 +29,13 @@ private:
 
 	void fitness_binary_classification_double_cache_all_training_data(t_mep_data *mep_dataset, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class);
 
-	double fit;        // the fitness
+	double fitness;        // the fitness
 
 public:
 	code3 *prg;        // a string of genes
 	code3 *simplified_prg;      // simplified prg
 
-	int best;          // the index of the best expression in chromosome
+	int index_best_gene;          // the index of the best expression in chromosome
 	int num_utilized;  // number of utilized genes
 	double best_class_threshold;
 

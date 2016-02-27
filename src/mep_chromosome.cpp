@@ -17,8 +17,8 @@ t_mep_chromosome::t_mep_chromosome()
 {
 	prg = NULL;
 	simplified_prg = NULL;
-	best = -1;
-	fit = 0;
+	index_best_gene = -1;
+	fitness = 0;
 
 	num_constants = 0;
 	constants_double = NULL;
@@ -62,8 +62,8 @@ void t_mep_chromosome::clear(void)
 		delete[] simplified_prg;
 		simplified_prg = NULL;
 	}
-	best = -1;
-	fit = 0;
+	index_best_gene = -1;
+	fitness = 0;
 
 	num_constants = 0;
 	code_length = 0;
@@ -92,8 +92,8 @@ t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
 			prg[i] = source.prg[i];
 			//			simplified_prg[i] = source.simplified_prg[i];
 		}
-		fit = source.fit;        // the fitness
-		best = source.best;          // the index of the best expression in t_mep_chromosome
+		fitness = source.fitness;        // the fitness
+		index_best_gene = source.index_best_gene;          // the index of the best expression in t_mep_chromosome
 
 		num_constants = source.num_constants;
 		best_class_threshold = source.best_class_threshold;
@@ -298,10 +298,10 @@ char * t_mep_chromosome::to_C_double(bool simplified, double *data, int problem_
 
 		strcat(prog, "\n");
 		if (problem_type == PROBLEM_REGRESSION)
-			sprintf(tmp_s, "  outputs[0] = prg[%d];", best);
+			sprintf(tmp_s, "  outputs[0] = prg[%d];", index_best_gene);
 		else{
 			//            wxLogDebug(wxString() << best << " " << best_class_threshold);
-			sprintf(tmp_s, "  if (prg[%d] <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", best, best_class_threshold);
+			sprintf(tmp_s, "  if (prg[%d] <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", index_best_gene, best_class_threshold);
 			//          wxLogDebug(wxString(tmp_s));
 		}
 
@@ -363,12 +363,12 @@ int t_mep_chromosome::to_xml(pugi::xml_node parent)
 	}
 	node = parent.append_child("best");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", best);
+	sprintf(tmp_str, "%d", index_best_gene);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("error");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lg", fit);
+	sprintf(tmp_str, "%lg", fitness);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("binary_classification_threshold");
@@ -467,14 +467,14 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	if (node)
 	{
 		const char *value_as_cstring = node.child_value();
-		best = atoi(value_as_cstring);
+		index_best_gene = atoi(value_as_cstring);
 	}
 
 	node = parent.child("error");
 	if (node)
 	{
 		const char *value_as_cstring = node.child_value();
-		fit = atof(value_as_cstring);
+		fitness = atof(value_as_cstring);
 	}
 
 	node = parent.child("binary_classification_threshold");
@@ -553,13 +553,13 @@ void t_mep_chromosome::simplify(void)
 {
 	bool *marked = new bool[code_length];
 	for (int i = 0; i < code_length; marked[i++] = false);
-	mark(best, marked);
-	int *skipped = new int[best + 1];
+	mark(index_best_gene, marked);
+	int *skipped = new int[index_best_gene + 1];
 	if (!marked[0])
 		skipped[0] = 1;
 	else
 		skipped[0] = 0;
-	for (int i = 1; i <= best; i++)
+	for (int i = 1; i <= index_best_gene; i++)
 		if (!marked[i])
 			skipped[i] = skipped[i - 1] + 1;
 		else
@@ -567,10 +567,10 @@ void t_mep_chromosome::simplify(void)
 
 	if (simplified_prg)
 		delete[] simplified_prg;
-	simplified_prg = new code3[best + 1];
+	simplified_prg = new code3[index_best_gene + 1];
 
 	num_utilized = 0;
-	for (int i = 0; i <= best; i++)
+	for (int i = 0; i <= index_best_gene; i++)
 		if (marked[i]){
 			simplified_prg[num_utilized] = prg[i];
 			if (prg[i].op < 0){
@@ -588,9 +588,9 @@ void t_mep_chromosome::simplify(void)
 //---------------------------------------------------------------------------
 int t_mep_chromosome::compare(t_mep_chromosome *other, bool minimize_operations_count)
 {
-	if (fit > other->fit)
+	if (fitness > other->fitness)
 		return 1;
-	else if (fit < other->fit)
+	else if (fitness < other->fitness)
 		return -1;
 	else
 		return 0;
@@ -762,8 +762,8 @@ void t_mep_chromosome::fitness_regression_double(t_mep_data *mep_dataset, double
 {
 	double **data = mep_dataset->get_data_matrix_double();
 
-	fit = 1E+308;
-	best = -1;
+	fitness = 1E+308;
+	index_best_gene = -1;
 
 	for (int i = 0; i < code_length; i++)
 		sum_of_errors_array[i] = 0;
@@ -889,9 +889,9 @@ void t_mep_chromosome::fitness_regression_double(t_mep_data *mep_dataset, double
 	}
 
 	for (int i = 0; i < code_length; i++) {    // find the best gene
-		if (fit > sum_of_errors_array[i] / mep_dataset->get_num_rows()) {
-			fit = sum_of_errors_array[i] / mep_dataset->get_num_rows();
-			best = i;
+		if (fitness > sum_of_errors_array[i] / mep_dataset->get_num_rows()) {
+			fitness = sum_of_errors_array[i] / mep_dataset->get_num_rows();
+			index_best_gene = i;
 		}
 	}
 }
@@ -914,8 +914,8 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(t_mep_d
 	// evaluate a_chromosome
 	// partial results are stored and used later in other sub-expressions
 
-	fit = 1E+308;
-	best = -1;
+	fitness = 1E+308;
+	index_best_gene = -1;
 
 	int *line_of_constants = NULL;
 	double* cached_sum_of_errors_for_constants = NULL;
@@ -958,9 +958,9 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(t_mep_d
 			for (int k = 0; k < num_training_data; k++)
 				sum_of_errors += fabs(eval[k] - data[k][num_total_variables]);
 		}
-		if (fit > sum_of_errors / mep_dataset->get_num_rows()) {
-			fit = sum_of_errors / mep_dataset->get_num_rows();
-			best = i;
+		if (fitness > sum_of_errors / mep_dataset->get_num_rows()) {
+			fitness = sum_of_errors / mep_dataset->get_num_rows();
+			index_best_gene = i;
 		}
 	}
 
@@ -1035,8 +1035,8 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 	double **data = mep_dataset->get_data_matrix_double();
 	int num_rows = mep_dataset->get_num_rows();
 
-	fit = 1E+308;
-	best = -1;
+	fitness = 1E+308;
+	index_best_gene = -1;
 
 	int *line_of_constants = NULL;
 	if (num_constants) {
@@ -1103,9 +1103,9 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 			}
 		}
 
-		if (fit > sum_of_errors / num_rows) {
-			fit = sum_of_errors / num_rows;
-			best = i;
+		if (fitness > sum_of_errors / num_rows) {
+			fitness = sum_of_errors / num_rows;
+			index_best_gene = i;
 			best_class_threshold = best_threshold;
 		}
 	}
@@ -1304,9 +1304,9 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs)
 {
 	bool is_error_case;  // division by zero, other errors
 
-	double *eval_vect = new double[best + 1];
+	double *eval_vect = new double[index_best_gene + 1];
 
-	for (int i = 0; i <= best; i++)   // read the t_mep_chromosome from top to down
+	for (int i = 0; i <= index_best_gene; i++)   // read the t_mep_chromosome from top to down
 	{
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
@@ -1421,7 +1421,7 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs)
 			return false;
 		}
 	}
-	outputs[0] = eval_vect[best];
+	outputs[0] = eval_vect[index_best_gene];
 	delete[] eval_vect;
 
 	return true;
@@ -1671,6 +1671,6 @@ bool t_mep_chromosome::get_error_double(double *inputs, double *outputs)
 */
 double t_mep_chromosome::get_fitness(void)
 {
-	return fit;
+	return fitness;
 }
 //---------------------------------------------------------------------------
