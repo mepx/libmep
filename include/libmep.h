@@ -56,8 +56,8 @@ private:
 
 	t_mep_statistics *stats;
 
-	bool get_error_double(t_mep_chromosome &a_chromosome, double *inputs, double *outputs);
-	bool evaluate_double(t_mep_chromosome &a_chromosome, double *inputs, double *outputs);
+//	bool get_error_double(t_mep_chromosome &a_chromosome, double *inputs, double *outputs);
+	//bool evaluate_double(t_mep_chromosome &a_chromosome, double *inputs, double *outputs);
 
 
 	int num_total_variables;
@@ -77,13 +77,10 @@ private:
 	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
 	long tournament(t_sub_population &pop);
 
-	void fitness_regression_double_cache_all_training_data(t_mep_chromosome &a_chromosome, double **);
-	void fitness_classification_double_cache_all_training_data(t_mep_chromosome &a_chromosome, double**);
-	void fitness_regression_double(t_mep_chromosome &a_chromosome, double* eval_array_double, double *fitness_array);
 
 	void generate_random_individuals(void); // randomly initializes the individuals
 
-	double compute_validation_error(int *, int*, double **eval_double);
+	double compute_validation_error(int *, int*, double **eval_double, s_value_class *tmp_value_class);
 
 	void allocate_sub_population(t_sub_population &pop);
 
@@ -92,26 +89,20 @@ private:
 
 	void sort_by_fitness(t_sub_population &pop); // sort ascending the individuals in population
 	void compute_best_and_average_error(double &best_error, double &mean_error);
-	void compute_eval_matrix_double(t_mep_chromosome &a_chromosome, double **, int*);
-	void compute_eval_vector_double(t_mep_chromosome &a_chromosome);
+	//void compute_eval_matrix_double(t_mep_chromosome &a_chromosome, double **, int*);
+	//void compute_eval_vector_double(t_mep_chromosome &a_chromosome);
 	void compute_cached_eval_matrix_double(void);
 	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
 
-
+	/*
 	bool compute_regression_error_on_double_data(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
 	bool compute_classification_error_on_double_data(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
 	bool compute_regression_error_on_double_data_return_error(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
 	bool compute_classification_error_on_double_data_return_error(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
-
+	*/
 	void delete_sub_population(t_sub_population &pop);
 
 	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);
-
-
-	void fitness_regression(t_mep_chromosome &a_chromosome, double **);
-	void fitness_classification(t_mep_chromosome &a_chromosome, double **, s_value_class *);
-	void fitness_binary_classification_double_cache_all_training_data(t_mep_chromosome &a_chromosome, double **eval_double, s_value_class *);
-	void fitness_multi_class_classification_double_cache_all_training_data(t_mep_chromosome &a_chromosome, double **eval_matrix_double);
 
 
 public:
