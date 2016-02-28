@@ -1674,3 +1674,19 @@ double t_mep_chromosome::get_fitness(void)
 	return fitness;
 }
 //---------------------------------------------------------------------------
+int t_mep_chromosome::get_index_best_gene(void)
+{
+	return index_best_gene;
+}
+//---------------------------------------------------------------------------
+double t_mep_chromosome::get_best_class_threshold(void)
+{
+	return best_class_threshold;
+}
+//---------------------------------------------------------------------------
+void t_mep_chromosome::set_gene_operation(int gene_index, int new_operation)
+{
+	if (prg)
+		prg[gene_index].op = new_operation;
+}
+//---------------------------------------------------------------------------
