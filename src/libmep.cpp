@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.02.27.1-beta");
+	strcpy(version, "2016.03.02.0-beta");
 
 	num_operators = 0;
 	
@@ -491,16 +491,19 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 
 	stats[run].best_validation_error = -1;
 
+	double best_error_on_training, mean_error_on_training;
+	compute_best_and_average_error(best_error_on_training, mean_error_on_training);
+	stats[run].best_training_error[0] = best_error_on_training;
+	stats[run].average_training_error[0] = mean_error_on_training;
+
 	if (mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0) {
 		// I must run all solutions for the validation data and choose the best one
 		stats[run].best_validation_error = compute_validation_error(&best_subpopulation_index_for_test, &best_individual_index_for_test, eval_double[0], array_value_class[0]);
 		stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
 	}
+	else
+		stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index_for_test];
 
-	double best_error_on_training, mean_error_on_training;
-	compute_best_and_average_error(best_error_on_training, mean_error_on_training);
-	stats[run].best_training_error[0] = best_error_on_training;
-	stats[run].average_training_error[0] = mean_error_on_training;
 	stats[run].last_gen = 0;
 	modified_project = true;
 
@@ -530,6 +533,10 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		for (int d = 0; d < mep_parameters->get_num_subpopulations(); d++) // din d in d+1
 			sort_by_fitness(pop[d]);
 
+		compute_best_and_average_error(best_error_on_training, mean_error_on_training);
+		stats[run].best_training_error[gen_index] = best_error_on_training;
+		stats[run].average_training_error[gen_index] = mean_error_on_training;
+
 		if (mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0) {
 			// I must run all solutions for the validation data and choose the best one
 			int best_index_on_validation, best_subpop_index_on_validation;
@@ -541,10 +548,9 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 				stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
 			}
 		}
+		else
+			stats[run].prg = pop[best_subpopulation_index].individuals[0];
 
-		compute_best_and_average_error(best_error_on_training, mean_error_on_training);
-		stats[run].best_training_error[gen_index] = best_error_on_training;
-		stats[run].average_training_error[gen_index] = mean_error_on_training;
 		stats[run].last_gen = gen_index;
 #ifdef _DEBUG
 		
@@ -562,8 +568,9 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	if (mep_parameters->get_problem_type() == PROBLEM_CLASSIFICATION)
 	fitness_classification(pop[0].individuals[0], eval_double[0], array_value_class[0]);
 	*/
-	if (!(mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
-		stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
+	/**/
+	//if (!(mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
+	//	stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
 	stats[run].prg.simplify();
 
 	if (test_data && test_data->get_num_rows() && test_data->get_num_outputs()) {// has target

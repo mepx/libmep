@@ -648,69 +648,126 @@ bool t_mep_data::from_csv_double(const char *filename) // extra_variable is used
 	return true;
 }
 //-----------------------------------------------------------------
-void t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
+int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 {
-	if (num_data) {
-		int *index_new_strings = new int[num_data];
+	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data2->num_data) {
+
 		//		int count_new_strings = 0;
-		if (data_type == MEP_DATA_STRING) {// string
-			if (_data_string) {
+		if (data_type != MEP_DATA_STRING && (!other_data1 || other_data1 && other_data1->data_type != MEP_DATA_STRING) && (other_data2 || other_data2 && other_data2->data_type != MEP_DATA_STRING))
+			return E_DATA_MUST_HAVE_STRING_TYPE;
 
-				delete_double_data();
+		if (_data_string) {
+			delete_double_data();
 
-				_data_double = new double*[num_data];
-				for (int r = 0; r < num_data; r++)
-					_data_double[r] = new double[num_cols];
-
-				for (int v = 0; v < num_cols; v++) {
-					//is this numeric or alpha ?
-					bool is_numeric = true;
-					for (int t = 0; t < num_data; t++) {
-						if (strpbrk(_data_string[t][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
-							is_numeric = false;
-							break;
-						}
-					}
-					if (!is_numeric) {
-						int count_new_strings = 0;
-						for (int t = 0; t < num_data; t++) {
-							// caut sa vad daca exista
-							int k = 0;
-							while (k < count_new_strings && my_strcmp(_data_string[index_new_strings[k]][v], _data_string[t][v])) {
-								k++;
-							}
-							_data_double[t][v] = k;
-							if (k == count_new_strings) {
-								// not found
-								index_new_strings[count_new_strings] = t;
-								count_new_strings++;
-							}
-						}
-					}
-					else {
-						// numeric - must be copy just like that
-						for (int t = 0; t < num_data; t++)
-							_data_double[t][v] = atof(_data_string[t][v]);
-					}
-				}
-			}
+			_data_double = new double*[num_data];
+			for (int r = 0; r < num_data; r++)
+				_data_double[r] = new double[num_cols];
 		}
 
-		delete[] index_new_strings;
+		if (other_data1 && other_data1->_data_string) {
 
-		_modified = true;
+			other_data1->delete_double_data();
+
+			other_data1->_data_double = new double*[other_data1->num_data];
+			for (int r = 0; r < other_data1->num_data; r++)
+				other_data1->_data_double[r] = new double[other_data1->num_cols];
+		}
+
+		if (other_data2 && other_data2->_data_string) {
+
+			other_data2->delete_double_data();
+
+			other_data2->_data_double = new double*[other_data2->num_data];
+			for (int r = 0; r < other_data2->num_data; r++)
+				other_data2->_data_double[r] = new double[other_data2->num_cols];
+		}
+
+		int k = 0; // this will be the replacement
+		for (int v = 0; v < num_cols; v++) {
+			//is this numeric or alpha ?
+			// search in the current dataset
+			for (int r = 0; r < num_data; r++)
+				if (strpbrk(_data_string[r][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
+					// search for it in the current set
+					for (int t = r; t < num_data; t++)
+						if (!my_strcmp(_data_string[r][v], _data_string[t][v]))
+							_data_double[t][v] = k;
+					// replace it in the other datasets too
+					if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
+						for (int t = 0; t < other_data1->num_data; t++)
+							if (!my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]))
+								other_data1->_data_double[t][v] = k;
+					// replace it in the other datasets too
+					if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
+						for (int t = 0; t < other_data2->num_data; t++)
+							if (!my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]))
+								other_data2->_data_double[t][v] = k;
+					_modified = true;
+					k++;
+				}
+				else 
+					// numeric - must be copy just like that
+					_data_double[r][v] = atof(_data_string[r][v]);
+				
+			// search in the other dataset
+			if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
+				for (int r = 0; r < other_data1->num_data; r++)
+					if (strpbrk(other_data1->_data_string[r][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
+					// search for it in the current set
+						for (int t = r; t < other_data1->num_data; t++)
+							if (!my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[t][v]))
+								other_data1->_data_double[t][v] = k;
+					// replace it in the other datasets too
+					if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
+						for (int t = 0; t < other_data2->num_data; t++)
+							if (!my_strcmp(other_data1->_data_string[r][v], other_data2->_data_string[t][v]))
+								other_data2->_data_double[t][v] = k;
+					_modified = true;
+					k++;
+				}
+				else
+					// numeric - must be copy just like that
+					other_data1->_data_double[r][v] = atof(other_data1->_data_string[r][v]);
+
+			// search in the other dataset
+			if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
+				for (int r = 0; r < other_data2->num_data; r++)
+					if (strpbrk(other_data2->_data_string[r][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
+						// search for it in the current set
+						for (int t = r; t < other_data2->num_data; t++)
+							if (!my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[t][v]))
+								other_data2->_data_double[t][v] = k;
+						_modified = true;
+						k++;
+					}
+					else
+						// numeric - must be copy just like that
+						other_data2->_data_double[r][v] = atof(other_data2->_data_string[r][v]);
+
+		}
+
+		data_type = MEP_DATA_DOUBLE;
+		if (other_data1)
+		  other_data1->data_type = MEP_DATA_DOUBLE;
+		if (other_data2)
+		  other_data2->data_type = MEP_DATA_DOUBLE;
+
+		return MEP_OK;
 	}
-	data_type = MEP_DATA_DOUBLE;
+	else
+		return E_NO_DATA;
+
+	
 }
 //-----------------------------------------------------------------
 int t_mep_data::to_interval_selected_col(double min, double max, int col, t_mep_data *other_data1, t_mep_data* other_data2)
 {
-	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data1->num_data) {
+	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data2->num_data) {
 		if (data_type != MEP_DATA_DOUBLE || other_data1 && other_data1->num_data && other_data1->data_type != MEP_DATA_DOUBLE || other_data2 && other_data2->num_data && other_data2->data_type != MEP_DATA_DOUBLE) // string
 			return E_DATA_MUST_HAVE_REAL_TYPE;
 
-		double min_col;
-		double max_col;
+		double min_col = 0;
+		double max_col = 0;
 
 		if (num_data && num_cols > col) {
 			min_col = _data_double[0][col];
@@ -726,6 +783,7 @@ int t_mep_data::to_interval_selected_col(double min, double max, int col, t_mep_
 					min_col = other_data2->_data_double[0][col];
 					max_col = other_data2->_data_double[0][col];
 				}
+
 		if (num_cols > col)
 			for (int t = 0; t < num_data; t++) {
 				if (min_col > _data_double[t][col])
@@ -795,7 +853,7 @@ int t_mep_data::to_interval_selected_col(double min, double max, int col, t_mep_
 	}
 	else
 		return E_NO_DATA;
-	
+
 }
 //-----------------------------------------------------------------
 int t_mep_data::to_interval_everywhere(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
@@ -810,13 +868,13 @@ int t_mep_data::to_interval_everywhere(double min, double max, t_mep_data *other
 //-----------------------------------------------------------------
 int t_mep_data::to_interval_all_variables(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
 {
-			for (int v = 0; v < num_cols; v++) {
-				int result = to_interval_selected_col(min, max, v, other_data1, other_data2);
-				if (result != MEP_OK)
-					return result;
-				//is this numeric or alpha ?
-			}
-			return MEP_OK;
+	for (int v = 0; v < num_cols; v++) {
+		int result = to_interval_selected_col(min, max, v, other_data1, other_data2);
+		if (result != MEP_OK)
+			return result;
+		//is this numeric or alpha ?
+	}
+	return MEP_OK;
 }
 //-----------------------------------------------------------------
 int t_mep_data::move_to(t_mep_data *dest, int count)

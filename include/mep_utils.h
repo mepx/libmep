@@ -15,6 +15,7 @@ int my_strcmp(char *s1, char *s2);
 
 #define MEP_OK 0
 #define E_NO_DATA 1
-#define E_DATA_MUST_HAVE_REAL_TYPE 1
+#define E_DATA_MUST_HAVE_REAL_TYPE 2
+#define E_DATA_MUST_HAVE_STRING_TYPE 3
 
 #endif

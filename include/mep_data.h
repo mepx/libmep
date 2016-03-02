@@ -88,7 +88,7 @@ public:
 	bool from_csv(const char *filename);
 
 	// transform string values to real values
-	void to_numeric(t_mep_data *other_data1, t_mep_data* other_data2);
+	int to_numeric(t_mep_data *other_data1, t_mep_data* other_data2);
 
 	// scale to interval in the entire matrix
 	int to_interval_everywhere(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2);
