@@ -8,7 +8,7 @@
 #include "mep_rands.h"
 #include "libmep.h"
 
-#include <errno.h>
+
 
 
 #ifdef WIN32
@@ -23,7 +23,7 @@ t_mep::t_mep()
 	strcpy(version, "2016.03.02.0-beta");
 
 	num_operators = 0;
-	
+
 
 	cached_eval_matrix_double = NULL;
 	cached_sum_of_errors = NULL;
@@ -502,7 +502,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
 	}
 	else
-		stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index_for_test];
+		stats[run].prg = pop[best_subpopulation_index].individuals[0];
 
 	stats[run].last_gen = 0;
 	modified_project = true;
@@ -553,7 +553,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 
 		stats[run].last_gen = gen_index;
 #ifdef _DEBUG
-		
+
 #endif
 		if (on_generation)
 			on_generation();
@@ -610,9 +610,9 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 	test_data->to_xml(testing_node);
 
 	if (variables_enabled) {
-        
+
         	char *tmp_str = new char[training_data->get_num_cols() * 2 + 10];
-        
+
 		pugi::xml_node utilized_variables_node = parent.append_child("variables_utilization");
 
 		tmp_str[0] = 0;
@@ -624,7 +624,7 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 		}
 		pugi::xml_node utilized_variables_data_node = utilized_variables_node.append_child(pugi::node_pcdata);
 		utilized_variables_data_node.set_value(tmp_str);
-        
+
         delete [] tmp_str;
 	}
 /*
@@ -674,7 +674,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	}
 	else
 		num_total_variables = 0;
-	
+
 
 	if (training_data->get_num_rows()) {
 		//actual_enabled_variables = new int[num_total_variables];
