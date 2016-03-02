@@ -126,7 +126,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 		else
 			num_cols = 0;
 	}
-	else{
+	else {
 		node = parent.child("num_cols");
 		if (node) {
 			const char *value_as_cstring = node.child_value();
@@ -227,7 +227,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 		}
 	}
 
-	_modified = true;
+	_modified = false;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -329,7 +329,7 @@ bool my_fgets(char*buf, int max_n, FILE *f)
 	}
 	if (feof(f))
 		if (i)
-		  buf[i - 1] = 0;
+			buf[i - 1] = 0;
 	return (i > 0);
 }
 //------------------------------------------------------------
@@ -352,11 +352,11 @@ bool t_mep_data::to_csv(const char *filename, char list_separator)
 		return false;
 
 	if (_data_double)
-	  for (int d = 0; d < num_data; d++) {
-		for (int v = 0; v < num_cols; v++)
-			fprintf(f, "%lg%c", _data_double[d][v], list_separator);
-		fprintf(f, "\n");
-	}
+		for (int d = 0; d < num_data; d++) {
+			for (int v = 0; v < num_cols; v++)
+				fprintf(f, "%lg%c", _data_double[d][v], list_separator);
+			fprintf(f, "\n");
+		}
 	else
 		if (_data_string)
 			for (int d = 0; d < num_data; d++) {
@@ -521,7 +521,7 @@ bool t_mep_data::from_csv_string(const char *filename) // extra_variable is used
 			buf = start_buf;
 		}
 	}
-//	num_cols--;
+	//	num_cols--;
 	rewind(f);
 
 	_data_string = new char**[num_data];
@@ -550,7 +550,7 @@ bool t_mep_data::from_csv_string(const char *filename) // extra_variable is used
 				}
 				buf = buf + size + skipped;
 				//if (buf - start_buf >= len)
-					//break;
+				//break;
 				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 
 				col++;
@@ -613,7 +613,7 @@ bool t_mep_data::from_csv_double(const char *filename) // extra_variable is used
 			buf = start_buf;
 		}
 	}
-//	num_cols--;
+	//	num_cols--;
 	rewind(f);
 
 	_data_double = new double*[num_data];
@@ -648,7 +648,7 @@ bool t_mep_data::from_csv_double(const char *filename) // extra_variable is used
 	return true;
 }
 //-----------------------------------------------------------------
-void t_mep_data::to_numeric(void)
+void t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 {
 	if (num_data) {
 		int *index_new_strings = new int[num_data];
@@ -692,7 +692,6 @@ void t_mep_data::to_numeric(void)
 						for (int t = 0; t < num_data; t++)
 							_data_double[t][v] = atof(_data_string[t][v]);
 					}
-
 				}
 			}
 		}
@@ -704,26 +703,30 @@ void t_mep_data::to_numeric(void)
 	data_type = MEP_DATA_DOUBLE;
 }
 //-----------------------------------------------------------------
-int t_mep_data::to_interval_everywhere(double min, double max)
+int t_mep_data::to_interval_selected_col(double min, double max, int col, t_mep_data *other_data1, t_mep_data* other_data2)
 {
-    int result = to_interval_all_variables(min, max);
-	_modified = true;
-	if (!result)
-		return 0;
-	if (num_outputs)
-      return to_interval_selected_col(min, max, num_cols - 1);
-	return 1;
-}
-//-----------------------------------------------------------------
-int t_mep_data::to_interval_selected_col(double min, double max, int col)
-{
-	if (num_data){
-		if (data_type == MEP_DATA_DOUBLE) {// double
-			_modified = true;
+	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data1->num_data) {
+		if (data_type != MEP_DATA_DOUBLE || other_data1 && other_data1->num_data && other_data1->data_type != MEP_DATA_DOUBLE || other_data2 && other_data2->num_data && other_data2->data_type != MEP_DATA_DOUBLE) // string
+			return E_DATA_MUST_HAVE_REAL_TYPE;
 
-			double min_col = _data_double[0][col];
-			double max_col = _data_double[0][col];
+		double min_col;
+		double max_col;
 
+		if (num_data && num_cols > col) {
+			min_col = _data_double[0][col];
+			max_col = _data_double[0][col];
+		}
+		else
+			if (other_data1->num_data && other_data1->num_cols > col) {
+				min_col = other_data1->_data_double[0][col];
+				max_col = other_data1->_data_double[0][col];
+			}
+			else
+				if (other_data2->num_data && other_data2->num_cols > col) {
+					min_col = other_data2->_data_double[0][col];
+					max_col = other_data2->_data_double[0][col];
+				}
+		if (num_cols > col)
 			for (int t = 0; t < num_data; t++) {
 				if (min_col > _data_double[t][col])
 					min_col = _data_double[t][col];
@@ -731,136 +734,171 @@ int t_mep_data::to_interval_selected_col(double min, double max, int col)
 					max_col = _data_double[t][col];
 			}
 
-			for (int t = 0; t < num_data; t++) {
-				_data_double[t][col] -= min_col;
-				if (max_col > min_col)
-					_data_double[t][col] /= (max_col - min_col);
-				_data_double[t][col] *= (max - min);
-				_data_double[t][col] += min;
+		if (other_data1->num_cols > col)
+			for (int t = 0; t < other_data1->num_data; t++) {
+				if (min_col > other_data1->_data_double[t][col])
+					min_col = other_data1->_data_double[t][col];
+				if (max_col < other_data1->_data_double[t][col])
+					max_col = other_data1->_data_double[t][col];
 			}
-			return 1;
+
+		if (other_data2->num_cols > col)
+			for (int t = 0; t < other_data2->num_data; t++) {
+				if (min_col > other_data2->_data_double[t][col])
+					min_col = other_data2->_data_double[t][col];
+				if (max_col < other_data2->_data_double[t][col])
+					max_col = other_data2->_data_double[t][col];
+			}
+		// min, max found
+		// now scale
+		if (num_cols > col) {
+			_modified = true;
+			for (int t = 0; t < num_data; t++)
+				_data_double[t][col] -= min_col;
+			if (max_col > min_col)
+				for (int t = 0; t < num_data; t++) {
+					_data_double[t][col] /= (max_col - min_col);
+					_data_double[t][col] *= (max - min);
+				}
+			for (int t = 0; t < num_data; t++)
+				_data_double[t][col] += min;
 		}
-		else
-			return 0;
-    }
-	return 1;
+
+		if (other_data1->num_cols > col) {
+			other_data1->_modified = true;
+			for (int t = 0; t < other_data1->num_data; t++)
+				other_data1->_data_double[t][col] -= min_col;
+			if (max_col > min_col)
+				for (int t = 0; t < other_data1->num_data; t++) {
+					other_data1->_data_double[t][col] /= (max_col - min_col);
+					other_data1->_data_double[t][col] *= (max - min);
+				}
+			for (int t = 0; t < other_data1->num_data; t++)
+				other_data1->_data_double[t][col] += min;
+
+		}
+
+		if (other_data2->num_cols > col) {
+			other_data2->_modified = true;
+			for (int t = 0; t < other_data2->num_data; t++)
+				other_data2->_data_double[t][col] -= min_col;
+			if (max_col > min_col)
+				for (int t = 0; t < other_data2->num_data; t++) {
+					other_data2->_data_double[t][col] /= (max_col - min_col);
+					other_data2->_data_double[t][col] *= (max - min);
+				}
+			for (int t = 0; t < other_data2->num_data; t++)
+				other_data2->_data_double[t][col] += min;
+		}
+
+		return MEP_OK;
+	}
+	else
+		return E_NO_DATA;
+	
 }
 //-----------------------------------------------------------------
-int t_mep_data::to_interval_all_variables(double min, double max)
+int t_mep_data::to_interval_everywhere(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
 {
-	if (num_data){
-		_modified = true;
-		
-		if (data_type == MEP_DATA_DOUBLE) {// double
+	int result = to_interval_all_variables(min, max, other_data1, other_data2);
+	if (result != MEP_OK)
+		return result;
+	if (num_outputs)
+		return to_interval_selected_col(min, max, num_cols - 1, other_data1, other_data2);
+	return MEP_OK;
+}
+//-----------------------------------------------------------------
+int t_mep_data::to_interval_all_variables(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
+{
 			for (int v = 0; v < num_cols; v++) {
+				int result = to_interval_selected_col(min, max, v, other_data1, other_data2);
+				if (result != MEP_OK)
+					return result;
 				//is this numeric or alpha ?
-
-				double min_col = _data_double[0][v];
-				double max_col = _data_double[0][v];
-
-				for (int t = 0; t < num_data; t++) {
-					if (min_col > _data_double[t][v])
-						min_col = _data_double[t][v];
-					if (max_col < _data_double[t][v])
-						max_col = _data_double[t][v];
-				}
-
-				for (int t = 0; t < num_data; t++) {
-					_data_double[t][v] -= min_col;
-					if (max_col > min_col)
-						_data_double[t][v] /= (max_col - min_col);
-					_data_double[t][v] *= (max - min);
-					_data_double[t][v] += min;
-				}
 			}
-			return 1;
-		}
-		else
-			return 0;
-    }
-	return 1;
+			return MEP_OK;
 }
 //-----------------------------------------------------------------
 int t_mep_data::move_to(t_mep_data *dest, int count)
 {
 	if (!(data_type == dest->data_type || !dest->num_data))
 		return E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES; // can move only of the same type
-	
+
 	if (num_data && dest->num_data && num_cols != dest->num_cols)
 		return E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS; // 
 
-		if (num_data >= count) {
+	if (num_data >= count) {
 
-			_modified = true;
+		_modified = true;
 
-			if (dest->num_data == 0) {
-				dest->num_cols = num_cols;
-				dest->num_outputs = num_outputs;
-			}
-
-			if (data_type == MEP_DATA_DOUBLE) {// double
-
-				double** tmp_data_double = new double*[dest->num_data + count];
-				for (int i = 0; i < dest->num_data; i++)
-					tmp_data_double[i] = dest->_data_double[i];
-
-				for (int i = 0; i < count; i++)
-					tmp_data_double[i + dest->num_data] = _data_double[num_data - count + i];
-
-				if (dest->_data_double)
-					delete[] dest->_data_double;
-				dest->_data_double = tmp_data_double;
-
-				if (num_data - count > 0) {
-					tmp_data_double = new double*[num_data - count];
-					for (int i = 0; i < num_data - count; i++)
-						tmp_data_double[i] = _data_double[i];
-
-					delete[] _data_double;
-					_data_double = tmp_data_double;
-				}
-				else {// no more data left in the source
-					delete[] _data_double;
-					_data_double = NULL;
-				}
-
-				dest->data_type = MEP_DATA_DOUBLE;
-			}
-			else {// string
-				char*** tmp_data_string = new char**[dest->num_data + count];
-				for (int i = 0; i < dest->num_data; i++)
-					tmp_data_string[i] = dest->_data_string[i];
-
-				for (int i = 0; i < count; i++)
-					tmp_data_string[i + dest->num_data] = _data_string[num_data - count + i];
-
-				if (dest->_data_string)
-					delete[] dest->_data_string;
-				dest->_data_string = tmp_data_string;
-
-				if (num_data - count > 0) {
-					tmp_data_string = new char**[num_data - count];
-					for (int i = 0; i < num_data - count; i++)
-						tmp_data_string[i] = _data_string[i];
-
-					delete[] _data_string;
-					_data_string = tmp_data_string;
-				}
-				else {// no more data left in the source
-					delete[] _data_string;
-					_data_string = NULL;
-				}
-
-				dest->data_type = MEP_DATA_STRING;
-			}
-
-
-			num_data -= count;
-			dest->num_data += count;
-
+		if (dest->num_data == 0) {
+			dest->num_cols = num_cols;
+			dest->num_outputs = num_outputs;
 		}
-		else
-			return E_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
+
+		if (data_type == MEP_DATA_DOUBLE) {// double
+
+			double** tmp_data_double = new double*[dest->num_data + count];
+			for (int i = 0; i < dest->num_data; i++)
+				tmp_data_double[i] = dest->_data_double[i];
+
+			for (int i = 0; i < count; i++)
+				tmp_data_double[i + dest->num_data] = _data_double[num_data - count + i];
+
+			if (dest->_data_double)
+				delete[] dest->_data_double;
+			dest->_data_double = tmp_data_double;
+
+			if (num_data - count > 0) {
+				tmp_data_double = new double*[num_data - count];
+				for (int i = 0; i < num_data - count; i++)
+					tmp_data_double[i] = _data_double[i];
+
+				delete[] _data_double;
+				_data_double = tmp_data_double;
+			}
+			else {// no more data left in the source
+				delete[] _data_double;
+				_data_double = NULL;
+			}
+
+			dest->data_type = MEP_DATA_DOUBLE;
+		}
+		else {// string
+			char*** tmp_data_string = new char**[dest->num_data + count];
+			for (int i = 0; i < dest->num_data; i++)
+				tmp_data_string[i] = dest->_data_string[i];
+
+			for (int i = 0; i < count; i++)
+				tmp_data_string[i + dest->num_data] = _data_string[num_data - count + i];
+
+			if (dest->_data_string)
+				delete[] dest->_data_string;
+			dest->_data_string = tmp_data_string;
+
+			if (num_data - count > 0) {
+				tmp_data_string = new char**[num_data - count];
+				for (int i = 0; i < num_data - count; i++)
+					tmp_data_string[i] = _data_string[i];
+
+				delete[] _data_string;
+				_data_string = tmp_data_string;
+			}
+			else {// no more data left in the source
+				delete[] _data_string;
+				_data_string = NULL;
+			}
+
+			dest->data_type = MEP_DATA_STRING;
+		}
+
+
+		num_data -= count;
+		dest->num_data += count;
+
+	}
+	else
+		return E_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
 	return E_OK;
 }
 //-----------------------------------------------------------------
@@ -868,13 +906,13 @@ bool re_match(char *str, const char *pattern, bool use_regular)
 {
 	if (!use_regular)
 		return !strcmp(pattern, str);
-	else{
+	else {
 		std::regex re_pattern(pattern, std::regex::basic | std::regex::icase);
 		if (std::regex_match(str, re_pattern))
-				return true;
-			else
-				return false;
-		}
+			return true;
+		else
+			return false;
+	}
 }
 //-----------------------------------------------------------------
 int t_mep_data::replace_symbol_from_selected_col(const char *s_find_what, const char* s_replace_with, int col, bool use_regular)
@@ -912,11 +950,11 @@ int t_mep_data::replace_symbol_from_selected_col(const char *s_find_what, const 
 //-----------------------------------------------------------------
 int  t_mep_data::replace_symbol_everywhere(const char *s_find_what, const char* s_replace_with, bool use_regular)
 {
-    int tmp_count;
+	int tmp_count;
 	tmp_count = replace_symbol_from_all_variables(s_find_what, s_replace_with, use_regular);
-    int count_replaced = tmp_count;
+	int count_replaced = tmp_count;
 	tmp_count = replace_symbol_from_selected_col(s_find_what, s_replace_with, num_cols - 1, use_regular);
-    count_replaced += tmp_count;
+	count_replaced += tmp_count;
 
 	_modified = true;
 
@@ -1031,16 +1069,16 @@ int t_mep_data::find_symbol_from_all_variables(const char *s_find_what, bool use
 void t_mep_data::shuffle(void)
 {
 	if (data_type == MEP_DATA_DOUBLE) { // double
-		for (int i = num_data - 1; i >= 1; i--){
+		for (int i = num_data - 1; i >= 1; i--) {
 			int j = my_rand() % (i + 1);
 			double *row = _data_double[i];
 			_data_double[i] = _data_double[j];
 			_data_double[j] = row;
 		}
 	}
-	else{
+	else {
 		// string
-		for (int i = num_data - 1; i >= 1; i--){
+		for (int i = num_data - 1; i >= 1; i--) {
 			int j = my_rand() % (i + 1);
 			char**row = _data_string[i];
 			_data_string[i] = _data_string[j];
@@ -1074,7 +1112,7 @@ int t_mep_data::get_data_type(void)
 }
 //-----------------------------------------------------------------
 double* t_mep_data::get_row(int row)
-{ 
+{
 	return _data_double[row];
 }
 //-----------------------------------------------------------------

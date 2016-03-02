@@ -88,14 +88,14 @@ public:
 	bool from_csv(const char *filename);
 
 	// transform string values to real values
-	void to_numeric(void);
+	void to_numeric(t_mep_data *other_data1, t_mep_data* other_data2);
 
 	// scale to interval in the entire matrix
-	int to_interval_everywhere(double min, double max);
+	int to_interval_everywhere(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2);
 	// scale to interval in all variables
-	int to_interval_all_variables(double min, double max);
+	int to_interval_all_variables(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2);
 	// scale to interval in the selected column
-	int to_interval_selected_col(double min, double max, int col);
+	int to_interval_selected_col(double min, double max, int col, t_mep_data *other_data1, t_mep_data* other_data2);
     
 	// replace a given string with another string; returns the number of replacements
 	int replace_symbol_from_selected_col(const char *find_what, const char* replace_with, int col, bool use_regular);
