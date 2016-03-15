@@ -91,7 +91,7 @@ private:
 	void compute_best_and_average_error(double &best_error, double &mean_error);
 	//void compute_eval_matrix_double(t_mep_chromosome &a_chromosome, double **, int*);
 	//void compute_eval_vector_double(t_mep_chromosome &a_chromosome);
-	void compute_cached_eval_matrix_double(void);
+	//void compute_cached_eval_matrix_double(void);
 	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
 
 	/*
