@@ -76,7 +76,7 @@ int t_mep_statistics::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::from_xml(pugi::xml_node parent, int num_gens, int code_length)
+int t_mep_statistics::from_xml(pugi::xml_node parent, int num_gens, int code_length, int problem_type)
 {
 	pugi::xml_node node = parent.child("running_time");
 	if (node)
@@ -152,7 +152,8 @@ int t_mep_statistics::from_xml(pugi::xml_node parent, int num_gens, int code_len
 	if (node)
 	{
 		prg.from_xml(node);
-		prg.simplify();
+        if (problem_type != PROBLEM_MULTICLASS_CLASSIFICATION)
+		  prg.simplify();
 	}
 
 

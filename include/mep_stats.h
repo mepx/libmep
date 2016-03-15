@@ -21,7 +21,7 @@ public:
 	~t_mep_statistics();
 
 	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent, int num_gens, int code_length);
+	int from_xml(pugi::xml_node parent, int num_gens, int code_length, int problem_type);
 	int to_csv(const char *file_name);
 
 };
