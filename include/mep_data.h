@@ -27,6 +27,8 @@ private:
 
 	int num_class_0;
 
+	int num_classes;
+
 	int data_type; // 0-double, 1- string
 
 	char list_separator;
@@ -38,6 +40,7 @@ private:
 
 	void delete_double_data(void);
 	void delete_string_data(void);
+
 public:
 
 	t_mep_data(void);
@@ -72,7 +75,7 @@ public:
 	double get_value_double(int row, int col);
 	char* get_value_string(int row, int col);
 
-	// clears the training data internal structures
+	// clears the data internal structures and deletes memory
 	void clear_data(void);
 	void delete_data(void);
 
@@ -126,6 +129,9 @@ public:
 
 	// returns the number of items belonging to class 0
 	int get_num_items_class_0(void);
+
+	void count_num_classes(int target_col);
+	int get_num_classes(void);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

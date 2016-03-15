@@ -63,6 +63,7 @@ void t_mep_data::clear_data(void)
 	num_cols = 0;
 	data_type = MEP_DATA_DOUBLE;// double
 	num_outputs = 1;
+	num_classes = 0;
 
 	_modified = false;
 }
@@ -81,8 +82,9 @@ void t_mep_data::init(void)
 	data_type = MEP_DATA_DOUBLE;// double
 	num_outputs = 1;
 
-	_modified = false;
+	num_classes = 0;
 
+	_modified = false;
 }
 //-----------------------------------------------------------------
 bool get_next_field(char *start_sir, char list_separator, char* dest, int & size, int &skipped)
@@ -144,6 +146,15 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	else
 		num_outputs = 1;
 
+    
+    node = parent.child("num_classes");
+    if (node) {
+        const char *value_as_cstring = node.child_value();
+        num_classes = atoi(value_as_cstring);
+    }
+    else
+        num_classes = 0;
+    
 	node = parent.child("data_type");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
@@ -249,6 +260,11 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", num_outputs);
 	data.set_value(tmp_str);
+    
+    node = parent.append_child("num_classes");
+    data = node.append_child(pugi::node_pcdata);
+    sprintf(tmp_str, "%d", num_classes);
+    data.set_value(tmp_str);
 
 	node = parent.append_child("data_type");
 	data = node.append_child(pugi::node_pcdata);
@@ -1212,5 +1228,23 @@ char*** t_mep_data::get_data_matrix_string(void)
 void t_mep_data::set_num_outputs(int new_num)
 {
 	num_outputs = new_num;
+}
+//-----------------------------------------------------------------
+int t_mep_data::get_num_classes(void)
+{
+	return num_classes;
+}
+//-----------------------------------------------------------------
+void t_mep_data::count_num_classes(int target_col)
+{
+	if (num_outputs && num_data) {
+		int max_value = _data_double[0][target_col];
+		for (int i = 1; i < num_data; i++)
+			if (max_value < _data_double[i][target_col])
+				max_value = _data_double[i][target_col];
+		num_classes = max_value + 1;
+	}
+	else
+		num_classes = 0;
 }
 //-----------------------------------------------------------------
