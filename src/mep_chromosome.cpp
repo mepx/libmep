@@ -1433,6 +1433,7 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, int &ind
 		}
 		if (errno || is_error_case || isnan(eval_vect[i]) || isinf(eval_vect[i])) {
 			delete[] eval_vect;
+            index_error_gene = i;
 			return false;
 		}
 	}
