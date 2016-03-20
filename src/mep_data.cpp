@@ -504,7 +504,8 @@ bool t_mep_data::from_PROBEN1_format(const char *filename, int num_classes)
 		}
 	}
 	num_cols -= num_classes;
-	num_cols++;
+	if (num_classes)
+	  num_cols++;
 
 	rewind(f);
 
