@@ -64,6 +64,7 @@ void t_mep_data::clear_data(void)
 	data_type = MEP_DATA_DOUBLE;// double
 	num_outputs = 1;
 	num_classes = 0;
+	num_class_0 = 0;
 
 	_modified = false;
 }
@@ -454,7 +455,86 @@ void t_mep_data::count_0_class(int target_col)
 			num_class_0++;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_mep_data::from_PROBEN1_format(const char *filename, int num_classes)
+{
+	FILE *f = NULL;
+#ifdef WIN32
+	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+	wchar_t *w_filename = new wchar_t[count_chars];
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
+
+	f = _wfopen(w_filename, L"r");
+
+	delete[] w_filename;
+#else
+	f = fopen(filename, "r");
+#endif
+
+	if (!f)
+		return false;
+
+	delete_data();
+
+	char *buf = new char[MAX_ROW_CHARS];
+	char * start_buf = buf;
+
+	num_data = 0;
+	data_type = MEP_DATA_DOUBLE;
+
+	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
+		long len = strlen(buf);
+		if (len > 1)
+			num_data++;
+		if (num_data == 1) {
+			num_cols = 0;
+
+			char tmp_str[1000];
+			int size;
+			int skipped;
+			bool result = get_next_field(buf, ' ', tmp_str, size, skipped);
+			while (result) {
+				num_cols++;
+				if (!buf[size])
+					break;
+				buf = buf + size + skipped;
+				result = get_next_field(buf, ' ', tmp_str, size, skipped);
+
+			}
+			buf = start_buf;
+		}
+	}
+	num_cols -= num_classes;
+	num_cols++;
+
+	rewind(f);
+
+	_data_double = new double*[num_data];
+	int count_mep_data = 0;
+
+	int out_class;
+	for (int r = 0; r < num_data; r++) {
+		_data_double[r] = new double[num_cols];
+		for (int c = 0; c < num_cols - 1; c++)
+			fscanf(f, "%lf", &_data_double[r][c]);
+		// now scan the outputs
+		if (num_classes) // classification problem
+		for (int c = 0; c < num_classes; c++) {
+			fscanf(f, "%d", &out_class);
+			if (out_class == 1)
+				_data_double[r][num_cols - 1] = c;
+		}
+		else// regression problem
+			fscanf(f, "%lf", &_data_double[r][num_cols - 1]);
+	}
+
+	fclose(f);
+	delete[] buf;
+	return true;
+
+}
+//-----------------------------------------------------------------
+
+bool t_mep_data::from_csv(const char *filename) 
 {
 
 	if (!detect_list_separator(filename))
@@ -490,7 +570,7 @@ bool t_mep_data::from_csv(const char *filename) // extra_variable is used by tes
 
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv_string(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_mep_data::from_csv_string(const char *filename) 
 {
 	FILE *f = NULL;
 #ifdef WIN32
@@ -581,7 +661,7 @@ bool t_mep_data::from_csv_string(const char *filename) // extra_variable is used
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv_double(const char *filename) // extra_variable is used by test data when we are not sure if the test data has or not target
+bool t_mep_data::from_csv_double(const char *filename) 
 {
 	FILE *f = NULL;
 #ifdef WIN32

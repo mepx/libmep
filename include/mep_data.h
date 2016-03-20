@@ -87,8 +87,14 @@ public:
 
 	// saves the training data to a csv files
 	bool to_csv(const char *file_name, char ListSeparator);
+	
 	// loads the data from a csv file
 	bool from_csv(const char *filename);
+
+	// loads from PROBEN1 format
+	// num_classes must be known in advanced because it is an "1 of m" format
+	// if num_classes is 0, it means that is a regression problem
+	bool from_PROBEN1_format(const char *filename, int num_classes);
 
 	// transform string values to real values
 	int to_numeric(t_mep_data *other_data1, t_mep_data* other_data2);
