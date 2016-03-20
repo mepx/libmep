@@ -118,10 +118,10 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 {
 	int index_error_gene;
 	if (run_index > -1) {
-		if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION || mep_parameters->get_problem_type() == PROBLEM_REGRESSION) {
+		if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION || mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 			if (!stats[run_index].prg.evaluate_double(inputs, outputs, index_error_gene))
 				return false;
-			if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION) {
+			if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION) {
 				if (outputs[0] <= stats[run_index].prg.get_best_class_threshold())
 					outputs[0] = 0;
 				else
@@ -129,7 +129,7 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 			}
 		}
 		else
-			if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION) {
+			if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
 				int max_index = -1;
 				if (!stats[run_index].prg.get_first_max_index(inputs, max_index, index_error_gene))
 					return false;
@@ -173,7 +173,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 {
 	double **data = training_data->get_data_matrix_double();
 
-	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
+	if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
 		for (int v = 0; v < num_actual_variables; v++) {
 			cached_sum_of_errors[actual_enabled_variables[v]] = 0;
 			for (int k = 0; k < training_data->get_num_rows(); k++) {
@@ -320,7 +320,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 	double validation_error;
 	int index_error_gene = -1;
 
-	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION) {
+	if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 		for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 			while (!pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene)) {
 				// I have to mutate that a_chromosome.
@@ -340,7 +340,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 		}
 	}
 	else
-		if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION) {
+		if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION) {
 			for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 				while (!pop[k].individuals[0].compute_binary_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene)) {
 					pop[k].individuals[0].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
@@ -357,7 +357,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 			}
 		}
 		else
-			if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION)
+			if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 				for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
 					while (!pop[k].individuals[0].compute_multiclass_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_data->get_num_classes(), validation_error, index_error_gene)) {
 						pop[k].individuals[0].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
@@ -394,10 +394,10 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 
 	allocate_values(&eval_double, &array_value_class);
 
-	if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION) 
+	if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 		training_data->count_0_class(target_col);
 	else
-		if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION) 
+		if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 		  training_data->count_num_classes(target_col);
 	
 
@@ -439,15 +439,15 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 		t_sub_population *a_sub_population = &sub_populations[pop_index];
 
 		if (generation_index == 0) {
-			if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
+			if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
 				for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
 					pop[pop_index].individuals[i].fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 			else
-				if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION)
+				if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 					for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
 						pop[pop_index].individuals[i].fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 				else
-					if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION)
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
 							pop[pop_index].individuals[i].fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
@@ -461,7 +461,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 				// crossover
 				double p = my_rand() / (RAND_MAX + 1.0);
 				if (p < mep_parameters->get_crossover_probability())
-					if (mep_parameters->get_crossover_type() == UNIFORM_CROSSOVER)
+					if (mep_parameters->get_crossover_type() == MEP_UNIFORM_CROSSOVER)
 						a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
 					else
 						a_sub_population->individuals[r1].one_cut_point_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
@@ -471,23 +471,23 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 				}
 				// mutate the result and move the mutant in the new population
 				a_sub_population->offspring1.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-				if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
+				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
 					a_sub_population->offspring1.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 				else
-					if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION)
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 					  a_sub_population->offspring1.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					else
-						if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION)
+						if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 							a_sub_population->offspring1.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
 				a_sub_population->offspring2.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-				if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
+				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
 					a_sub_population->offspring2.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 				else
-					if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION)
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 						a_sub_population->offspring2.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					else
-						if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION)
+						if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 							a_sub_population->offspring2.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
 				if (a_sub_population->offspring1.get_fitness() < a_sub_population->offspring2.get_fitness())   // the best offspring replaces the worst a_chromosome in the population
@@ -617,20 +617,20 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	/**/
 	//if (!(mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
 	//	stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
-	if (mep_parameters->get_problem_type() != PROBLEM_MULTICLASS_CLASSIFICATION)
+	if (mep_parameters->get_problem_type() != MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 	  stats[run].prg.simplify();
 
 	if (test_data && test_data->get_num_rows() && test_data->get_num_outputs()) {// has target
 		// I must run all solutions for the test data and choose the best one
-		if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION) {
+		if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 			if (stats[run].prg.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error));
 		}
 		else
-			if (mep_parameters->get_problem_type() == PROBLEM_BINARY_CLASSIFICATION) {
+			if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION) {
 				if (stats[run].prg.compute_binary_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error));
 			}
 				else
-					if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION) {
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
 						if (stats[run].prg.compute_multiclass_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, test_data->get_num_classes(), stats[run].test_error));
 					}
 	}
@@ -808,7 +808,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		mep_constants->init();
     
     
-    if (mep_parameters->get_problem_type() == PROBLEM_MULTICLASS_CLASSIFICATION && training_data->get_num_classes() == 0){
+	if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION && training_data->get_num_classes() == 0) {
         training_data->count_num_classes(target_col);
         validation_data->count_num_classes(target_col);
         if (test_data->get_num_cols() == training_data->get_num_cols())

@@ -16,7 +16,7 @@ void t_mep_parameters::init (void)
     code_length = 50;               // the number of genes
     subpopulation_size = 100;                 // the number of individuals in population  (must be an odd number!!!)
 	num_generations = 100;
-	problem_type = PROBLEM_REGRESSION;               // 0- regression, 1-classification
+	problem_type = MEP_PROBLEM_REGRESSION;               // 0- regression, 1-classification
 	random_seed = 0;
 	num_runs = 1;
 	tournament_size = 2;

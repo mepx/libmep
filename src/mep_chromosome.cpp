@@ -260,10 +260,10 @@ char * t_mep_chromosome::to_C_double(bool simplified, double *data, int problem_
 		}
 
 		strcat(prog, "\n");
-		if (problem_type == PROBLEM_REGRESSION)
+		if (problem_type == MEP_PROBLEM_REGRESSION)
 			sprintf(tmp_s, "  outputs[0] = prg[%d];", num_utilized - 1);
 		else
-			if (problem_type == PROBLEM_BINARY_CLASSIFICATION)
+			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION)
 			  sprintf(tmp_s, "  if (prg[%d] <= %lf)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", num_utilized - 1, best_class_threshold);
 			else {
 // cannot be here
@@ -303,12 +303,12 @@ char * t_mep_chromosome::to_C_double(bool simplified, double *data, int problem_
 		}
 
 		strcat(prog, "\n");
-		if (problem_type == PROBLEM_REGRESSION) {
+		if (problem_type == MEP_PROBLEM_REGRESSION) {
 			sprintf(tmp_s, "  outputs[0] = prg[%d];", index_best_gene);
 			strcat(prog, tmp_s);
 		}
 		else
-			if (problem_type == PROBLEM_BINARY_CLASSIFICATION) {
+			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION) {
 				sprintf(tmp_s, "  if (prg[%d] <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", index_best_gene, best_class_threshold);
 				strcat(prog, tmp_s);
 			}

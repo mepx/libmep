@@ -152,7 +152,7 @@ int t_mep_statistics::from_xml(pugi::xml_node parent, int num_gens, int code_len
 	if (node)
 	{
 		prg.from_xml(node);
-        if (problem_type != PROBLEM_MULTICLASS_CLASSIFICATION)
+		if (problem_type != MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 		  prg.simplify();
 	}
 

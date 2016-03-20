@@ -4,13 +4,13 @@
 #include "pugixml.hpp"
 #include "mep_constants.h"
 
-#define PROBLEM_REGRESSION 0
-#define PROBLEM_BINARY_CLASSIFICATION 1
-#define PROBLEM_MULTICLASS_CLASSIFICATION 2
+#define MEP_PROBLEM_REGRESSION 0
+#define MEP_PROBLEM_BINARY_CLASSIFICATION 1
+#define MEP_PROBLEM_MULTICLASS_CLASSIFICATION 2
 
 
-#define UNIFORM_CROSSOVER 0
-#define ONE_CUTTING_POINT_CROSSOVER 1
+#define MEP_UNIFORM_CROSSOVER 0
+#define MEP_ONE_CUTTING_POINT_CROSSOVER 1
 
 //-----------------------------------------------------------------
 class t_mep_parameters
