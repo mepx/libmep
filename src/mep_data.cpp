@@ -965,7 +965,7 @@ int t_mep_data::to_interval_everywhere(double min, double max, t_mep_data *other
 //-----------------------------------------------------------------
 int t_mep_data::to_interval_all_variables(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
 {
-	for (int v = 0; v < num_cols; v++) {
+	for (int v = 0; v < num_cols - 1; v++) {
 		int result = to_interval_selected_col(min, max, v, other_data1, other_data2);
 		if (result != MEP_OK)
 			return result;
