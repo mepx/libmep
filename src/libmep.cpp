@@ -438,72 +438,73 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 
 		// pop_index is the index of the subpopulation evolved by the current thread
 
-		t_sub_population *a_sub_population = &sub_populations[pop_index];
+		if (pop_index < mep_parameters->get_num_subpopulations()) {
+			t_sub_population *a_sub_population = &sub_populations[pop_index];
 
-		if (generation_index == 0) {
-			if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-				for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-					pop[pop_index].individuals[i].fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
-			else
-				if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
+			if (generation_index == 0) {
+				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
 					for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-						pop[pop_index].individuals[i].fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+						pop[pop_index].individuals[i].fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 				else
-					if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-							pop[pop_index].individuals[i].fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
-
-			sort_by_fitness(pop[pop_index]);
-		}
-		else // other generations, after initial
-			for (int k = 0; k < mep_parameters->get_subpopulation_size(); k += 2) {
-				// choose the parents using binary tournament
-				long r1 = tournament(*a_sub_population);
-				long r2 = tournament(*a_sub_population);
-				// crossover
-				double p = my_rand() / (RAND_MAX + 1.0);
-				if (p < mep_parameters->get_crossover_probability())
-					if (mep_parameters->get_crossover_type() == MEP_UNIFORM_CROSSOVER)
-						a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
-					else
-						a_sub_population->individuals[r1].one_cut_point_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
-				else {
-					a_sub_population->offspring1 = a_sub_population->individuals[r1];
-					a_sub_population->offspring2 = a_sub_population->individuals[r2];
-				}
-				// mutate the result and move the mutant in the new population
-				a_sub_population->offspring1.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-					a_sub_population->offspring1.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
-				else
-					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
-					  a_sub_population->offspring1.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+							pop[pop_index].individuals[i].fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					else
 						if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-							a_sub_population->offspring1.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+							for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
+								pop[pop_index].individuals[i].fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
-				a_sub_population->offspring2.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-					a_sub_population->offspring2.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
-				else
-					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
-						a_sub_population->offspring2.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+				sort_by_fitness(pop[pop_index]);
+			}
+			else // other generations, after initial
+				for (int k = 0; k < mep_parameters->get_subpopulation_size(); k += 2) {
+					// choose the parents using binary tournament
+					long r1 = tournament(*a_sub_population);
+					long r2 = tournament(*a_sub_population);
+					// crossover
+					double p = my_rand() / (RAND_MAX + 1.0);
+					if (p < mep_parameters->get_crossover_probability())
+						if (mep_parameters->get_crossover_type() == MEP_UNIFORM_CROSSOVER)
+							a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
+						else
+							a_sub_population->individuals[r1].one_cut_point_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
+					else {
+						a_sub_population->offspring1 = a_sub_population->individuals[r1];
+						a_sub_population->offspring2 = a_sub_population->individuals[r2];
+					}
+					// mutate the result and move the mutant in the new population
+					a_sub_population->offspring1.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
+						a_sub_population->offspring1.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 					else
-						if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-							a_sub_population->offspring2.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+						if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
+							a_sub_population->offspring1.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+						else
+							if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
+								a_sub_population->offspring1.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
-				if (a_sub_population->offspring1.get_fitness() < a_sub_population->offspring2.get_fitness())   // the best offspring replaces the worst a_chromosome in the population
-					if (a_sub_population->offspring1.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
-						a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring1;
+					a_sub_population->offspring2.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
+						a_sub_population->offspring2.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+					else
+						if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
+							a_sub_population->offspring2.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+						else
+							if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
+								a_sub_population->offspring2.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+
+					if (a_sub_population->offspring1.get_fitness() < a_sub_population->offspring2.get_fitness())   // the best offspring replaces the worst a_chromosome in the population
+						if (a_sub_population->offspring1.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
+							a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring1;
+							sort_by_fitness(*a_sub_population);
+						}
+						else;
+					else if (a_sub_population->offspring2.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
+						a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring2;
 						sort_by_fitness(*a_sub_population);
 					}
-					else;
-				else if (a_sub_population->offspring2.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
-					a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1] = a_sub_population->offspring2;
-					sort_by_fitness(*a_sub_population);
 				}
-			}
-
+		}// end of if (pop_index < mep_parameters->get_num_subpopulations())
 	}
 }
 //-----------------------------------------------------------------------
