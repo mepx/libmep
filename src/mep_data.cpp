@@ -510,7 +510,6 @@ bool t_mep_data::from_PROBEN1_format(const char *filename, int num_classes)
 	rewind(f);
 
 	_data_double = new double*[num_data];
-	int count_mep_data = 0;
 
 	int out_class;
 	for (int r = 0; r < num_data; r++) {
