@@ -1625,6 +1625,9 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data, double 
 			else
 				arg4 = eval_double[prg[i].adr4];
 		}
+		else {
+			arg1 = arg2 = arg3 = arg4 = NULL; // just to silence some compiler warnings
+		}
 
 		switch (prg[i].op) {
 		case  O_ADDITION:  // +
