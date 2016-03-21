@@ -48,6 +48,7 @@ private:
 	int actual_operators[MAX_OPERATORS];
 
 	bool _stopped;
+	bool _stopped_signal_sent;
 	int last_run_index;
 
 	t_mep_data* training_data;

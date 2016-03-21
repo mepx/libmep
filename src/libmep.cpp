@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.03.20.0-beta");
+	strcpy(version, "2016.03.22.0-beta");
 
 	num_operators = 0;
 
@@ -31,6 +31,7 @@ t_mep::t_mep()
 	stats = NULL;
 	modified_project = false;
 	_stopped = true;
+	_stopped_signal_sent = false;
 	last_run_index = -1;
 
 	variables_enabled = NULL;
@@ -379,6 +380,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run)
 {
 	_stopped = false;
+	_stopped_signal_sent = false;
 
 	compute_list_of_enabled_variables();
 
@@ -408,9 +410,9 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 		stats[run_index].allocate(mep_parameters->get_num_generations());
 		last_run_index++;
 		start_steady_state(run_index, eval_double, array_value_class, on_generation, on_new_evaluation);
-		if (on_complete_run)
+        if (on_complete_run)
 			on_complete_run();
-		if (_stopped)
+		if (_stopped_signal_sent)
 			break;
 	}
 
@@ -557,7 +559,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		on_generation();
 
 	for (int gen_index = 1; gen_index < mep_parameters->get_num_generations(); gen_index++) {
-		if (_stopped)
+		if (_stopped_signal_sent)
 			break;
 
 		int current_subpop_index = 0;
@@ -965,7 +967,7 @@ double t_mep::get_running_time(int run)
 //---------------------------------------------------------------------------
 void t_mep::stop(void)
 {
-	_stopped = true;
+	_stopped_signal_sent = true;
 }
 //---------------------------------------------------------------------------
 int t_mep::stats_to_csv(const char *filename)
@@ -1266,7 +1268,7 @@ bool t_mep::get_enable_cache_results_for_all_training_data(void)
 long long t_mep::get_memory_consumption(void)
 {
 	// for chromosomes
-	long long chromosomes_memory = 0;
+//	long long chromosomes_memory = 0;
 
 	return 0;
 }
