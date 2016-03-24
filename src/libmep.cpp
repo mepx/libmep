@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.03.22.0-beta");
+	strcpy(version, "2016.03.23.0-beta");
 
 	num_operators = 0;
 
@@ -572,10 +572,10 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 			delete mep_threads[t];
 		}
 
-		// now copy the best from each deme to the next one
+		// now copy one from each subpopulation to the next one
 		for (int d = 0; d < mep_parameters->get_num_subpopulations(); d++) { // din d in d+1
-			// aleg unul din dema d
-			long w = tournament(pop[d]);
+			// choose a random individual from subpopulation d
+            long w = rand() % mep_parameters->get_subpopulation_size();
 			if (pop[d].individuals[w].compare(&pop[(d + 1) % mep_parameters->get_num_subpopulations()].individuals[mep_parameters->get_subpopulation_size() - 1], false))
 				pop[(d + 1) % mep_parameters->get_num_subpopulations()].individuals[mep_parameters->get_subpopulation_size() - 1] = pop[d].individuals[w];
 		}
