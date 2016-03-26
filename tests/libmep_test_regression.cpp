@@ -1,16 +1,19 @@
 #include "libmep.h"
 
 static int generation_index;
+
+t_mep mep;
+
 //-----------------------------------------------------------------
 void on_generation(void)
 {
-	printf("Generation %d - done\n", generation_index);
+	printf("Generation %d fitness = %lf\n", generation_index, mep.get_best_training_error(0, generation_index));
 	generation_index++;
 }
 //-----------------------------------------------------------------
 int main(void)
 {
-	t_mep mep;
+	
 	t_mep_data training_data;
 	t_mep_operators mep_operators;
 	t_mep_parameters mep_parameters;
