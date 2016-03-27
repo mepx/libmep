@@ -57,10 +57,6 @@ private:
 
 	t_mep_statistics *stats;
 
-//	bool get_error_double(t_mep_chromosome &a_chromosome, double *inputs, double *outputs);
-	//bool evaluate_double(t_mep_chromosome &a_chromosome, double *inputs, double *outputs);
-
-
 	int num_total_variables;
 	int target_col;
 
@@ -74,6 +70,8 @@ private:
 	char *problem_description;
 
 	bool cache_results_for_all_training_data;
+
+	int *random_subset_indexes;
 
 	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
 	long tournament(t_sub_population &pop);
@@ -104,7 +102,7 @@ private:
 	void delete_sub_population(t_sub_population &pop);
 
 	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);
-
+	void get_random_subset(int count, int *indecses);
 
 public:
 
@@ -230,7 +228,7 @@ public:
 	long long get_memory_consumption(void);
 
 	// returns true if parameters are correct
-	bool validate_project(void);
+	bool validate_project(char*);
 
 	void compute_list_of_enabled_variables(void);
 };

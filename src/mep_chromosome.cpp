@@ -778,7 +778,7 @@ void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2, t_mep_
 			}
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_regression_double_no_cache(t_mep_data *mep_dataset, double* eval_vect, double *sum_of_errors_array)
+void t_mep_chromosome::fitness_regression_double_no_cache(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double* eval_vect, double *sum_of_errors_array)
 {
 	double **data = mep_dataset->get_data_matrix_double();
 
@@ -916,22 +916,22 @@ void t_mep_chromosome::fitness_regression_double_no_cache(t_mep_data *mep_datase
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_regression(t_mep_data *mep_dataset, double** cached_eval_matrix, double * cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix)
+void t_mep_chromosome::fitness_regression(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double** cached_eval_matrix, double * cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix)
 {
-	fitness_regression_double_cache_all_training_data(mep_dataset, cached_eval_matrix, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_matrix);
+	fitness_regression_double_cache_all_training_data(mep_dataset, random_subset_indexes, random_subset_selection_size, cached_eval_matrix, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_matrix);
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_binary_classification(t_mep_data *mep_dataset, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class)
+void t_mep_chromosome::fitness_binary_classification(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class)
 {
-	fitness_binary_classification_double_cache_all_training_data(mep_dataset, cached_eval_matrix, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_matrix_double, tmp_value_class);
+	fitness_binary_classification_double_cache_all_training_data(mep_dataset, random_subset_indexes, random_subset_selection_size, cached_eval_matrix, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_matrix_double, tmp_value_class);
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_multiclass_classification(t_mep_data *mep_dataset, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double)
+void t_mep_chromosome::fitness_multiclass_classification(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double)
 {
-	fitness_multi_class_classification_double_cache_all_training_data(mep_dataset, cached_eval_matrix, num_actual_variables, actual_enabled_variables, eval_matrix_double);
+	fitness_multi_class_classification_double_cache_all_training_data(mep_dataset, random_subset_indexes, random_subset_selection_size, cached_eval_matrix, num_actual_variables, actual_enabled_variables, eval_matrix_double);
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_regression_double_cache_all_training_data(t_mep_data *mep_dataset, double** cached_eval_matrix, double *cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double** eval_matrix_double)
+void t_mep_chromosome::fitness_regression_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double** cached_eval_matrix, double *cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double** eval_matrix_double)
 {
 	double **data = mep_dataset->get_data_matrix_double();
 	int num_rows = mep_dataset->get_num_rows();
@@ -961,29 +961,30 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(t_mep_d
 		double sum_of_errors;
 
 
-		if (prg[i].op >= 0)
+		if (prg[i].op >= 0)// variable or constant
 			if (prg[i].op < num_total_variables) // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 			else {// a constant
 				sum_of_errors = 0;
-				int cst_index = prg[i].op - num_total_variables;
-				if (cached_sum_of_errors_for_constants[cst_index] < -0.5) {
-					double *eval = eval_matrix_double[line_of_constants[cst_index]];
-					for (int k = 0; k < num_training_data; k++)
-						sum_of_errors += fabs(eval[k] - data[k][num_total_variables]);
+				int constant_index = prg[i].op - num_total_variables;
+				if (cached_sum_of_errors_for_constants[constant_index] < -0.5) {// this is not cached?
+					double *eval = eval_matrix_double[line_of_constants[constant_index]];
+					for (int k = 0; k < random_subset_selection_size; k++)
+						sum_of_errors += fabs(eval[random_subset_indexes[k]] - data[random_subset_indexes[k]][num_total_variables]);
+					sum_of_errors /= double(random_subset_selection_size);
 				}
 				else
-					sum_of_errors = cached_sum_of_errors_for_constants[cst_index];
+					sum_of_errors = cached_sum_of_errors_for_constants[constant_index];
 			}
-
-		else {
+		else {// operator
 			double *eval = eval_matrix_double[i];
 			sum_of_errors = 0;
-			for (int k = 0; k < num_training_data; k++)
-				sum_of_errors += fabs(eval[k] - data[k][num_total_variables]);
+			for (int k = 0; k < random_subset_selection_size; k++)
+				sum_of_errors += fabs(eval[random_subset_indexes[k]] - data[random_subset_indexes[k]][num_total_variables]);
+			sum_of_errors /= double(random_subset_selection_size);
 		}
-		if (fitness > sum_of_errors / mep_dataset->get_num_rows()) {
-			fitness = sum_of_errors / mep_dataset->get_num_rows();
+		if (fitness > sum_of_errors) {
+			fitness = sum_of_errors;
 			index_best_gene = i;
 		}
 	}
@@ -1050,7 +1051,7 @@ delete[] line_of_constants;
 }
 */
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_data(t_mep_data *mep_dataset, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class)
+void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class)
 {
 
 	// evaluate a_chromosome
@@ -1074,7 +1075,7 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 	double best_threshold;
 	for (int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
-		if (prg[i].op >= 0)
+		if (prg[i].op >= 0)// a vairable 
 			if (prg[i].op < num_total_variables) { // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 				best_threshold = cached_threashold[prg[i].op];
@@ -1088,25 +1089,28 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 					sum_of_errors = num_rows - mep_dataset->get_num_items_class_0();
 					best_threshold = eval_matrix_double[line_of_constants[prg[i].op - num_total_variables]][0];
 				}
+				sum_of_errors /= (double)num_rows;
 			}
 		else {// an operator
 			double *eval = eval_matrix_double[i];
 
-
-			for (int k = 0; k < num_rows; k++) {
-				tmp_value_class[k].value = eval[k];
-				tmp_value_class[k].data_class = (int)data[k][num_total_variables];
+			int num_0_incorrect = 0;
+			for (int k = 0; k < random_subset_selection_size; k++) {
+				tmp_value_class[k].value = eval[random_subset_indexes[k]];
+				tmp_value_class[k].data_class = (int)data[random_subset_indexes[k]][num_total_variables];
+				if (data[random_subset_indexes[k]][num_total_variables] < 0.5)
+					num_0_incorrect++;
 			}
-			qsort((void*)tmp_value_class, num_rows, sizeof(s_value_class), sort_function_value_class);
+			qsort((void*)tmp_value_class, random_subset_selection_size, sizeof(s_value_class), sort_function_value_class);
 
-			int num_0_incorrect = mep_dataset->get_num_items_class_0();
+//			int num_0_incorrect = mep_dataset->get_num_items_class_0();
 			int num_1_incorrect = 0;
 			best_threshold = tmp_value_class[0].value - 1;// all are classified to class 1 in this case
 			sum_of_errors = num_0_incorrect;
 
-			for (int t = 0; t < num_rows; t++) {
+			for (int t = 0; t < random_subset_selection_size; t++) {
 				int j = t + 1;
-				while (j < num_rows && fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				while (j < random_subset_selection_size && fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
 				// le verific pe toate intre i si j si le cataloghez ca apartinant la clasa 0
@@ -1125,10 +1129,11 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 				t = j;
 				t--;
 			}
+			sum_of_errors /= (double)random_subset_selection_size;
 		}
 
-		if (fitness > sum_of_errors / num_rows) {
-			fitness = sum_of_errors / num_rows;
+		if (fitness > sum_of_errors) {
+			fitness = sum_of_errors;
 			index_best_gene = i;
 			best_class_threshold = best_threshold;
 		}
@@ -1138,7 +1143,7 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 		delete[] line_of_constants;
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_multi_class_classification_double_cache_all_training_data(t_mep_data *mep_dataset, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double)
+void t_mep_chromosome::fitness_multi_class_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double)
 {
 
 
@@ -1159,34 +1164,33 @@ void t_mep_chromosome::fitness_multi_class_classification_double_cache_all_train
 	compute_eval_matrix_double(num_rows, cached_eval_matrix, num_actual_variables, actual_enabled_variables, line_of_constants, eval_matrix_double);
 
 	int count_incorrect_classified = 0;
-	for (int t = 0; t < num_rows; t++) {
+	for (int t = 0; t < random_subset_selection_size; t++) {
 		// find the maximal value
-		double max_val = eval_matrix_double[0][t];
+		double max_val = eval_matrix_double[0][random_subset_indexes[t]];
 		int max_index = 0;
 		for (int i = 1; i < code_length; i++)
-
-			if (prg[i].op >= 0)
+			if (prg[i].op >= 0)// variable or constant
 				if (prg[i].op < num_total_variables) {
-					if (max_val < cached_eval_matrix[prg[i].op][t]) {
-						max_val = cached_eval_matrix[prg[i].op][t];
+					if (max_val < cached_eval_matrix[prg[i].op][random_subset_indexes[t]]) {
+						max_val = cached_eval_matrix[prg[i].op][random_subset_indexes[t]];
 						max_index = i;
 					}
 				}
 				else {
-					if (max_val < eval_matrix_double[line_of_constants[prg[i].op - num_total_variables]][t]) {
-						max_val = eval_matrix_double[line_of_constants[prg[i].op - num_total_variables]][t];
+					if (max_val < eval_matrix_double[line_of_constants[prg[i].op - num_total_variables]][random_subset_indexes[t]]) {
+						max_val = eval_matrix_double[line_of_constants[prg[i].op - num_total_variables]][random_subset_indexes[t]];
 						max_index = i;
 					}
 				}
 			else// an operator
-			  if (max_val < eval_matrix_double[i][t]) {
-				max_val = eval_matrix_double[i][t];
+				if (max_val < eval_matrix_double[i][random_subset_indexes[t]]) {
+					max_val = eval_matrix_double[i][random_subset_indexes[t]];
 				max_index = i;
 			  }
-		if (max_index % num_classes != (int)data[t][num_total_variables])
+		if (max_index % num_classes != (int)data[random_subset_indexes[t]][num_total_variables])
 			count_incorrect_classified++;
 	}
-	fitness = count_incorrect_classified / (double)num_rows;
+	fitness = count_incorrect_classified / (double)random_subset_selection_size;
 
 	if (line_of_constants)
 		delete[] line_of_constants;

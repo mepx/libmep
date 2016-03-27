@@ -31,6 +31,8 @@ private:
 	bool use_validation_data;
 	int crossover_type;
 
+	int random_subset_selection_size;
+
 	long random_seed;
 	long num_runs;
 
@@ -152,6 +154,9 @@ public:
 
 	// sets the simplified programs parameters
 	void set_simplified_programs(bool value);
+
+	void set_random_subset_selection_size(int value);
+	int get_random_subset_selection_size(void);
 
 };
 //-----------------------------------------------------------------

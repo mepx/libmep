@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.03.23.0-beta");
+	strcpy(version, "2016.03.27.0-beta");
 
 	num_operators = 0;
 
@@ -47,6 +47,7 @@ t_mep::t_mep()
 	training_data = NULL;
 	validation_data = NULL;
 	test_data = NULL;
+	random_subset_indexes = NULL;
 }
 //---------------------------------------------------------------------------
 t_mep::~t_mep()
@@ -181,6 +182,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 				cached_eval_matrix_double[actual_enabled_variables[v]][k] = data[k][actual_enabled_variables[v]];
 				cached_sum_of_errors[actual_enabled_variables[v]] += fabs(cached_eval_matrix_double[actual_enabled_variables[v]][k] - data[k][num_total_variables]);
 			}
+			cached_sum_of_errors[actual_enabled_variables[v]] /= (double)training_data->get_num_rows();
 		}
 	else
 		for (int v = 0; v < num_actual_variables; v++) {
@@ -220,6 +222,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 				i = j;
 				i--;
 			}
+			cached_sum_of_errors[actual_enabled_variables[v]] /= (double)training_data->get_num_rows();
 		}
 }
 //---------------------------------------------------------------------------
@@ -327,7 +330,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 				// I have to mutate that a_chromosome.
 				pop[k].individuals[0].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
 				// recompute its fitness on training;
-				pop[k].individuals[0].fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+				pop[k].individuals[0].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 				// resort the population
 				sort_by_fitness(pop[k]);
 				// apply it again on validation
@@ -346,7 +349,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 				while (!pop[k].individuals[0].compute_binary_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene)) {
 					pop[k].individuals[0].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
 					// recompute its fitness on training;
-					pop[k].individuals[0].fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+					pop[k].individuals[0].fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					// resort the population
 					sort_by_fitness(pop[k]);
 				}
@@ -363,7 +366,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 					while (!pop[k].individuals[0].compute_multiclass_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_data->get_num_classes(), validation_error, index_error_gene)) {
 						pop[k].individuals[0].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
 						// recompute its fitness on training;
-						pop[k].individuals[0].fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+						pop[k].individuals[0].fitness_multiclass_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 						// resort the population
 						sort_by_fitness(pop[k]);
 					}
@@ -383,6 +386,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 	_stopped_signal_sent = false;
 
 	compute_list_of_enabled_variables();
+	random_subset_indexes = new int[training_data->get_num_rows()];
 
 	pop = new t_sub_population[mep_parameters->get_num_subpopulations()];
 	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
@@ -421,6 +425,8 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 		delete_sub_population(pop[i]);
 	delete[] pop;
 
+	delete[] random_subset_indexes;
+
 	_stopped = true;
 	return true;
 }
@@ -444,15 +450,15 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 			if (generation_index == 0) {
 				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
 					for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-						pop[pop_index].individuals[i].fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+						pop[pop_index].individuals[i].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 				else
 					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-							pop[pop_index].individuals[i].fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+							pop[pop_index].individuals[i].fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					else
 						if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
 							for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-								pop[pop_index].individuals[i].fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+								pop[pop_index].individuals[i].fitness_multiclass_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
 				sort_by_fitness(pop[pop_index]);
 			}
@@ -475,23 +481,23 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 					// mutate the result and move the mutant in the new population
 					a_sub_population->offspring1.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-						a_sub_population->offspring1.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+						a_sub_population->offspring1.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 					else
 						if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
-							a_sub_population->offspring1.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+							a_sub_population->offspring1.fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 						else
 							if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-								a_sub_population->offspring1.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+								a_sub_population->offspring1.fitness_multiclass_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
 					a_sub_population->offspring2.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
 					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-						a_sub_population->offspring2.fitness_regression(training_data, cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+						a_sub_population->offspring2.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
 					else
 						if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
-							a_sub_population->offspring2.fitness_binary_classification(training_data, cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
+							a_sub_population->offspring2.fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 						else
 							if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-								a_sub_population->offspring2.fitness_multiclass_classification(training_data, cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
+								a_sub_population->offspring2.fitness_multiclass_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
 					if (a_sub_population->offspring1.get_fitness() < a_sub_population->offspring2.get_fitness())   // the best offspring replaces the worst a_chromosome in the population
 						if (a_sub_population->offspring1.get_fitness() < a_sub_population->individuals[mep_parameters->get_subpopulation_size() - 1].get_fitness()) {
@@ -505,6 +511,33 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 					}
 				}
 		}// end of if (pop_index < mep_parameters->get_num_subpopulations())
+	}
+}
+//-----------------------------------------------------------------------
+void t_mep::get_random_subset(int requested_size, int *indexes)
+{
+	int num_data = training_data->get_num_rows();
+	if (num_data == requested_size) {
+		// do it faster if you want all data
+		for (int i = 0; i < num_data; i++)
+			indexes[i] = i;
+	}
+	else {
+		double p_selection = requested_size / (double)num_data;
+		int count_real = 0;
+		for (int i = 0; i < num_data; i++) {
+			double p = rand() / (double)RAND_MAX;
+			if (p <= p_selection) {
+				indexes[count_real] = i;
+				count_real++;
+				if (count_real == requested_size)
+					break;
+			}
+		}
+		while (count_real < requested_size) {
+			indexes[count_real] = rand() % num_data;
+			count_real++;
+		}
 	}
 }
 //-----------------------------------------------------------------------
@@ -525,11 +558,11 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	std::mutex mutex;
 	// we need a mutex to make sure that the same subpopulation will not be evolved twice by different threads
 
+	get_random_subset(mep_parameters->get_random_subset_selection_size(), random_subset_indexes);
 	// initial population (generation 0)
 	int current_subpop_index = 0;
 	for (int t = 0; t < mep_parameters->get_num_threads(); t++)
 		mep_threads[t] = new std::thread(&t_mep::evolve_one_subpopulation_for_one_generation, this, &current_subpop_index, &mutex, pop, 0, eval_double[t], array_value_class[t]);
-
 
 	for (int t = 0; t < mep_parameters->get_num_threads(); t++) {
 		mep_threads[t]->join(); // wait for all threads to execute
@@ -563,6 +596,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		if (_stopped_signal_sent)
 			break;
 
+		get_random_subset(mep_parameters->get_random_subset_selection_size(), random_subset_indexes);
 		int current_subpop_index = 0;
 		for (int t = 0; t < mep_parameters->get_num_threads(); t++)
 			mep_threads[t] = new std::thread(&t_mep::evolve_one_subpopulation_for_one_generation, this, &current_subpop_index, &mutex, pop, gen_index, eval_double[t], array_value_class[t]);
@@ -793,8 +827,12 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	}
 
 	node = parent.child("parameters");
-	if (node)
+	if (node) {
 		mep_parameters->from_xml(node);
+		if (mep_parameters->get_random_subset_selection_size() == 0) {
+			mep_parameters->set_random_subset_selection_size(training_data->get_num_rows());
+		}
+	}
 	else
 		mep_parameters->init();
 
@@ -1274,8 +1312,18 @@ long long t_mep::get_memory_consumption(void)
 	return 0;
 }
 //---------------------------------------------------------------------------
-bool t_mep::validate_project(void)
+bool t_mep::validate_project(char *error_message)
 {
+	if (mep_parameters->get_random_subset_selection_size() > training_data->get_num_rows()) {
+		sprintf(error_message, "Random subset size cannot be larger than the number of training data!");
+		return false;
+	}
+
+	if (mep_parameters->get_random_subset_selection_size() < 1) {
+		sprintf(error_message, "Random subset size cannot be less than 1!");
+		return false;
+	}
+
 	return true;
 }
 //---------------------------------------------------------------------------

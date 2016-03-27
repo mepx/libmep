@@ -28,6 +28,7 @@ void t_mep_parameters::init (void)
 	crossover_type = 0;
 	simplified_programs = 0;
     num_threads = 1;
+	random_subset_selection_size = 1000;
 
 	modified = false;
 }
@@ -118,6 +119,11 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
     node = parent.append_child("num_threads");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%ld", num_threads);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("random_subset_selection_size");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%ld", random_subset_selection_size);
 	data.set_value(tmp_str);
 
 	modified = false;
@@ -255,6 +261,14 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	}
 	else
 		num_threads = 1;
+
+	node = parent.child("random_subset_selection_size");
+	if (node) {
+		const char *value_as_cstring = node.child_value();
+		random_subset_selection_size = atoi(value_as_cstring);
+	}
+	else
+		random_subset_selection_size = 0;
 
 	modified = false;
 
@@ -481,5 +495,16 @@ void t_mep_parameters::set_simplified_programs(bool value)
 		simplified_programs = value;
 		modified = true;
 	
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_random_subset_selection_size(int value)
+{
+	random_subset_selection_size = value;
+	modified = true;
+}
+//---------------------------------------------------------------------------
+int t_mep_parameters::get_random_subset_selection_size(void)
+{
+	return random_subset_selection_size;
 }
 //---------------------------------------------------------------------------
