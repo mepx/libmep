@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 //---------------------------------------------------------------------------
-t_mep_statistics::t_mep_statistics(void)
+t_mep_run_statistics::t_mep_run_statistics(void)
 {
 	running_time = 0;
 	best_training_error = NULL;
@@ -13,13 +13,13 @@ t_mep_statistics::t_mep_statistics(void)
 	test_error = -1;
 }
 //---------------------------------------------------------------------------
-void t_mep_statistics::allocate(long num_gen)
+void t_mep_run_statistics::allocate(long num_gen)
 {
 	best_training_error = new double[num_gen];
 	average_training_error = new double[num_gen];
 }
 //---------------------------------------------------------------------------
-t_mep_statistics::~t_mep_statistics()
+t_mep_run_statistics::~t_mep_run_statistics()
 {
 	if (best_training_error){
 		delete[] best_training_error;
@@ -31,7 +31,7 @@ t_mep_statistics::~t_mep_statistics()
 	}
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::to_xml(pugi::xml_node parent)
+int t_mep_run_statistics::to_xml(pugi::xml_node parent)
 {
 	char tmp_str[100];
 	pugi::xml_node node = parent.append_child("running_time");
@@ -76,7 +76,7 @@ int t_mep_statistics::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::from_xml(pugi::xml_node parent, int num_gens, int code_length, int problem_type)
+int t_mep_run_statistics::from_xml(pugi::xml_node parent, int num_gens, int code_length, int problem_type)
 {
 	pugi::xml_node node = parent.child("running_time");
 	if (node)

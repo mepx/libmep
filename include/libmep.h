@@ -55,7 +55,7 @@ private:
 	t_mep_data* validation_data;
 	t_mep_data* test_data;
 
-	t_mep_statistics *stats;
+	t_mep_run_statistics *stats;
 
 	int num_total_variables;
 	int target_col;
@@ -76,7 +76,6 @@ private:
 	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
 	long tournament(t_sub_population &pop);
 
-
 	void generate_random_individuals(void); // randomly initializes the individuals
 
 	double compute_validation_error(int *, int*, double **eval_double, s_value_class *tmp_value_class);
@@ -88,21 +87,17 @@ private:
 
 	void sort_by_fitness(t_sub_population &pop); // sort ascending the individuals in population
 	void compute_best_and_average_error(double &best_error, double &mean_error);
-	//void compute_eval_matrix_double(t_mep_chromosome &a_chromosome, double **, int*);
-	//void compute_eval_vector_double(t_mep_chromosome &a_chromosome);
-	//void compute_cached_eval_matrix_double(void);
 	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
 
-	/*
-	bool compute_regression_error_on_double_data(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
-	bool compute_classification_error_on_double_data(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
-	bool compute_regression_error_on_double_data_return_error(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
-	bool compute_classification_error_on_double_data_return_error(t_mep_chromosome &a_chromosome, double **inputs, int num_data, double ** data, double *error);
-	*/
 	void delete_sub_population(t_sub_population &pop);
 
 	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);
 	void get_random_subset(int count, int *indecses);
+
+	double stddev_training, stddev_validation, stddev_test, stddev_runtime;
+	double mean_training, mean_validation, mean_test, mean_runtime;
+
+	void compute_mean_stddev(int num_runs);
 
 public:
 
@@ -178,10 +173,6 @@ public:
 	// loads everything from a pugixml node
 	int from_pugixml_node(pugi::xml_node parent);
 
-public:
-
-
-
 	void set_operators(t_mep_operators *mep_operators);
 	void set_constants(t_mep_constants *mep_constants);
 	void set_parameters(t_mep_parameters *mep_parameters);
@@ -231,6 +222,9 @@ public:
 	bool validate_project(char*);
 
 	void compute_list_of_enabled_variables(void);
+
+	void get_mean(double &training, double &validation, double &test, double &running_time);
+	void get_sttdev(double &training, double &validation, double &test, double &running_time);
 };
 //-----------------------------------------------------------------
 //extern t_mep mep_alg;
