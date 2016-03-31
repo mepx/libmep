@@ -20,14 +20,14 @@ void t_mep_constants::init(void)
 {
 	num_automatic_constants = 5;
 	num_user_defined_constants = 0;
-	min_constants_interval_double = -10;
-	max_constants_interval_double = 10;
+	min_constants_interval_double = 0;
+	max_constants_interval_double = 1;
 
 	constants_double = NULL;
 
 	constants_type = 1; // automatically generated
 	constants_can_evolve = true;
-	constants_mutation_max_deviation = 1;
+	constants_mutation_max_deviation = 0.1;
 
 	modified = false;
 }

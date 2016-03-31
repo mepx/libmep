@@ -96,6 +96,7 @@ private:
 
 	double stddev_training, stddev_validation, stddev_test, stddev_runtime;
 	double mean_training, mean_validation, mean_test, mean_runtime;
+	double best_training, best_validation, best_test, best_runtime;
 
 	void compute_mean_stddev(int num_runs);
 
@@ -223,6 +224,7 @@ public:
 
 	void compute_list_of_enabled_variables(void);
 
+	void get_best(double &training, double &validation, double &test, double &running_time);
 	void get_mean(double &training, double &validation, double &test, double &running_time);
 	void get_sttdev(double &training, double &validation, double &test, double &running_time);
 };

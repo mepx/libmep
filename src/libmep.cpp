@@ -1031,9 +1031,10 @@ int t_mep::stats_to_csv(const char *filename)
 		return false;
 	fprintf(f, "#;training error; validation error; test error; running time\n");
 	for (int r = 0; r <= last_run_index; r++)
-		fprintf(f, "%d;%lf;%lf;%lf%lf\n", r, stats[r].best_training_error[mep_parameters->get_num_generations() - 1], stats[r].best_validation_error, stats[r].test_error, stats[r].running_time);
-    fprintf(f, "Average;%lf;%lf;%lf%lf\n", mean_training, mean_validation, mean_test, mean_runtime);
-    fprintf(f, "StdDev;%lf;%lf;%lf%lf\n", stddev_training, stddev_validation, stddev_test, stddev_runtime);
+		fprintf(f, "%d;%lf;%lf;%lf%;lf\n", r, stats[r].best_training_error[mep_parameters->get_num_generations() - 1], stats[r].best_validation_error, stats[r].test_error, stats[r].running_time);
+	fprintf(f, "Best;%lf;%lf;%lf;%lf\n", best_training, best_validation, best_test, best_runtime);
+	fprintf(f, "Average;%lf;%lf;%lf;%lf\n", mean_training, mean_validation, mean_test, mean_runtime);
+	fprintf(f, "StdDev;%lf;%lf;%lf;%lf\n", stddev_training, stddev_validation, stddev_test, stddev_runtime);
 
 	fclose(f);
 	return true;
@@ -1248,6 +1249,14 @@ void t_mep::init(void)
 
 		num_actual_variables = 0;
 
+		if (problem_description) {
+			delete[] problem_description;
+			problem_description = NULL;
+		}
+
+		problem_description = new char[100];
+		strcpy(problem_description, "Problem description here ...");
+
 		modified_project = false;
 	}
 }
@@ -1408,12 +1417,33 @@ void t_mep::compute_mean_stddev(int num_runs)
 	mean_training = mean_validation = mean_test = mean_runtime = 0;
 
 	if (num_runs) {
-		for (int r = 0; r < num_runs; r++) {
+		best_training = stats[0].best_training_error[stats[0].last_gen];
+		if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
+			best_validation = stats[0].best_validation_error;
+		if (test_data->get_num_rows())
+			best_test = stats[0].test_error;
+		best_runtime = stats[0].running_time;
+		mean_training = stats[0].best_training_error[stats[0].last_gen];
+	    if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
+		  mean_validation = stats[0].best_validation_error;
+	    if (test_data->get_num_rows())
+		  mean_test = stats[0].test_error;
+		mean_runtime = stats[0].running_time;
+
+		for (int r = 1; r < num_runs; r++) {
 			mean_training += stats[r].best_training_error[stats[r].last_gen];
-            if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
-			  mean_validation += stats[r].best_validation_error;
-            if (test_data->get_num_rows())
-			  mean_test += stats[r].test_error;
+			if (best_training > stats[r].best_training_error[stats[r].last_gen])
+				best_training = stats[r].best_training_error[stats[r].last_gen];
+			if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data()) {
+				mean_validation += stats[r].best_validation_error;
+				if (best_validation > stats[r].best_validation_error)
+				  best_validation = stats[r].best_validation_error;
+			}
+			if (test_data->get_num_rows()) {
+				mean_test += stats[r].test_error;
+				if (best_test > stats[r].test_error)
+				  best_test = stats[r].test_error;
+			}
 			mean_runtime += stats[r].running_time;
 		}
 		mean_training /= num_runs;
@@ -1452,5 +1482,13 @@ void t_mep::get_sttdev(double &training, double &validation, double &test, doubl
 	validation = stddev_validation;
 	test = stddev_test;
 	running_time = stddev_runtime;
+}
+//---------------------------------------------------------------------------
+void t_mep::get_best(double &training, double &validation, double &test, double &running_time)
+{
+	training = best_training;
+	validation = best_validation;
+	test = best_test;
+	running_time = best_runtime;
 }
 //---------------------------------------------------------------------------
