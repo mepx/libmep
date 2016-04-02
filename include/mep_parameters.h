@@ -12,6 +12,11 @@
 #define MEP_UNIFORM_CROSSOVER 0
 #define MEP_ONE_CUTTING_POINT_CROSSOVER 1
 
+#define MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 0
+#define MEP_REGRESSION_MEAN_SQUARED_ERROR 1
+#define MEP_CLASSIFICATION_MEAN_ERROR 2
+
+
 //-----------------------------------------------------------------
 class t_mep_parameters
 {
@@ -39,6 +44,8 @@ private:
 	bool simplified_programs;
 
 	bool modified;
+
+	int error_measure;
 
 public:
 
@@ -157,6 +164,9 @@ public:
 
 	void set_random_subset_selection_size(int value);
 	int get_random_subset_selection_size(void);
+
+	void set_error_measure(int value);
+	int get_error_measure(void);
 
 };
 //-----------------------------------------------------------------

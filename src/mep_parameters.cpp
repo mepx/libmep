@@ -29,6 +29,7 @@ void t_mep_parameters::init (void)
 	simplified_programs = 0;
     num_threads = 1;
 	random_subset_selection_size = 1000;
+	error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 
 	modified = false;
 }
@@ -124,6 +125,11 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	node = parent.append_child("random_subset_selection_size");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%ld", random_subset_selection_size);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("error_measure");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%d", error_measure);
 	data.set_value(tmp_str);
 
 	modified = false;
@@ -270,6 +276,29 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	else
 		random_subset_selection_size = 0;
 
+	node = parent.child("error_measure");
+	if (node) {
+		const char *value_as_cstring = node.child_value();
+		int value = atoi(value_as_cstring);
+		if (problem_type == MEP_PROBLEM_REGRESSION) {
+			if (value == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR || value == MEP_REGRESSION_MEAN_SQUARED_ERROR)
+				error_measure = value;
+			else
+				error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
+		}
+		else {// classification
+			if (value == MEP_CLASSIFICATION_MEAN_ERROR)
+				error_measure = value;
+			else
+				error_measure = MEP_CLASSIFICATION_MEAN_ERROR;
+		}
+	}
+	else
+		if (problem_type == MEP_PROBLEM_REGRESSION)
+			error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
+		else
+			error_measure = MEP_CLASSIFICATION_MEAN_ERROR;
+
 	modified = false;
 
 	return true;
@@ -411,18 +440,18 @@ void t_mep_parameters::set_tournament_size(long value)
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_num_generations(long value)
 {
-	
 		num_generations = value;
-		modified = true;
-	
+		modified = true;	
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_problem_type(long value)
 {
-	
 		problem_type = value;
+		if (problem_type == MEP_PROBLEM_REGRESSION)
+			error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
+		else
+			error_measure = MEP_CLASSIFICATION_MEAN_ERROR;
 		modified = true;
-	
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_num_subpopulations(long value)
@@ -506,5 +535,23 @@ void t_mep_parameters::set_random_subset_selection_size(int value)
 int t_mep_parameters::get_random_subset_selection_size(void)
 {
 	return random_subset_selection_size;
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_error_measure(int value)
+{
+	if (problem_type == MEP_PROBLEM_REGRESSION) {
+		if (value == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR || value == MEP_REGRESSION_MEAN_SQUARED_ERROR)
+			error_measure = value;
+	}
+	else {// classification
+		if (value == MEP_CLASSIFICATION_MEAN_ERROR)
+			error_measure = value;
+	}
+	modified = true;
+}
+//---------------------------------------------------------------------------
+int t_mep_parameters::get_error_measure(void)
+{
+	return error_measure;
 }
 //---------------------------------------------------------------------------

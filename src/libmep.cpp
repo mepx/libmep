@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.03.30.0-beta");
+	strcpy(version, "2016.04.02.0-beta");
 
 	num_operators = 0;
 
@@ -147,27 +147,27 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 /*
 void t_mep::compute_cached_eval_matrix_double(void)
 {
-	
-	if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
-	for (int v = 0; v < training_data.num_vars; v++) {
-	cached_sum_of_errors[v] = 0;
-	for (int k = 0; k < training_data->get_num_rows(); k++) {
-	cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
-	cached_sum_of_errors[v] += fabs(cached_eval_matrix_double[v][k] - training_data._target_double[k]);
-	}
-	}
-	else
-	for (int v = 0; v < training_data.num_vars; v++) {
-	cached_sum_of_errors[v] = 0;
-	for (int k = 0; k < training_data->get_num_rows(); k++) {
-	cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
-	if (cached_eval_matrix_double[v][k] <= mep_parameters->classification_threshold)
-	cached_sum_of_errors[v] += training_data._target_double[k];
-	else
-	cached_sum_of_errors[v] += 1 - training_data._target_double[k];
-	}
-	}
-	
+
+if (mep_parameters->get_problem_type() == PROBLEM_REGRESSION)
+for (int v = 0; v < training_data.num_vars; v++) {
+cached_sum_of_errors[v] = 0;
+for (int k = 0; k < training_data->get_num_rows(); k++) {
+cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
+cached_sum_of_errors[v] += fabs(cached_eval_matrix_double[v][k] - training_data._target_double[k]);
+}
+}
+else
+for (int v = 0; v < training_data.num_vars; v++) {
+cached_sum_of_errors[v] = 0;
+for (int k = 0; k < training_data->get_num_rows(); k++) {
+cached_eval_matrix_double[v][k] = training_data->_data_double[k][v];
+if (cached_eval_matrix_double[v][k] <= mep_parameters->classification_threshold)
+cached_sum_of_errors[v] += training_data._target_double[k];
+else
+cached_sum_of_errors[v] += 1 - training_data._target_double[k];
+}
+}
+
 }
 */
 //---------------------------------------------------------------------------
@@ -175,16 +175,24 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 {
 	double **data = training_data->get_data_matrix_double();
 
-	if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
+	if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 		for (int v = 0; v < num_actual_variables; v++) {
 			cached_sum_of_errors[actual_enabled_variables[v]] = 0;
-			for (int k = 0; k < training_data->get_num_rows(); k++) {
-				cached_eval_matrix_double[actual_enabled_variables[v]][k] = data[k][actual_enabled_variables[v]];
-				cached_sum_of_errors[actual_enabled_variables[v]] += fabs(cached_eval_matrix_double[actual_enabled_variables[v]][k] - data[k][num_total_variables]);
-			}
+			if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+				for (int k = 0; k < training_data->get_num_rows(); k++) {
+					cached_eval_matrix_double[actual_enabled_variables[v]][k] = data[k][actual_enabled_variables[v]];
+					cached_sum_of_errors[actual_enabled_variables[v]] += mep_absolute_error(cached_eval_matrix_double[actual_enabled_variables[v]][k], data[k][num_total_variables]);
+				}
+			else// MEP_REGRESSION_MEAN_SQUARED_ERROR
+				for (int k = 0; k < training_data->get_num_rows(); k++) {
+					cached_eval_matrix_double[actual_enabled_variables[v]][k] = data[k][actual_enabled_variables[v]];
+					cached_sum_of_errors[actual_enabled_variables[v]] += mep_squared_error(cached_eval_matrix_double[actual_enabled_variables[v]][k], data[k][num_total_variables]);
+				}
+
 			cached_sum_of_errors[actual_enabled_variables[v]] /= (double)training_data->get_num_rows();
 		}
-	else
+	}
+	else// classification
 		for (int v = 0; v < num_actual_variables; v++) {
 
 			cached_threashold[actual_enabled_variables[v]] = 0;
@@ -223,6 +231,7 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class *array_value_class)
 				i--;
 			}
 			cached_sum_of_errors[actual_enabled_variables[v]] /= (double)training_data->get_num_rows();
+			cached_sum_of_errors[actual_enabled_variables[v]] *= 100;
 		}
 }
 //---------------------------------------------------------------------------
@@ -326,14 +335,26 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 
 	if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 		for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++) {
-			while (!pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene)) {
+			bool result = true;
+			if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+				result = pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene, mep_absolute_error);
+			else
+				result = pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene, mep_squared_error);
+			while (!result) {
 				// I have to mutate that a_chromosome.
 				pop[k].individuals[0].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
 				// recompute its fitness on training;
-				pop[k].individuals[0].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+				if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+					pop[k].individuals[0].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_absolute_error);
+				else
+					pop[k].individuals[0].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_squared_error);
 				// resort the population
 				sort_by_fitness(pop[k]);
 				// apply it again on validation
+				if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+					result = pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene, mep_absolute_error);
+				else
+					result = pop[k].individuals[0].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene, mep_squared_error);
 			}
 			// now it is ok; no errors on
 			if ((validation_error < best_validation_error) || (fabs(best_validation_error + 1) <= 1E-6)) {
@@ -404,8 +425,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 		training_data->count_0_class(target_col);
 	else
 		if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-		  training_data->count_num_classes(target_col);
-	
+			training_data->count_num_classes(target_col);
 
 	compute_cached_eval_matrix_double2(array_value_class[0]);
 
@@ -414,7 +434,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 		stats[run_index].allocate(mep_parameters->get_num_generations());
 		last_run_index++;
 		start_steady_state(run_index, eval_double, array_value_class, on_generation, on_new_evaluation);
-        if (on_complete_run)
+		if (on_complete_run)
 			on_complete_run();
 		if (_stopped_signal_sent)
 			break;
@@ -450,9 +470,14 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 			t_sub_population *a_sub_population = &sub_populations[pop_index];
 
 			if (generation_index == 0) {
-				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-					for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
-						pop[pop_index].individuals[i].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
+					if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
+							pop[pop_index].individuals[i].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_absolute_error);
+					else
+						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
+							pop[pop_index].individuals[i].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_squared_error);
+				}
 				else
 					if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
@@ -482,8 +507,12 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 					}
 					// mutate the result and move the mutant in the new population
 					a_sub_population->offspring1.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-						a_sub_population->offspring1.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
+						if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+							a_sub_population->offspring1.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_absolute_error);
+						else
+							a_sub_population->offspring1.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_squared_error);
+					}
 					else
 						if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 							a_sub_population->offspring1.fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
@@ -492,8 +521,12 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 								a_sub_population->offspring1.fitness_multiclass_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 
 					a_sub_population->offspring2.mutation(mep_parameters, mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION)
-						a_sub_population->offspring2.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double);
+					if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
+						if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+							a_sub_population->offspring2.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_absolute_error);
+						else
+							a_sub_population->offspring2.fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_squared_error);
+					}
 					else
 						if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 							a_sub_population->offspring2.fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
@@ -611,7 +644,7 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 		// now copy one from each subpopulation to the next one
 		for (int d = 0; d < mep_parameters->get_num_subpopulations(); d++) { // din d in d+1
 			// choose a random individual from subpopulation d
-            long w = rand() % mep_parameters->get_subpopulation_size();
+			long w = rand() % mep_parameters->get_subpopulation_size();
 			if (pop[d].individuals[w].compare(&pop[(d + 1) % mep_parameters->get_num_subpopulations()].individuals[mep_parameters->get_subpopulation_size() - 1], false))
 				pop[(d + 1) % mep_parameters->get_num_subpopulations()].individuals[mep_parameters->get_subpopulation_size() - 1] = pop[d].individuals[w];
 		}
@@ -657,21 +690,28 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	//if (!(mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
 	//	stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
 	if (mep_parameters->get_problem_type() != MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-	  stats[run].prg.simplify();
+		stats[run].prg.simplify();
 
 	if (test_data && test_data->get_num_rows() && test_data->get_num_outputs()) {// has target
 		// I must run all solutions for the test data and choose the best one
 		if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
-			if (stats[run].prg.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error));
+			if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR) {
+				if (stats[run].prg.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error, mep_absolute_error))
+					;
+			}
+			else {
+				if (stats[run].prg.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error, mep_squared_error))
+					;
+			}
 		}
 		else
 			if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION) {
 				if (stats[run].prg.compute_binary_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error));
 			}
-				else
-					if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
-						if (stats[run].prg.compute_multiclass_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, test_data->get_num_classes(), stats[run].test_error));
-					}
+			else
+				if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
+					if (stats[run].prg.compute_multiclass_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, test_data->get_num_classes(), stats[run].test_error));
+				}
 	}
 
 
@@ -701,7 +741,7 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 
 	if (variables_enabled) {
 
-        	char *tmp_str = new char[training_data->get_num_cols() * 2 + 10];
+		char *tmp_str = new char[training_data->get_num_cols() * 2 + 10];
 
 		pugi::xml_node utilized_variables_node = parent.append_child("variables_utilization");
 
@@ -715,14 +755,9 @@ int t_mep::to_pugixml_node(pugi::xml_node parent)
 		pugi::xml_node utilized_variables_data_node = utilized_variables_node.append_child(pugi::node_pcdata);
 		utilized_variables_data_node.set_value(tmp_str);
 
-        delete [] tmp_str;
+		delete[] tmp_str;
 	}
-/*
-	pugi::xml_node target_col_node = parent.append_child("target_col");
-	pugi::xml_node target_col_data_node = target_col_node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", target_col);
-	target_col_data_node.set_value(tmp_str);
-*/
+
 	pugi::xml_node parameters_node = parent.append_child("parameters");
 	mep_parameters->to_xml(parameters_node);
 
@@ -778,9 +813,9 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 			int i = 0;
 
 			while (*(value_as_cstring + num_jumped_chars)) {
-                int int_read;
+				int int_read;
 				sscanf(value_as_cstring + num_jumped_chars, "%d", &int_read);
-                variables_enabled[i] = int_read;
+				variables_enabled[i] = int_read;
 				/*
 				if (variables_utilization[i]) {
 				actual_enabled_variables[num_actual_variables] = i;
@@ -849,14 +884,14 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		mep_constants->from_xml(node);
 	else
 		mep_constants->init();
-    
-    
+
+
 	if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION && training_data->get_num_classes() == 0) {
-        training_data->count_num_classes(target_col);
-        validation_data->count_num_classes(target_col);
-        if (test_data->get_num_cols() == training_data->get_num_cols())
-          test_data->count_num_classes(target_col);
-    }
+		training_data->count_num_classes(target_col);
+		validation_data->count_num_classes(target_col);
+		if (test_data->get_num_cols() == training_data->get_num_cols())
+			test_data->count_num_classes(target_col);
+	}
 
 	last_run_index = -1;
 	pugi::xml_node node_results = parent.child("results");
@@ -1045,7 +1080,7 @@ int running_time_comparator_ascending(const void * a, const void * b)
 	if (((t_mep_run_statistics*)a)->running_time < ((t_mep_run_statistics*)b)->running_time)
 		return -1;
 	else
-		if (((t_mep_run_statistics*)a)->running_time >((t_mep_run_statistics*)b)->running_time)
+		if (((t_mep_run_statistics*)a)->running_time > ((t_mep_run_statistics*)b)->running_time)
 			return 1;
 		else
 			return 0;
@@ -1056,7 +1091,7 @@ int running_time_comparator_descending(const void * a, const void * b)
 	if (((t_mep_run_statistics*)a)->running_time < ((t_mep_run_statistics*)b)->running_time)
 		return 1;
 	else
-		if (((t_mep_run_statistics*)a)->running_time >((t_mep_run_statistics*)b)->running_time)
+		if (((t_mep_run_statistics*)a)->running_time > ((t_mep_run_statistics*)b)->running_time)
 			return -1;
 		else
 			return 0;
@@ -1106,7 +1141,7 @@ int validation_error_comparator_ascending(const void * a, const void * b)
 	if (((t_mep_run_statistics*)a)->best_validation_error < ((t_mep_run_statistics*)b)->best_validation_error)
 		return -1;
 	else
-		if (((t_mep_run_statistics*)a)->best_validation_error >((t_mep_run_statistics*)b)->best_validation_error)
+		if (((t_mep_run_statistics*)a)->best_validation_error > ((t_mep_run_statistics*)b)->best_validation_error)
 			return 1;
 		else
 			return 0;
@@ -1117,7 +1152,7 @@ int validation_error_comparator_descending(const void * a, const void * b)
 	if (((t_mep_run_statistics*)a)->best_validation_error < ((t_mep_run_statistics*)b)->best_validation_error)
 		return 1;
 	else
-		if (((t_mep_run_statistics*)a)->best_validation_error >((t_mep_run_statistics*)b)->best_validation_error)
+		if (((t_mep_run_statistics*)a)->best_validation_error > ((t_mep_run_statistics*)b)->best_validation_error)
 			return -1;
 		else
 			return 0;
@@ -1137,7 +1172,7 @@ int test_error_comparator_ascending(const void * a, const void * b)
 	if (((t_mep_run_statistics*)a)->test_error < ((t_mep_run_statistics*)b)->test_error)
 		return -1;
 	else
-		if (((t_mep_run_statistics*)a)->test_error >((t_mep_run_statistics*)b)->test_error)
+		if (((t_mep_run_statistics*)a)->test_error > ((t_mep_run_statistics*)b)->test_error)
 			return 1;
 		else
 			return 0;
@@ -1148,7 +1183,7 @@ int test_error_comparator_descending(const void * a, const void * b)
 	if (((t_mep_run_statistics*)a)->test_error < ((t_mep_run_statistics*)b)->test_error)
 		return 1;
 	else
-		if (((t_mep_run_statistics*)a)->test_error >((t_mep_run_statistics*)b)->test_error)
+		if (((t_mep_run_statistics*)a)->test_error > ((t_mep_run_statistics*)b)->test_error)
 			return -1;
 		else
 			return 0;
@@ -1310,7 +1345,7 @@ char* t_mep::get_problem_description(void)
 void t_mep::set_enable_cache_results_for_all_training_data(bool value)
 {
 	if (_stopped)
-	  cache_results_for_all_training_data = value;
+		cache_results_for_all_training_data = value;
 }
 //---------------------------------------------------------------------------
 bool t_mep::get_enable_cache_results_for_all_training_data(void)
@@ -1321,7 +1356,7 @@ bool t_mep::get_enable_cache_results_for_all_training_data(void)
 long long t_mep::get_memory_consumption(void)
 {
 	// for chromosomes
-//	long long chromosomes_memory = 0;
+	//	long long chromosomes_memory = 0;
 
 	return 0;
 }
@@ -1424,10 +1459,10 @@ void t_mep::compute_mean_stddev(int num_runs)
 			best_test = stats[0].test_error;
 		best_runtime = stats[0].running_time;
 		mean_training = stats[0].best_training_error[stats[0].last_gen];
-	    if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
-		  mean_validation = stats[0].best_validation_error;
-	    if (test_data->get_num_rows())
-		  mean_test = stats[0].test_error;
+		if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
+			mean_validation = stats[0].best_validation_error;
+		if (test_data->get_num_rows())
+			mean_test = stats[0].test_error;
 		mean_runtime = stats[0].running_time;
 
 		for (int r = 1; r < num_runs; r++) {
@@ -1437,12 +1472,12 @@ void t_mep::compute_mean_stddev(int num_runs)
 			if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data()) {
 				mean_validation += stats[r].best_validation_error;
 				if (best_validation > stats[r].best_validation_error)
-				  best_validation = stats[r].best_validation_error;
+					best_validation = stats[r].best_validation_error;
 			}
 			if (test_data->get_num_rows()) {
 				mean_test += stats[r].test_error;
 				if (best_test > stats[r].test_error)
-				  best_test = stats[r].test_error;
+					best_test = stats[r].test_error;
 			}
 			mean_runtime += stats[r].running_time;
 		}
@@ -1456,9 +1491,9 @@ void t_mep::compute_mean_stddev(int num_runs)
 		for (int r = 0; r < num_runs; r++) {
 			stddev_training += (mean_training - stats[r].best_training_error[stats[r].last_gen]) * (mean_training - stats[r].best_training_error[stats[r].last_gen]);
 			if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
-              stddev_validation += (mean_validation - stats[r].best_validation_error) * (mean_validation - stats[r].best_validation_error);
-            if (test_data->get_num_rows())
-			  stddev_test += (mean_test - stats[r].test_error) * (mean_test - stats[r].test_error);
+				stddev_validation += (mean_validation - stats[r].best_validation_error) * (mean_validation - stats[r].best_validation_error);
+			if (test_data->get_num_rows())
+				stddev_test += (mean_test - stats[r].test_error) * (mean_test - stats[r].test_error);
 			stddev_runtime += (mean_runtime - stats[r].running_time) * (mean_runtime - stats[r].running_time);
 		}
 		stddev_training = sqrt(stddev_training / num_runs);
@@ -1472,7 +1507,7 @@ void t_mep::get_mean(double &training, double &validation, double &test, double 
 {
 	training = mean_training;
 	validation = mean_validation;
-		test = mean_test;
+	test = mean_test;
 	running_time = mean_runtime;
 }
 //---------------------------------------------------------------------------
