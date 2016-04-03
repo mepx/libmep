@@ -326,10 +326,10 @@ char * t_mep_chromosome::to_C_double(bool simplified, double *data, int problem_
 			else {
 				sprintf(tmp_s, "// find maximal value and divide index by num classes\n");
 				strcat(prog, tmp_s);
-				
+
 				strcat(prog, "  double max_value = prg[0];\n");
 				strcat(prog, "  int index_max_value = 0;\n");
-				sprintf(tmp_s, "  for (int i = 1; i < %d; i++)\n", code_length);
+				sprintf(tmp_s, "  for (int i = 1; i < %ld; i++)\n", code_length);
 				strcat(prog, tmp_s);
 
 				strcat(prog, "    if (max_value > prg[i] + 1e-6){\n      max_value = prg[i];\n      index_max_value = i;\n    }\n");
@@ -967,7 +967,7 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(t_mep_d
 
 	compute_eval_matrix_double(num_rows, cached_eval_matrix, num_actual_variables, actual_enabled_variables, line_of_constants, eval_matrix_double);
 
-	int num_training_data = mep_dataset->get_num_rows();
+//	int num_training_data = mep_dataset->get_num_rows();
 
 	for (int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
@@ -1087,7 +1087,7 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 	double best_threshold;
 	for (int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
-		if (prg[i].op >= 0)// a vairable 
+		if (prg[i].op >= 0)// a vairable
 			if (prg[i].op < num_total_variables) { // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 				best_threshold = cached_threashold[prg[i].op];
@@ -1597,7 +1597,7 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, int &max_index, int &
 				max_index = i;
 			}
 	}
-	
+
 	delete[] eval_vect;
 
 	return true;

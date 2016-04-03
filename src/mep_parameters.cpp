@@ -124,7 +124,7 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("random_subset_selection_size");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", random_subset_selection_size);
+	sprintf(tmp_str, "%d", random_subset_selection_size);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("error_measure");
@@ -231,7 +231,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	}
 	else
 		random_seed = 0;
-	
+
 	node = parent.child("num_runs");
 	if (node)
 	{
@@ -258,7 +258,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	}
 	else
 		simplified_programs = 0;
-    
+
     node = parent.child("num_threads");
 	if (node)
 	{
@@ -391,57 +391,57 @@ bool t_mep_parameters::get_simplified_programs(void)
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_mutation_probability(double value)
 {
-	
+
 		mutation_probability = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_crossover_probability(double value)
 {
-	
+
 		crossover_probability = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_code_length(long value)
 {
-	
+
 		code_length = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 
 void t_mep_parameters::set_subpopulation_size(long value)
 {
-	
+
 		subpopulation_size = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_num_threads(long value)
 {
-	
+
 		num_threads = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_tournament_size(long value)
 {
-	
+
 		tournament_size = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_num_generations(long value)
 {
 		num_generations = value;
-		modified = true;	
+		modified = true;
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_problem_type(long value)
@@ -456,74 +456,74 @@ void t_mep_parameters::set_problem_type(long value)
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_num_subpopulations(long value)
 {
-	
+
 		num_subpopulations = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_operators_probability(double value)
 {
-	
+
 		operators_probability = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_variables_probability(double value)
 {
-	
+
 		variables_probability = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_constants_probability(double value)
 {
-	
+
 		constants_probability = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_use_validation_data(bool value)
 {
-	
+
 		use_validation_data = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_crossover_type(int value)
 {
-	
+
 		crossover_type = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_random_seed(long value)
 {
-	
+
 		random_seed = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_num_runs(long value)
 {
-	
+
 		num_runs = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_simplified_programs(bool value)
 {
-	
+
 		simplified_programs = value;
 		modified = true;
-	
+
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_random_subset_selection_size(int value)

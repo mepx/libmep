@@ -1066,7 +1066,7 @@ int t_mep::stats_to_csv(const char *filename)
 		return false;
 	fprintf(f, "#;training error; validation error; test error; running time\n");
 	for (int r = 0; r <= last_run_index; r++)
-		fprintf(f, "%d;%lf;%lf;%lf%;lf\n", r, stats[r].best_training_error[mep_parameters->get_num_generations() - 1], stats[r].best_validation_error, stats[r].test_error, stats[r].running_time);
+		fprintf(f, "%d;%lf;%lf;%lf;%lf\n", r, stats[r].best_training_error[mep_parameters->get_num_generations() - 1], stats[r].best_validation_error, stats[r].test_error, stats[r].running_time);
 	fprintf(f, "Best;%lf;%lf;%lf;%lf\n", best_training, best_validation, best_test, best_runtime);
 	fprintf(f, "Average;%lf;%lf;%lf;%lf\n", mean_training, mean_validation, mean_test, mean_runtime);
 	fprintf(f, "StdDev;%lf;%lf;%lf;%lf\n", stddev_training, stddev_validation, stddev_test, stddev_runtime);
