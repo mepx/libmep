@@ -162,10 +162,21 @@ public:
 	// sets the simplified programs parameters
 	void set_simplified_programs(bool value);
 
+	// set the size of the random subset on which the training is performed.
+	// this must be called after calling set_training_data from the t_mep class because set_training_data sets this value to the size of the training data
 	void set_random_subset_selection_size(int value);
+
+	// returns the size of the random subset on which the training is performed
 	int get_random_subset_selection_size(void);
 
+	// sets the error measure type
+	// for regression it can be: MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 0 or MEP_REGRESSION_MEAN_SQUARED_ERROR 1
+	// for classification it can be: MEP_CLASSIFICATION_MEAN_ERROR 2
 	void set_error_measure(int value);
+
+	// returns the error measure type
+	// for regression it can be: MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 0 or MEP_REGRESSION_MEAN_SQUARED_ERROR 1
+	// for classification it can be: MEP_CLASSIFICATION_MEAN_ERROR 2
 	int get_error_measure(void);
 
 };

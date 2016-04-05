@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.04.02.0-beta");
+	strcpy(version, "2016.04.05.0-beta");
 
 	num_operators = 0;
 
@@ -1380,6 +1380,8 @@ void t_mep::set_training_data(t_mep_data *_data)
 {
 	if (_stopped) {
 		training_data = _data;
+
+		mep_parameters->set_random_subset_selection_size(training_data->get_num_rows());
 
 		if (variables_enabled) {
 			delete[] variables_enabled;
