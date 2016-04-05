@@ -1381,7 +1381,7 @@ void t_mep::set_training_data(t_mep_data *_data)
 	if (_stopped) {
 		training_data = _data;
 
-		mep_parameters->set_random_subset_selection_size(training_data->get_num_rows());
+//		mep_parameters->set_random_subset_selection_size(training_data->get_num_rows());
 
 		if (variables_enabled) {
 			delete[] variables_enabled;
