@@ -36,7 +36,10 @@ int main(void)
 	mep_parameters.set_num_subpopulations(1);
 	mep_parameters.set_num_generations(50);
 	mep_parameters.set_code_length(20);
-	mep_parameters.set_problem_type(0); // regression
+	mep_parameters.set_problem_type(MEP_PROBLEM_REGRESSION); 
+	mep_parameters.set_random_subset_selection_size(training_data.get_num_rows());
+	mep_parameters.set_num_threads(1);
+	mep_parameters.set_error_measure(MEP_REGRESSION_MEAN_ABSOLUTE_ERROR);
 
 	mep.set_parameters(&mep_parameters);
 	mep.set_constants(&mep_constants);
