@@ -1455,15 +1455,15 @@ void t_mep::compute_mean_stddev(int num_runs)
 
 	if (num_runs) {
 		best_training = stats[0].best_training_error[stats[0].last_gen];
-		if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
+		if (validation_data && mep_parameters->get_use_validation_data() && validation_data->get_num_rows())
 			best_validation = stats[0].best_validation_error;
-		if (test_data->get_num_rows())
+		if (test_data && test_data->get_num_rows())
 			best_test = stats[0].test_error;
 		best_runtime = stats[0].running_time;
 		mean_training = stats[0].best_training_error[stats[0].last_gen];
-		if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
+		if (validation_data && validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
 			mean_validation = stats[0].best_validation_error;
-		if (test_data->get_num_rows())
+		if (test_data && test_data->get_num_rows())
 			mean_test = stats[0].test_error;
 		mean_runtime = stats[0].running_time;
 
@@ -1471,12 +1471,12 @@ void t_mep::compute_mean_stddev(int num_runs)
 			mean_training += stats[r].best_training_error[stats[r].last_gen];
 			if (best_training > stats[r].best_training_error[stats[r].last_gen])
 				best_training = stats[r].best_training_error[stats[r].last_gen];
-			if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data()) {
+			if (validation_data && validation_data->get_num_rows() && mep_parameters->get_use_validation_data()) {
 				mean_validation += stats[r].best_validation_error;
 				if (best_validation > stats[r].best_validation_error)
 					best_validation = stats[r].best_validation_error;
 			}
-			if (test_data->get_num_rows()) {
+			if (test_data && test_data->get_num_rows()) {
 				mean_test += stats[r].test_error;
 				if (best_test > stats[r].test_error)
 					best_test = stats[r].test_error;
@@ -1492,9 +1492,9 @@ void t_mep::compute_mean_stddev(int num_runs)
 
 		for (int r = 0; r < num_runs; r++) {
 			stddev_training += (mean_training - stats[r].best_training_error[stats[r].last_gen]) * (mean_training - stats[r].best_training_error[stats[r].last_gen]);
-			if (validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
+			if (validation_data && validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
 				stddev_validation += (mean_validation - stats[r].best_validation_error) * (mean_validation - stats[r].best_validation_error);
-			if (test_data->get_num_rows())
+			if (test_data && test_data->get_num_rows())
 				stddev_test += (mean_test - stats[r].test_error) * (mean_test - stats[r].test_error);
 			stddev_runtime += (mean_runtime - stats[r].running_time) * (mean_runtime - stats[r].running_time);
 		}
