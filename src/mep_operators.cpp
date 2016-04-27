@@ -22,6 +22,9 @@ void t_mep_operators::init(void)
 
 	use_iflz = use_ifalbcd = false;
 
+	use_inputs_average = false;
+	use_num_inputs = false;
+
 	modified = false;
 }
 //---------------------------------------------------------------------------
@@ -186,6 +189,16 @@ int t_mep_operators::to_xml(pugi::xml_node parent)
 	node = parent.append_child("use_ifalbcd");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", use_ifalbcd);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("use_num_inputs");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%d", use_num_inputs);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("use_inputs_average");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%d", use_inputs_average);
 	data.set_value(tmp_str);
 
 	modified = false;
@@ -475,6 +488,22 @@ int t_mep_operators::from_xml(pugi::xml_node parent)
 	else
 		use_ifalbcd = false;
 
+	node = parent.child("use_num_inputs");
+	if (node) {
+		const char *value_as_cstring = node.child_value();
+		use_num_inputs = atoi(value_as_cstring) > 0;
+	}
+	else
+		use_num_inputs = false;
+
+	node = parent.child("use_inputs_average");
+	if (node) {
+		const char *value_as_cstring = node.child_value();
+		use_inputs_average = atoi(value_as_cstring) > 0;
+	}
+	else
+		use_inputs_average = false;
+
 	modified = false;
 
 	return true;
@@ -587,6 +616,17 @@ int t_mep_operators::get_list_of_operators(int *actual_operators)
 		actual_operators[num_operators] = O_IFALBCD;
 		num_operators++;
 	}
+
+	if (use_num_inputs) {
+		actual_operators[num_operators] = O_NUM_INPUTS;
+		num_operators++;
+	}
+
+	if (use_inputs_average) {
+		actual_operators[num_operators] = O_INPUTS_AVERAGE;
+		num_operators++;
+	}
+
 	return num_operators;
 }
 //---------------------------------------------------------------------------
@@ -933,4 +973,27 @@ bool t_mep_operators::is_modified(void)
 	return modified;
 }
 //---------------------------------------------------------------------------
-
+/*
+bool t_mep_operators::get_inputs_average(void)
+{
+	return use_inputs_average;
+}
+//---------------------------------------------------------------------------
+bool t_mep_operators::get_num_inputs(void)
+{
+	return use_num_inputs;
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_inputs_average(bool value)
+{
+	use_inputs_average = value;
+	modified = true;
+}
+//---------------------------------------------------------------------------
+void t_mep_operators::set_num_inputs(bool value)
+{
+	use_num_inputs = value;
+	modified = true;
+}
+//---------------------------------------------------------------------------
+*/

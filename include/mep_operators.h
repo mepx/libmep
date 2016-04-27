@@ -30,6 +30,8 @@
 #define O_ATAN -24
 #define O_IFLZ -25
 #define O_IFALBCD -26
+#define O_INPUTS_AVERAGE -27
+#define O_NUM_INPUTS -28
 
 
 /*
@@ -45,13 +47,15 @@
 #define O_NOR -27
 */
 
-#define MAX_OPERATORS 26
+#define MAX_OPERATORS 28
 
 //-----------------------------------------------------------------
 class t_mep_operators
 {
     public:
     bool use_addition, use_subtraction, use_multiplication, use_division, use_power, use_sqrt, use_exp, use_pow10, use_ln, use_log10, use_log2, use_floor, use_ceil, use_abs, use_inv, use_x2, use_min, use_max;
+	bool use_inputs_average;
+	bool use_num_inputs;
 //	bool use_mod, use_mod10, use_mod2;
 	bool use_not, use_and, use_or, use_xor, use_nand, use_nor;
     bool use_sin, use_cos, use_tan, use_asin, use_acos, use_atan;
@@ -62,7 +66,7 @@ class t_mep_operators
 	bool modified;
 
 	t_mep_operators(void);
-
+	
 	void init(void);
 
     int to_xml(pugi::xml_node parent);
@@ -148,6 +152,10 @@ class t_mep_operators
 	// returns true if the "if a lower than b returns c else returns d" operator is enabled
 	bool get_ifalbcd(void);
 
+	//bool get_inputs_average(void);
+	//bool get_num_inputs(void);
+
+
 
 	// sets if the addition operator is enabled or not
 	void set_addition(bool value);
@@ -226,6 +234,9 @@ class t_mep_operators
 
 	// sets if the "if a lower than b returns c else returns d" operator is enabled or not
 	void set_ifalbcd(bool value);
+
+	//void set_inputs_average(bool value);
+	//void set_num_inputs(bool value);
 
 	// returns true if the state of some operator is modified
 	bool is_modified(void);
