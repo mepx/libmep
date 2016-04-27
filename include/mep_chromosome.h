@@ -36,11 +36,12 @@ private:
 
 	void fitness_binary_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class);
 	void fitness_multi_class_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double);
+//	void fitness_multi_class_classification_double_cache_all_training_data_range(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double);
 
 	double fitness;               // the fitness
 	int index_best_gene;          // the index of the best expression in chromosome
 	double best_class_threshold;  // only for binary classification
-	int num_utilized;             // number of utilized genes for regression and binary classification
+	int num_utilized_genes;             // number of utilized genes for regression and binary classification
 
 	code3 *prg;                   // a string of genes
 	code3 *simplified_prg;        // simplified prg
