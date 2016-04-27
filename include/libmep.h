@@ -33,7 +33,7 @@ private:
 	t_mep_parameters *mep_parameters;
 	t_mep_constants *mep_constants;
 	t_sub_population* pop;
-	double **cached_eval_matrix_double;
+	double **cached_eval_variables_matrix_double;
 	double *cached_sum_of_errors, *cached_threashold;
 	int best_individual_index;
 	int best_subpopulation_index;
