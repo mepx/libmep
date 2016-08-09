@@ -749,7 +749,7 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2, 
 		offspring2.prg[i] = prg[i];
 	}
 
-	if (mep_constants->get_constants_can_evolve() && mep_constants->get_constants_type() == AUTOMATIC_CONSTANTS) {
+	if (num_constants && mep_constants->get_constants_can_evolve() && mep_constants->get_constants_type() == AUTOMATIC_CONSTANTS) {
 		pct = 1 + my_rand() % (num_constants - 2);
 		for (int c = 0; c < pct; c++) {
 			offspring1.constants_double[c] = constants_double[c];

@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.04.24.0-beta");
+	strcpy(version, "2016.08.09.0-beta");
 
 	num_operators = 0;
 
@@ -814,26 +814,26 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		if (node) {
 			const char *value_as_cstring = node.child_value();
 			int num_jumped_chars = 0;
-			//num_actual_variables = 0;
+			num_actual_variables = 0;
 			int i = 0;
 
 			while (*(value_as_cstring + num_jumped_chars)) {
 				int int_read;
 				sscanf(value_as_cstring + num_jumped_chars, "%d", &int_read);
 				variables_enabled[i] = int_read;
-				/*
-				if (variables_utilization[i]) {
-				actual_enabled_variables[num_actual_variables] = i;
+				
+				if (variables_enabled[i]) {
+			//	actual_enabled_variables[num_actual_variables] = i;
 				num_actual_variables++;
 				}
-				*/
+				
 				long local_jump = strcspn(value_as_cstring + num_jumped_chars, " ");
 				num_jumped_chars += local_jump + 1;
 				i++;
 			}
 		}
 		else {// not found, use everything
-			//num_actual_variables = num_total_variables;
+			num_actual_variables = num_total_variables;
 			for (int i = 0; i < num_total_variables; i++) {
 				variables_enabled[i] = 1;
 				//actual_enabled_variables[i] = i;
