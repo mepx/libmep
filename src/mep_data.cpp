@@ -1224,7 +1224,7 @@ void t_mep_data::shuffle(void)
 {
 	if (data_type == MEP_DATA_DOUBLE) { // double
 		for (int i = num_data - 1; i >= 1; i--) {
-			int j = my_rand() % (i + 1);
+			int j = my_int_rand(0, i);
 			double *row = _data_double[i];
 			_data_double[i] = _data_double[j];
 			_data_double[j] = row;
@@ -1233,7 +1233,7 @@ void t_mep_data::shuffle(void)
 	else {
 		// string
 		for (int i = num_data - 1; i >= 1; i--) {
-			int j = my_rand() % (i + 1);
+			int j = my_int_rand(0, i);
 			char**row = _data_string[i];
 			_data_string[i] = _data_string[j];
 			_data_string[j] = row;
