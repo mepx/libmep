@@ -13,10 +13,12 @@ public:
 	double test_error;
 	double *average_training_error;
 
-	t_mep_chromosome prg;
-	int last_gen;
+	t_mep_chromosome best_program;
 
-	void allocate(long num_gen);
+	// could be less than the number of generations of the algorithm if the user stops it earlier
+	int last_generation;
+
+	void allocate(long num_generations);
 
 	t_mep_run_statistics(void);
 	~t_mep_run_statistics();

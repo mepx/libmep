@@ -25,9 +25,9 @@ private:
 	long code_length;
 	int num_total_variables;
 	long num_constants;
-	double *constants_double;
+	double *real_constants;
 
-	void mark(int k, bool* marked);
+	void mark(int position, bool* marked);
 	void compute_eval_matrix_double(int num_training_data, double **cached_eval_matrix_double, int num_actual_variables, int * actual_enabled_variables, int *line_of_constants, double ** eval_double);
 	
 
@@ -48,13 +48,20 @@ private:
 
 public:
 
+	// constructor
 	t_mep_chromosome();
+
+	// destructor - deletes memory
 	~t_mep_chromosome();
 
 	// set the operator inside a gene
 	void set_gene_operation(int gene_index, int new_operation);
 
+
 	void clear(void);
+	
+	// converts the MEP program into a C program
+	// a row of data is also required because the main C program will also contain an example on how to run the obtained program
 	char * to_C_double(bool simplified, double *data, int problem_type, int num_classes);
 
 	double get_fitness(void);

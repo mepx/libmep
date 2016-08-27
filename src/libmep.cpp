@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.08.09.0-beta");
+	strcpy(version, "2016.08.27.0-beta");
 
 	num_operators = 0;
 
@@ -121,10 +121,10 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 	int index_error_gene;
 	if (run_index > -1) {
 		if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION || mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
-			if (!stats[run_index].prg.evaluate_double(inputs, outputs, index_error_gene))
+			if (!stats[run_index].best_program.evaluate_double(inputs, outputs, index_error_gene))
 				return false;
 			if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION) {
-				if (outputs[0] <= stats[run_index].prg.get_best_class_threshold())
+				if (outputs[0] <= stats[run_index].best_program.get_best_class_threshold())
 					outputs[0] = 0;
 				else
 					outputs[0] = 1;
@@ -133,7 +133,7 @@ bool t_mep::get_output(int run_index, double *inputs, double *outputs)
 		else
 			if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
 				int max_index = -1;
-				if (!stats[run_index].prg.get_first_max_index(inputs, max_index, index_error_gene))
+				if (!stats[run_index].best_program.get_first_max_index(inputs, max_index, index_error_gene))
 					return false;
 				outputs[0] = max_index % training_data->get_num_classes();
 			}
@@ -299,9 +299,9 @@ void t_mep::delete_values(double ****eval_double, s_value_class ***array_value_c
 long t_mep::tournament(t_sub_population &pop)     // Size is the size of the tournament
 {
 	long r, p;
-	p = my_rand() % mep_parameters->get_subpopulation_size();
+	p = my_int_rand(0, mep_parameters->get_subpopulation_size() - 1);
 	for (int i = 1; i < mep_parameters->get_tournament_size(); i++) {
-		r = my_rand() % mep_parameters->get_subpopulation_size();
+		r = my_int_rand(0, mep_parameters->get_subpopulation_size() - 1);
 		p = pop.individuals[r].get_fitness() < pop.individuals[p].get_fitness() ? r : p;
 	}
 	return p;
@@ -343,7 +343,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 				result = pop[k].individuals[i].compute_regression_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene, mep_squared_error);
 			while (!result) {
 				// I have to mutate that a_chromosome.
-				pop[k].individuals[i].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
+				pop[k].individuals[i].set_gene_operation(index_error_gene, actual_enabled_variables[my_int_rand(0, num_actual_variables - 1)]);
 				// recompute its fitness on training;
 				if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 					pop[k].individuals[i].fitness_regression(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_variables_matrix_double, cached_sum_of_errors, num_actual_variables, actual_enabled_variables, eval_double, mep_absolute_error);
@@ -370,7 +370,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 			for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++)
             for (int i = 0; i < 1; i++){
 				while (!pop[k].individuals[i].compute_binary_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_error, index_error_gene)) {
-					pop[k].individuals[i].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
+					pop[k].individuals[i].set_gene_operation(index_error_gene, actual_enabled_variables[my_int_rand(0, num_actual_variables - 1)]);
 					// recompute its fitness on training;
 					pop[k].individuals[i].fitness_binary_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_variables_matrix_double, cached_sum_of_errors, cached_threashold, num_actual_variables, actual_enabled_variables, eval_double, tmp_value_class);
 					// resort the population
@@ -388,7 +388,7 @@ double t_mep::compute_validation_error(int *best_subpopulation_index_for_validat
 				for (int k = 0; k < mep_parameters->get_num_subpopulations(); k++)
                 for (int i = 0; i < 1; i++){
 					while (!pop[k].individuals[i].compute_multiclass_classification_error_on_double_data_return_error(validation_data->get_data_matrix_double(), validation_data->get_num_rows(), validation_data->get_num_cols() - 1, validation_data->get_num_classes(), validation_error, index_error_gene)) {
-						pop[k].individuals[i].set_gene_operation(index_error_gene, actual_enabled_variables[my_rand() % num_actual_variables]);
+						pop[k].individuals[i].set_gene_operation(index_error_gene, actual_enabled_variables[my_int_rand(0, num_actual_variables - 1)]);
 						// recompute its fitness on training;
 						pop[k].individuals[i].fitness_multiclass_classification(training_data, random_subset_indexes, mep_parameters->get_random_subset_selection_size(), cached_eval_variables_matrix_double, num_actual_variables, actual_enabled_variables, eval_double);
 						// resort the population
@@ -498,7 +498,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 					long r1 = tournament(*a_sub_population);
 					long r2 = tournament(*a_sub_population);
 					// crossover
-					double p = my_rand() / (RAND_MAX + 1.0);
+					double p = my_real_rand(0, 1);
 					if (p < mep_parameters->get_crossover_probability())
 						if (mep_parameters->get_crossover_type() == MEP_UNIFORM_CROSSOVER)
 							a_sub_population->individuals[r1].uniform_crossover(a_sub_population->individuals[r2], a_sub_population->offspring1, a_sub_population->offspring2, mep_parameters, mep_constants);
@@ -581,7 +581,7 @@ void t_mep::get_random_subset(int requested_size, int *indexes)
 //-----------------------------------------------------------------------
 bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation)       // Steady-State MEP
 {
-	my_srand(run + mep_parameters->get_random_seed());
+	//my_srand(run + mep_parameters->get_random_seed());
 
 	//clock_t start_time = clock();
 	time_t start_time;
@@ -619,12 +619,12 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	if (mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0) {
 		// I must run all solutions for the validation data and choose the best one
 		stats[run].best_validation_error = compute_validation_error(&best_subpopulation_index_for_test, &best_individual_index_for_test, eval_double[0], array_value_class[0]);
-		stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
+		stats[run].best_program = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
 	}
 	else
-		stats[run].prg = pop[best_subpopulation_index].individuals[0];
+		stats[run].best_program = pop[best_subpopulation_index].individuals[0];
 
-	stats[run].last_gen = 0;
+	stats[run].last_generation = 0;
 	modified_project = true;
 
 	if (on_generation)
@@ -666,13 +666,13 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 				stats[run].best_validation_error = validation_error;
 				best_individual_index_for_test = best_index_on_validation;
 				best_subpopulation_index_for_test = best_subpop_index_on_validation;
-				stats[run].prg = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
+				stats[run].best_program = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
 			}
 		}
 		else
-			stats[run].prg = pop[best_subpopulation_index].individuals[0];
+			stats[run].best_program = pop[best_subpopulation_index].individuals[0];
 
-		stats[run].last_gen = gen_index;
+		stats[run].last_generation = gen_index;
 #ifdef _DEBUG
 
 #endif
@@ -693,27 +693,27 @@ bool t_mep::start_steady_state(int run, double ***eval_double, s_value_class **a
 	//if (!(mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0)) // if no validation data, the test is the best from all
 	//	stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
 	if (mep_parameters->get_problem_type() != MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
-		stats[run].prg.simplify();
+		stats[run].best_program.simplify();
 
 	if (test_data && test_data->get_num_rows() && test_data->get_num_outputs()) {// has target
 		// I must run all solutions for the test data and choose the best one
 		if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 			if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR) {
-				if (stats[run].prg.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error, mep_absolute_error))
+				if (stats[run].best_program.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error, mep_absolute_error))
 					;
 			}
 			else {
-				if (stats[run].prg.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error, mep_squared_error))
+				if (stats[run].best_program.compute_regression_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error, mep_squared_error))
 					;
 			}
 		}
 		else
 			if (mep_parameters->get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION) {
-				if (stats[run].prg.compute_binary_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error));
+				if (stats[run].best_program.compute_binary_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, stats[run].test_error));
 			}
 			else
 				if (mep_parameters->get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
-					if (stats[run].prg.compute_multiclass_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, test_data->get_num_classes(), stats[run].test_error));
+					if (stats[run].best_program.compute_multiclass_classification_error_on_double_data(test_data->get_data_matrix_double(), test_data->get_num_rows(), test_data->get_num_cols() - 1, test_data->get_num_classes(), stats[run].test_error));
 				}
 	}
 
@@ -1009,10 +1009,10 @@ int t_mep::from_xml(const char* filename)
 double t_mep::get_best_training_error(int run, int gen)
 {
 	if (stats[run].best_training_error)
-		if (gen <= stats[run].last_gen)
+		if (gen <= stats[run].last_generation)
 			return stats[run].best_training_error[gen];
 		else
-			return stats[run].best_training_error[stats[run].last_gen];
+			return stats[run].best_training_error[stats[run].last_generation];
 	else
 		return -1;
 }
@@ -1030,17 +1030,17 @@ double t_mep::get_test_error(int run)
 double t_mep::get_average_training_error(int run, int gen)
 {
 	if (stats[run].average_training_error)
-		if (gen <= stats[run].last_gen)
+		if (gen <= stats[run].last_generation)
 			return stats[run].average_training_error[gen];
 		else
-			return stats[run].average_training_error[stats[run].last_gen];
+			return stats[run].average_training_error[stats[run].last_generation];
 	else
 		return -1;
 }
 //---------------------------------------------------------------------------
 int t_mep::get_latest_generation(int run)
 {
-	return stats[run].last_gen;
+	return stats[run].last_generation;
 }
 //---------------------------------------------------------------------------
 double t_mep::get_running_time(int run)
@@ -1113,10 +1113,10 @@ void t_mep::sort_stats_by_running_time(bool ascending)
 //---------------------------------------------------------------------------
 int training_error_comparator_ascending(const void * a, const void * b)
 {
-	if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_gen] < ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_gen])
+	if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_generation] < ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_generation])
 		return -1;
 	else
-		if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_gen] > ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_gen])
+		if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_generation] > ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_generation])
 			return 1;
 		else
 			return 0;
@@ -1124,10 +1124,10 @@ int training_error_comparator_ascending(const void * a, const void * b)
 //---------------------------------------------------------------------------
 int training_error_comparator_descending(const void * a, const void * b)
 {
-	if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_gen] < ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_gen])
+	if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_generation] < ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_generation])
 		return 1;
 	else
-		if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_gen] > ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_gen])
+		if (((t_mep_run_statistics*)a)->best_training_error[((t_mep_run_statistics*)a)->last_generation] > ((t_mep_run_statistics*)b)->best_training_error[((t_mep_run_statistics*)b)->last_generation])
 			return -1;
 		else
 			return 0;
@@ -1250,7 +1250,7 @@ void t_mep::clear_stats(void)
 //---------------------------------------------------------------------------
 char* t_mep::program_as_C(int run_index, bool simplified, double *inputs)
 {
-	return stats[run_index].prg.to_C_double(simplified, inputs, mep_parameters->get_problem_type(), training_data->get_num_classes());
+	return stats[run_index].best_program.to_C_double(simplified, inputs, mep_parameters->get_problem_type(), training_data->get_num_classes());
 }
 //---------------------------------------------------------------------------
 int t_mep::get_num_outputs(void)
@@ -1460,13 +1460,13 @@ void t_mep::compute_mean_stddev(int num_runs)
 	mean_training = mean_validation = mean_test = mean_runtime = 0;
 
 	if (num_runs > 0) {
-		best_training = stats[0].best_training_error[stats[0].last_gen];
+		best_training = stats[0].best_training_error[stats[0].last_generation];
 		if (validation_data && mep_parameters->get_use_validation_data() && validation_data->get_num_rows())
 			best_validation = stats[0].best_validation_error;
 		if (test_data && test_data->get_num_rows())
 			best_test = stats[0].test_error;
 		best_runtime = stats[0].running_time;
-		mean_training = stats[0].best_training_error[stats[0].last_gen];
+		mean_training = stats[0].best_training_error[stats[0].last_generation];
 		if (validation_data && validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
 			mean_validation = stats[0].best_validation_error;
 		if (test_data && test_data->get_num_rows())
@@ -1474,9 +1474,9 @@ void t_mep::compute_mean_stddev(int num_runs)
 		mean_runtime = stats[0].running_time;
 
 		for (int r = 1; r < num_runs; r++) {
-			mean_training += stats[r].best_training_error[stats[r].last_gen];
-			if (best_training > stats[r].best_training_error[stats[r].last_gen])
-				best_training = stats[r].best_training_error[stats[r].last_gen];
+			mean_training += stats[r].best_training_error[stats[r].last_generation];
+			if (best_training > stats[r].best_training_error[stats[r].last_generation])
+				best_training = stats[r].best_training_error[stats[r].last_generation];
 			if (validation_data && validation_data->get_num_rows() && mep_parameters->get_use_validation_data()) {
 				mean_validation += stats[r].best_validation_error;
 				if (best_validation > stats[r].best_validation_error)
@@ -1497,7 +1497,7 @@ void t_mep::compute_mean_stddev(int num_runs)
 		// compute stddev
 
 		for (int r = 0; r < num_runs; r++) {
-			stddev_training += (mean_training - stats[r].best_training_error[stats[r].last_gen]) * (mean_training - stats[r].best_training_error[stats[r].last_gen]);
+			stddev_training += (mean_training - stats[r].best_training_error[stats[r].last_generation]) * (mean_training - stats[r].best_training_error[stats[r].last_generation]);
 			if (validation_data && validation_data->get_num_rows() && mep_parameters->get_use_validation_data())
 				stddev_validation += (mean_validation - stats[r].best_validation_error) * (mean_validation - stats[r].best_validation_error);
 			if (test_data && test_data->get_num_rows())
