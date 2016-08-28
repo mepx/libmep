@@ -28,14 +28,14 @@ private:
 	double *real_constants;
 
 	void mark(int position, bool* marked);
-	void compute_eval_matrix_double(int num_training_data, double **cached_eval_matrix_double, int num_actual_variables, int * actual_enabled_variables, int *line_of_constants, double ** eval_double);
+	void compute_eval_matrix_double(int num_training_data, double **cached_eval_matrix_double, int num_actual_variables, int * actual_enabled_variables, int *line_of_constants, double ** eval_double, t_seed& seed);
 	
 
-	void fitness_regression_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double** cached_eval_matrix, double * cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double **, t_mep_error_function);
-	void fitness_regression_double_no_cache(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double* eval_vect, double *sum_of_errors_array, t_mep_error_function);
+	void fitness_regression_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double** cached_eval_matrix, double * cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double **, t_mep_error_function, t_seed &seed);
+	void fitness_regression_double_no_cache(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double* eval_vect, double *sum_of_errors_array, t_mep_error_function, t_seed &seed);
 
-	void fitness_binary_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class);
-	void fitness_multi_class_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double);
+	void fitness_binary_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class, t_seed &seed);
+	void fitness_multi_class_classification_double_cache_all_training_data(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, t_seed &seed);
 //	void fitness_multi_class_classification_double_cache_all_training_data_range(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double);
 
 	double fitness;               // the fitness
@@ -71,17 +71,17 @@ public:
 
 	void allocate_memory(long code_length, int num_total_vars, bool use_constants, t_mep_constants *constants);
     
-	void generate_random(t_mep_parameters *parameters, t_mep_constants * mep_constants, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
+	void generate_random(t_mep_parameters *parameters, t_seed &seed, t_mep_constants * mep_constants, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
     
 	int compare(t_mep_chromosome *other, bool minimize_operations_count);
 
-	void mutation(t_mep_parameters *parameters, t_mep_constants * mep_constants, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
-	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters, t_mep_constants * mep_constants);
-	void uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters, t_mep_constants * mep_constants);
+	void mutation(t_mep_parameters *parameters, t_seed &seed, t_mep_constants * mep_constants, int *actual_operators, int num_actual_operators, int *actual_used_variables, int num_actual_used_variables);
+	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters, t_seed &seed, t_mep_constants * mep_constants);
+	void uniform_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, t_mep_parameters *parameters, t_seed &seed, t_mep_constants * mep_constants);
 
-	void fitness_regression(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double** cached_eval_matrix, double * cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double **, t_mep_error_function);
-	void fitness_binary_classification(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class);
-	void fitness_multiclass_classification(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double);
+	void fitness_regression(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double** cached_eval_matrix, double * cached_sum_of_errors, int num_actual_variables, int * actual_enabled_variables, double **, t_mep_error_function, t_seed &seed);
+	void fitness_binary_classification(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, s_value_class *tmp_value_class, t_seed &seed);
+	void fitness_multiclass_classification(t_mep_data *mep_dataset, int *random_subset_indexes, int random_subset_selection_size, double **cached_eval_matrix, int num_actual_variables, int * actual_enabled_variables, double **eval_matrix_double, t_seed &seed);
 	
 	bool compute_binary_classification_error_on_double_data_return_error(double **inputs, int num_data, int output_col, double &error, int &index_error_gene);
 	bool compute_binary_classification_error_on_double_data(double **data, int num_data, int output_col, double &error);

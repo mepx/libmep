@@ -1,8 +1,17 @@
+#ifndef MEP_RANDS_H
+#define MEP_RANDS_H
+
 #include <inttypes.h>
 
-//uint32_t my_rand(void); // RAND_MAX assumed to be 32767
 
-//void my_srand(uint32_t seed);
+struct t_seed{
+	uint32_t z1, z2, z3, z4;
+	t_seed(void);
+	void init(uint32_t seed);
+};
 
-int my_int_rand(int _min, int _max);
-double my_real_rand(double _min, double _max);
+
+int mep_int_rand(t_seed &seed, int _min, int _max);
+double mep_real_rand(t_seed &seed, double _min, double _max);
+
+#endif

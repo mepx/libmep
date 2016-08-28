@@ -73,12 +73,10 @@ private:
 
 	int *random_subset_indexes;
 
-	bool start_steady_state(int seed, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
-	long tournament(t_sub_population &pop);
+	bool start_steady_state(int run, t_seed *seeds, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
+	long tournament(t_sub_population &pop, t_seed &seed);
 
-	void generate_random_individuals(void); // randomly initializes the individuals
-
-	double compute_validation_error(int *, int*, double **eval_double, s_value_class *tmp_value_class);
+	double compute_validation_error(int *, int*, double **eval_double, s_value_class *tmp_value_class, t_seed *seeds);
 
 	void allocate_sub_population(t_sub_population &pop);
 
@@ -91,7 +89,7 @@ private:
 
 	void delete_sub_population(t_sub_population &pop);
 
-	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class);
+	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class, t_seed* seeds);
 	void get_random_subset(int count, int *indecses);
 
 	double stddev_training, stddev_validation, stddev_test, stddev_runtime;

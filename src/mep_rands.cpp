@@ -1,64 +1,37 @@
-#include <inttypes.h>
-#include <stdlib.h>
-#include <random>
-#include <thread>
 
-void my_srand(uint32_t seed)
-{
+#include "mep_rands.h"
 
-	srand(seed);
-    //my_next = seed;
-}
-//---------------------------------------------------------
-// taken from http://stackoverflow.com/questions/18298280/how-to-declare-a-variable-as-thread-local-portably
-
-#ifndef thread_local
-# if __STDC_VERSION__ >= 201112 && !defined __STDC_NO_THREADS__
-#  define thread_local _Thread_local
-# elif defined _WIN32 && ( \
-       defined _MSC_VER || \
-       defined __ICL || \
-       defined __DMC__ || \
-       defined __BORLANDC__ )
-#  define thread_local __declspec(thread) 
-/* note that ICC (linux) and Clang are covered by __GNUC__ */
-# elif defined __GNUC__ || \
-       defined __SUNPRO_C || \
-       defined __xlC__
-#  define thread_local __thread
-# endif
-#endif
-//---------------------------------------------------------
-#ifdef thread_local
-int my_int_rand(int _min, int _max)
+//---------------------------------------------------------------------------
+t_seed::t_seed(void)
 {
-	static thread_local std::mt19937* generator = nullptr;
-	if (!generator) generator = new std::mt19937(clock() + std::this_thread::get_id().hash());
-	std::uniform_int_distribution<int> distribution(_min, _max);
-	int r = distribution(*generator);
-	//	printf("%d ", r);
-	return r;
+		z1 = z2 = z3 = z4 = 12345;
 }
-//---------------------------------------------------------
-double my_real_rand(double _min, double _max)
+void t_seed::init(uint32_t seed)
 {
-	static thread_local std::mt19937* generator = nullptr;
-	if (!generator) generator = new std::mt19937(clock() + std::this_thread::get_id().hash());
-	std::uniform_real_distribution<double> distribution(_min, _max);
-	double r = distribution(*generator);
-	//	printf("%d ", r);
-	return r;
+		z1 = z2 = z3 = z4 = 12345 + seed;
 }
-# else
-//---------------------------------------------------------
-int my_int_rand(int _min, int _max)
+//---------------------------------------------------------------------------
+uint32_t RNG(t_seed &seed)
 {
-	return rand() % (_max - _min + 1) + _min;
+	uint32_t b;
+	b = ((seed.z1 << 6) ^ seed.z1) >> 13;
+	seed.z1 = ((seed.z1 & 4294967294U) << 18) ^ b;
+	b = ((seed.z2 << 2) ^ seed.z2) >> 27;
+	seed.z2 = ((seed.z2 & 4294967288U) << 2) ^ b;
+	b = ((seed.z3 << 13) ^ seed.z3) >> 21;
+	seed.z3 = ((seed.z3 & 4294967280U) << 7) ^ b;
+	b = ((seed.z4 << 3) ^ seed.z4) >> 12;
+	seed.z4 = ((seed.z4 & 4294967168U) << 13) ^ b;
+	return (seed.z1 ^ seed.z2 ^ seed.z3 ^ seed.z4);
 }
-//---------------------------------------------------------
-double my_real_rand(int _min, int _max)
+//---------------------------------------------------------------------------
+int mep_int_rand(t_seed &seed, int _min, int _max)
 {
-	return rand() / (double)RAND_MAX * (_max - _min) + _min;
+	return RNG(seed) % (_max - _min + 1) + _min;
 }
-#endif
-//---------------------------------------------------------
+//---------------------------------------------------------------------------
+double mep_real_rand(t_seed &seed, double _min, double _max)
+{
+	return RNG(seed) * 2.3283064365386963e-10 * (_max - _min) + _min;
+}
+//---------------------------------------------------------------------------

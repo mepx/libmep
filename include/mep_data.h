@@ -2,6 +2,7 @@
 #define DATA_CLASS_H_INCLUDED
 
 #include "pugixml.hpp"
+#include "mep_rands.h"
 
 #define MEP_DATA_DOUBLE 0
 #define MEP_DATA_STRING 1
@@ -117,7 +118,7 @@ public:
 	int find_symbol_everywhere(const char *s_find_what, bool use_regular);
 
 	// randomly changes the rows of the data
-	void shuffle(void);
+	void shuffle(t_seed &seed);
 
 	bool detect_list_separator(const char *file_name);
 
