@@ -1,14 +1,15 @@
+//https://www.iro.umontreal.ca/~simardr/rng/lfsr113.c
 
 #include "mep_rands.h"
 
 //---------------------------------------------------------------------------
 t_seed::t_seed(void)
 {
-		z1 = z2 = z3 = z4 = 12345;
+	z1 = z2 = z3 = z4 = 12345;
 }
 void t_seed::init(uint32_t seed)
 {
-		z1 = z2 = z3 = z4 = 12345 + seed;
+	z1 = z2 = z3 = z4 = 12345 + seed;
 }
 //---------------------------------------------------------------------------
 uint32_t RNG(t_seed &seed)
