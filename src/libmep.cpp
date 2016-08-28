@@ -1488,6 +1488,10 @@ void t_mep::compute_mean_stddev(int num_runs)
 				if (best_test > stats[r].test_error)
 					best_test = stats[r].test_error;
 			}
+
+			if (best_runtime > stats[r].running_time)
+				best_runtime = stats[r].running_time;
+
 			mean_runtime += stats[r].running_time;
 		}
 		mean_training /= num_runs;
