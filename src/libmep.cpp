@@ -472,6 +472,9 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int *current_subpop_inde
 			t_sub_population *a_sub_population = &sub_populations[pop_index];
 
 			if (generation_index == 0) {
+				for (int j = 0; j < mep_parameters->get_subpopulation_size(); j++)
+					pop[pop_index].individuals[j].generate_random(mep_parameters, seeds[pop_index], mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
+
 				if (mep_parameters->get_problem_type() == MEP_PROBLEM_REGRESSION) {
 					if (mep_parameters->get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 						for (int i = 0; i < mep_parameters->get_subpopulation_size(); i++)
@@ -583,10 +586,6 @@ bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_
 	std::chrono::time_point<std::chrono::system_clock> start, end;
 	start = std::chrono::system_clock::now();
 
-	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
-		for (int j = 0; j < mep_parameters->get_subpopulation_size(); j++)
-			pop[i].individuals[j].generate_random(mep_parameters, seeds[i], mep_constants, actual_operators, num_operators, actual_enabled_variables, num_actual_variables);
-
 	//wxLogDebug(wxString() << "generation " << gen_index << " ");
 	// an array of threads. Each sub population is evolved by a thread
 	std::thread **mep_threads = new std::thread*[mep_parameters->get_num_threads()];
@@ -594,19 +593,8 @@ bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_
 	std::mutex mutex;
 	// we need a mutex to make sure that the same subpopulation will not be evolved twice by different threads
 
-	get_random_subset(mep_parameters->get_random_subset_selection_size(), random_subset_indexes);
-	// initial population (generation 0)
-	int current_subpop_index = 0;
-	for (int t = 0; t < mep_parameters->get_num_threads(); t++)
-		mep_threads[t] = new std::thread(&t_mep::evolve_one_subpopulation_for_one_generation, this, &current_subpop_index, &mutex, pop, 0, eval_double[t], array_value_class[t], seeds);
-
-	for (int t = 0; t < mep_parameters->get_num_threads(); t++) {
-		mep_threads[t]->join(); // wait for all threads to execute
-		delete mep_threads[t];
-	}
-
 	// now I have to apply this to the validation set
-
+	/*
 	stats[run].best_validation_error = -1;
 
 	double best_error_on_training, mean_error_on_training;
@@ -624,11 +612,8 @@ bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_
 
 	stats[run].last_generation = 0;
 	modified_project = true;
-
-	if (on_generation)
-		on_generation();
-
-	for (int gen_index = 1; gen_index < mep_parameters->get_num_generations(); gen_index++) {
+	*/
+	for (int gen_index = 0; gen_index < mep_parameters->get_num_generations(); gen_index++) {
 		if (_stopped_signal_sent)
 			break;
 
@@ -652,6 +637,7 @@ bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_
 		for (int d = 0; d < mep_parameters->get_num_subpopulations(); d++) // din d in d+1
 			sort_by_fitness(pop[d]);
 
+		double best_error_on_training, mean_error_on_training;
 		compute_best_and_average_error(best_error_on_training, mean_error_on_training);
 		stats[run].best_training_error[gen_index] = best_error_on_training;
 		stats[run].average_training_error[gen_index] = mean_error_on_training;
