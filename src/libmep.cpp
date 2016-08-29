@@ -580,11 +580,8 @@ void t_mep::get_random_subset(int requested_size, int *indexes)
 //-----------------------------------------------------------------------
 bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation)       // Steady-State MEP
 {
-	//my_srand(run + mep_parameters->get_random_seed());
-
-	//clock_t start_time = clock();
-	time_t start_time;
-	time(&start_time);
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+	start = std::chrono::system_clock::now();
 
 	for (int i = 0; i < mep_parameters->get_num_subpopulations(); i++)
 		for (int j = 0; j < mep_parameters->get_subpopulation_size(); j++)
@@ -721,12 +718,12 @@ bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_
 
 	delete[] mep_threads;
 
-	//clock_t end_time = clock();
-	time_t end_time;
-	time(&end_time);
 
-	//stats[run].running_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-	stats[run].running_time = difftime(end_time, start_time);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double> elapsed_seconds = end - start;
+
+	stats[run].running_time = elapsed_seconds.count();
 
 	return true;
 }
