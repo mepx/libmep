@@ -592,31 +592,19 @@ bool t_mep::start_steady_state(int run, t_seed *seeds, double ***eval_double, s_
 	std::mutex mutex;
 	// we need a mutex to make sure that the same subpopulation will not be evolved twice by different threads
 
-	// now I have to apply this to the validation set
-	/*
-	stats[run].best_validation_error = -1;
+	int num_generations_for_which_random_subset_is_kept_fixed_counter = mep_parameters->get_num_generations_for_which_random_subset_is_kept_fixed();
 
-	double best_error_on_training, mean_error_on_training;
-	compute_best_and_average_error(best_error_on_training, mean_error_on_training);
-	stats[run].best_training_error[0] = best_error_on_training;
-	stats[run].average_training_error[0] = mean_error_on_training;
-
-	if (mep_parameters->get_use_validation_data() && validation_data->get_num_rows() > 0) {
-		// I must run all solutions for the validation data and choose the best one
-		stats[run].best_validation_error = compute_validation_error(&best_subpopulation_index_for_test, &best_individual_index_for_test, eval_double[0], array_value_class[0], seeds);
-		stats[run].best_program = pop[best_subpopulation_index_for_test].individuals[best_individual_index_for_test];
-	}
-	else
-		stats[run].best_program = pop[best_subpopulation_index].individuals[0];
-
-	stats[run].last_generation = 0;
-	modified_project = true;
-	*/
 	for (int gen_index = 0; gen_index < mep_parameters->get_num_generations(); gen_index++) {
 		if (_stopped_signal_sent)
 			break;
 
-		get_random_subset(mep_parameters->get_random_subset_selection_size(), random_subset_indexes);
+		if (num_generations_for_which_random_subset_is_kept_fixed_counter >= mep_parameters->get_num_generations_for_which_random_subset_is_kept_fixed()) {
+			get_random_subset(mep_parameters->get_random_subset_selection_size(), random_subset_indexes);
+			num_generations_for_which_random_subset_is_kept_fixed_counter = 0;
+		}
+		else
+			num_generations_for_which_random_subset_is_kept_fixed_counter++;
+
 		int current_subpop_index = 0;
 		for (int t = 0; t < mep_parameters->get_num_threads(); t++)
 			mep_threads[t] = new std::thread(&t_mep::evolve_one_subpopulation_for_one_generation, this, &current_subpop_index, &mutex, pop, gen_index, eval_double[t], array_value_class[t], seeds);

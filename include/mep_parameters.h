@@ -37,9 +37,10 @@ private:
 	int crossover_type;
 
 	int random_subset_selection_size;
+	unsigned int num_generations_for_which_random_subset_is_kept_fixed;
 
 	long random_seed;
-	long num_runs;
+	unsigned int num_runs;
 
 	bool simplified_programs;
 
@@ -179,8 +180,11 @@ public:
 	// for classification it can be: MEP_CLASSIFICATION_MEAN_ERROR 2
 	int get_error_measure(void);
 
+	// get the number of generations for which the random subset of data is kept fixed
+	unsigned int get_num_generations_for_which_random_subset_is_kept_fixed(void);
+
+	// set the number of generations for which the random subset of data is kept fixed
+	void set_num_generations_for_which_random_subset_is_kept_fixed(unsigned int);
 };
 //-----------------------------------------------------------------
-
-
 #endif // PARAMETERS_CLASS_H_INCLUDED

@@ -30,6 +30,7 @@ void t_mep_parameters::init (void)
     num_threads = 1;
 	random_subset_selection_size = 1000;
 	error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
+	num_generations_for_which_random_subset_is_kept_fixed = 1;
 
 	modified = false;
 }
@@ -130,6 +131,11 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	node = parent.append_child("error_measure");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", error_measure);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("num_generations_for_which_random_subset_is_kept_fixed");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%d", num_generations_for_which_random_subset_is_kept_fixed);
 	data.set_value(tmp_str);
 
 	modified = false;
@@ -276,6 +282,14 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	else
 		random_subset_selection_size = 0;
 
+	node = parent.child("num_generations_for_which_random_subset_is_kept_fixed");
+	if (node) {
+		const char *value_as_cstring = node.child_value();
+		num_generations_for_which_random_subset_is_kept_fixed = atoi(value_as_cstring);
+	}
+	else
+		num_generations_for_which_random_subset_is_kept_fixed = 1;
+
 	node = parent.child("error_measure");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
@@ -391,18 +405,14 @@ bool t_mep_parameters::get_simplified_programs(void)
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_mutation_probability(double value)
 {
-
 		mutation_probability = value;
 		modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_crossover_probability(double value)
 {
-
 		crossover_probability = value;
 		modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_code_length(long value)
@@ -553,5 +563,15 @@ void t_mep_parameters::set_error_measure(int value)
 int t_mep_parameters::get_error_measure(void)
 {
 	return error_measure;
+}
+//---------------------------------------------------------------------------
+unsigned int t_mep_parameters::get_num_generations_for_which_random_subset_is_kept_fixed(void)
+{
+	return num_generations_for_which_random_subset_is_kept_fixed;
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_num_generations_for_which_random_subset_is_kept_fixed(unsigned int new_value)
+{
+	num_generations_for_which_random_subset_is_kept_fixed = new_value;
 }
 //---------------------------------------------------------------------------
