@@ -9,18 +9,14 @@
 #include "libmep.h"
 
 
-
-
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-
-
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2016.08.27.0-beta");
+	strcpy(version, "2016.11.09.0-beta");
 
 	num_operators = 0;
 
@@ -428,7 +424,10 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 	for (int p = 0; p < mep_parameters->get_num_subpopulations(); p++)
 		seeds[p].init(p);
 
+	last_run_index = -1;
 
+	if (stats)
+		delete[] stats;
 	stats = new t_mep_run_statistics[mep_parameters->get_num_runs()];
 	for (int run_index = 0; run_index < mep_parameters->get_num_runs(); run_index++) {
 		stats[run_index].allocate(mep_parameters->get_num_generations());
@@ -775,9 +774,8 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 		variables_enabled = NULL;
 	}
 
-	training_data->clear_data();
-
 	if (training_data) {
+		training_data->clear_data();
 		pugi::xml_node node = parent.child("training");
 		if (node) {
 			training_data->from_xml(node);
@@ -833,17 +831,16 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	else
 		target_col = training_data->get_num_cols() - 1;
 
-	validation_data->clear_data();
-
 	if (validation_data) {
+		validation_data->clear_data();
 		node = parent.child("validation");
 		if (node)
 			validation_data->from_xml(node);
 	}
 
-	test_data->clear_data();
 
 	if (test_data) {
+		test_data->clear_data();
 		node = parent.child("test");
 		if (node) {
 			test_data->from_xml(node);
