@@ -10,20 +10,24 @@ C++ 11 is required due to the use of C++ 11 threads.
 
 # To compile: 
 
-Create a new project and add all files from "src" and one file from "tests" folder (which contains the main function). Include paths must point to the "include" folder of this project.
+Create a new project and add all files from [src](src) and one file from [tests](tests) folder (which contains the **main** function). Include paths must point to the [include](include) folder of this project.
 
 # Documentation
 
-https://github.com/mepx/libmep/wiki
+[https://github.com/mepx/libmep/wiki](https://github.com/mepx/libmep/wiki)
 
-#More info:
+# More info:
 
-http://www.mep.cs.ubbcluj.ro
+[www.mepx.org](https://www.mepx.org)
 
-#Discussion Group:
+[mepx.github.io](https://mepx.github.io)
 
-https://groups.google.com/d/forum/mepx
+[https://github.com/mepx](https://github.com/mepx)
 
-#Contact author:
+# Discussion Group:
+
+[https://groups.google.com/d/forum/mepx](https://groups.google.com/d/forum/mepx)
+
+# Contact author:
 
 mihai.oltean@gmail.com
