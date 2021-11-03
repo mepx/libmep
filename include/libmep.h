@@ -1,5 +1,11 @@
-#ifndef MEP_CLASS_H_INCLUDED
-#define MEP_CLASS_H_INCLUDED
+// Author: Mihai Oltean, mihai.oltean@gmail.com
+// https://mepx.org
+// https://github.com/mepx
+// License: MIT
+//-----------------------------------------------------------------
+
+#ifndef lib_mep_H
+#define lib_mep_H
 
 #include <thread>
 #include <mutex>
@@ -8,31 +14,23 @@
 
 #include "mep_parameters.h"
 #include "mep_data.h"
-#include "mep_operators.h"
-#include "mep_chromosome.h"
+#include "mep_functions.h"
+#include "mep_subpopulation.h"
 #include "mep_stats.h"
 #include "mep_utils.h"
 
 //-----------------------------------------------------------------
 typedef void(*f_on_progress)(void);
 //-----------------------------------------------------------------
-
-//-----------------------------------------------------------------
-struct t_sub_population{
-	t_mep_chromosome *individuals;
-	t_mep_chromosome offspring1, offspring2;
-};
-//-----------------------------------------------------------------
-
-class t_mep
-{
+class t_mep{
 
 private:
 	char version[100];
 
-	t_mep_parameters *mep_parameters;
-	t_mep_constants *mep_constants;
-	t_sub_population* pop;
+	t_mep_parameters mep_parameters;
+	t_mep_constants mep_constants;
+
+	t_sub_population* pop; // array of subpopulations
 	double **cached_eval_variables_matrix_double;
 	double *cached_sum_of_errors, *cached_threashold;
 	int best_individual_index;
@@ -41,9 +39,9 @@ private:
 	int best_individual_index_for_test;
 	int best_subpopulation_index_for_test;
 
-	t_mep_operators *operators;
+	t_mep_functions mep_operators;
 
-	int num_operators;
+	int num_selected_operators;
 
 	int actual_operators[MAX_OPERATORS];
 
@@ -51,11 +49,11 @@ private:
 	bool _stopped_signal_sent;
 	int last_run_index;
 
-	t_mep_data* training_data;
-	t_mep_data* validation_data;
-	t_mep_data* test_data;
+	t_mep_data training_data;
+	t_mep_data validation_data;
+	t_mep_data test_data;
 
-	t_mep_run_statistics *stats;
+	t_mep_statistics statistics;
 
 	int num_total_variables;
 	int target_col;
@@ -73,10 +71,14 @@ private:
 
 	int *random_subset_indexes;
 
-	bool start_steady_state(int run, t_seed *seeds, double ***, s_value_class **array_value_class, f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
-	long tournament(t_sub_population &pop, t_seed &seed);
+	bool start_steady_state(int run, t_seed *seeds, double ***, 
+			s_value_class **array_value_class, 
+			f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
+	long tournament(const t_sub_population &pop, t_seed &seed);
 
-	double compute_validation_error(int *, int*, double **eval_double, s_value_class *tmp_value_class, t_seed *seeds);
+	double compute_validation_error(int &, int&, 
+			double **eval_double, s_value_class *tmp_value_class, 
+			t_seed *seeds, double &num_incorrectly_classified);
 
 	void allocate_sub_population(t_sub_population &pop);
 
@@ -84,28 +86,26 @@ private:
 	void delete_values(double ****, s_value_class***);
 
 	void sort_by_fitness(t_sub_population &pop); // sort ascending the individuals in population
-	void compute_best_and_average_error(double &best_error, double &mean_error);
+	void compute_best_and_average_error(double &best_error, double &mean_error, 
+			double &num_incorrectly_classified, double &average_incorrectly_classified);
 	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
 
 	void delete_sub_population(t_sub_population &pop);
 
-	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, std::mutex* mutex, t_sub_population * sub_populations, int generation_index, double ** eval_double, s_value_class *tmp_value_class, t_seed* seeds);
-	void get_random_subset(int count, int *indecses);
-
-	double stddev_training, stddev_validation, stddev_test, stddev_runtime;
-	double mean_training, mean_validation, mean_test, mean_runtime;
-	double best_training, best_validation, best_test, best_runtime;
-
-	void compute_mean_stddev(int num_runs);
+	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, 
+			std::mutex* mutex, t_sub_population * sub_populations, 
+			int generation_index, bool recompute_fitness, 
+			double ** eval_double, s_value_class *tmp_value_class, t_seed* seeds);
+	void get_random_subset(int count, int *indecses, t_seed& seed);
 
 public:
 
 	t_mep();
 	~t_mep();
 
-	void set_training_data(t_mep_data *_data);
-	void set_validation_data(t_mep_data *_data);
-	void set_test_data(t_mep_data *_data);
+	t_mep_data *get_training_data_ptr(void);
+	t_mep_data *get_validation_data_ptr(void);
+	t_mep_data *get_test_data_ptr(void);
 
 	// returns the version of the library
 	const char * get_version(void);
@@ -125,40 +125,14 @@ public:
 	// starts the optimization process
 	int start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run);
 
-	// returns the best training error
-	double get_best_training_error(int run, int generation);
-	
-	// returns the best validation error
-	double get_best_validation_error(int run);
-
-	// returns the average (over the entire population) training error
-	double get_average_training_error(int run, int generation);
-
-	// returns the running time
-	double get_running_time(int run);
-
-	// returns the last generation of a given run (useful when the run has been stopped earlier)
-	int get_latest_generation(int run);
-
-	// returns the error on the test data
-	double get_test_error(int run);
-
 	// stops the optimization process
 	void stop(void);
 
 	// gets the best chromosome
 	void get_best(t_mep_chromosome& dest);
 
-	// save statistics to csv file
-	int stats_to_csv(const char* file_name);
-
 	// gets the output obtaining by running the best program in a given run against in input
 	bool get_output(int run_index, double *inputs, double *outputs);
-
-	void sort_stats_by_running_time(bool ascending);
-	void sort_stats_by_training_error(bool ascending);
-	void sort_stats_by_validation_error(bool ascending);
-	void sort_stats_by_test_error(bool ascending);
 
 	// saves everything to an xml file
 	int to_xml(const char* file_name);
@@ -172,15 +146,18 @@ public:
 	// loads everything from a pugixml node
 	int from_pugixml_node(pugi::xml_node parent);
 
-	void set_operators(t_mep_operators *mep_operators);
-	void set_constants(t_mep_constants *mep_constants);
-	void set_parameters(t_mep_parameters *mep_parameters);
+	t_mep_functions* get_functions_ptr(void);
+	t_mep_constants* get_constants_ptr(void);
+	t_mep_parameters* get_parameters_ptr(void);
 
 	// clears everything
 	void clear_stats(void);
 
 	// returns the chromosome as a C program
 	char* program_as_C(int run_index, bool simplified, double *inputs);
+
+	// returns the chromosome as an Excel function
+	char* program_as_Excel_function(int run_index, bool simplified, double* inputs);
 
 	// returns the number of outputs of the program/
 	// currently only problems with 1 output are handled
@@ -222,11 +199,10 @@ public:
 
 	void compute_list_of_enabled_variables(void);
 
-	void get_best(double &training, double &validation, double &test, double &running_time);
-	void get_mean(double &training, double &validation, double &test, double &running_time);
-	void get_sttdev(double &training, double &validation, double &test, double &running_time);
+	t_mep_statistics* get_stats_ptr(void);
+
+	void init_enabled_variables(void);
 };
 //-----------------------------------------------------------------
-//extern t_mep mep_alg;
 
-#endif // MEP_CLASS_H_INCLUDED
+#endif 

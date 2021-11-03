@@ -1,5 +1,10 @@
-#ifndef OPERATORS_CLASS_H_INCLUDED
-#define OPERATORS_CLASS_H_INCLUDED
+// Author: Mihai Oltean, mihai.oltean@gmail.com
+// https://mepx.org
+// https://github.com/mepx
+// License: MIT
+//-----------------------------------------------------------------
+#ifndef mep_functions_H
+#define mep_functions_H
 
 #include "pugixml.hpp"
 
@@ -32,6 +37,10 @@
 #define O_IFALBCD -26
 #define O_INPUTS_AVERAGE -27
 #define O_NUM_INPUTS -28
+#define O_NEG -29
+
+#define O_IF_A_OR_B_CD -30
+#define O_IF_A_XOR_B_CD -31
 
 
 /*
@@ -47,13 +56,19 @@
 #define O_NOR -27
 */
 
-#define MAX_OPERATORS 28
+#define MAX_OPERATORS 31
+#define DIVISION_PROTECT 1E-10
+
+
 
 //-----------------------------------------------------------------
-class t_mep_operators
+class t_mep_functions
 {
     public:
-    bool use_addition, use_subtraction, use_multiplication, use_division, use_power, use_sqrt, use_exp, use_pow10, use_ln, use_log10, use_log2, use_floor, use_ceil, use_abs, use_inv, use_x2, use_min, use_max;
+
+    bool use_addition, use_subtraction, use_multiplication, use_division, 
+		use_power, use_sqrt, use_exp, use_pow10, use_ln, use_log10, use_log2, 
+		use_floor, use_ceil, use_abs, use_inv, use_x2, use_min, use_max, use_neg;
 	bool use_inputs_average;
 	bool use_num_inputs;
 //	bool use_mod, use_mod10, use_mod2;
@@ -62,10 +77,13 @@ class t_mep_operators
 	// if lower than 0 then
 	bool use_iflz;
 	bool use_ifalbcd;
+	bool use_if_a_or_b_cd;
+	bool use_if_a_xor_b_cd;
 
 	bool modified;
 
-	t_mep_operators(void);
+	t_mep_functions(void);
+	bool operator==(t_mep_functions&other);
 	
 	void init(void);
 
@@ -73,6 +91,7 @@ class t_mep_operators
     int from_xml(pugi::xml_node parent);
 
     int get_list_of_operators(int *actual_operators);
+	int count_operators(void);
 
 	// returns true if the addition operator is enabled
 	bool get_addition(void);
@@ -119,6 +138,9 @@ class t_mep_operators
 	// returns true if the inv (1/x) operator is enabled
 	bool get_inv(void);
 
+	// returns true if the neg -x operator is enabled
+	bool get_neg(void);
+
 	// returns true if the x^2 operator is enabled
 	bool get_x2(void);
 
@@ -151,6 +173,12 @@ class t_mep_operators
 
 	// returns true if the "if a lower than b returns c else returns d" operator is enabled
 	bool get_ifalbcd(void);
+
+	// returns true if the "if a < 0 or b < 0 returns c else returns d" operator is enabled
+	bool get_if_a_or_b_cd(void);
+
+	// returns true if the "if a < 0 xor b < 0 returns c else returns d" operator is enabled
+	bool get_if_a_xor_b_cd(void);
 
 	//bool get_inputs_average(void);
 	//bool get_num_inputs(void);
@@ -202,6 +230,9 @@ class t_mep_operators
 	// sets if the inv (1/x) operator is enabled or not
 	void set_inv(bool value);
 
+	// sets if the neg -x operator is enabled or not
+	void set_neg(bool value);
+
 	// sets if the x^2 operator is enabled or not
 	void set_x2(bool value);
 
@@ -234,6 +265,12 @@ class t_mep_operators
 
 	// sets if the "if a lower than b returns c else returns d" operator is enabled or not
 	void set_ifalbcd(bool value);
+
+	// sets if the "if a < 0 or b < 0 returns c else returns d" operator is enabled or not
+	void set_if_a_or_b_cd(bool value);
+
+	// sets if the "if a < 0 xor b < 0 returns c else returns d" operator is enabled or not
+	void set_if_a_xor_b_cd(bool value);
 
 	//void set_inputs_average(bool value);
 	//void set_num_inputs(bool value);

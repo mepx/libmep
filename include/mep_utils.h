@@ -1,12 +1,15 @@
-#ifndef UTILS_MEP
-#define UTILS_MEP
-
+// Author: Mihai Oltean, mihai.oltean@gmail.com
+// https://mepx.org
+// https://github.com/mepx
+// License: MIT
+//---------------------------------------------------------------------------
+#ifndef mep_utils_H
+#define mep_utils_H
 //----------------------------------------------------------------
 struct s_value_class{
 	double value;
 	int data_class;
 };
-
 //----------------------------------------------------------------
 int sort_function_value_class(const void *a, const void *b);
 //----------------------------------------------------------------

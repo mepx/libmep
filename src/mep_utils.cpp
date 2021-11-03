@@ -1,3 +1,8 @@
+// Author: Mihai Oltean, mihai.oltean@gmail.com
+// https://mepx.org
+// https://github.com/mepx
+// License: MIT
+//---------------------------------------------------------------------------
 
 #include "mep_utils.h"
 #include <cstring>
@@ -16,14 +21,18 @@ int sort_function_value_class(const void *a, const void *b)
 //---------------------------------------------------------------------------
 int my_strcmp(char *s1, char *s2)
 {
+	int result;
 	if (s1)
 		if (s2)
-			return strcmp(s1, s2);
+			result = strcmp(s1, s2);
 		else
-			return 1;
+			result = 1;
 	else
 		if (s2)
-			return 1;
-	return 0;// both NULL
+			result = 1;
+		else
+			result = 0;// both NULL
+
+	return result;
 }
 //---------------------------------------------------------------------------

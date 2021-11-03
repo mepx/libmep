@@ -1,20 +1,23 @@
-#include "mep_data.h"
-#include "mep_utils.h"
-#include "mep_rands.h"
-
+// Author: Mihai Oltean, mihai.oltean@gmail.com
+// https://mepx.org
+// https://github.com/mepx
+// License: MIT
+//-----------------------------------------------------------------
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <cstring>
 #include <regex>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif // WIN32
 
-#define MAX_ROW_CHARS 1000000
+#include "mep_data.h"
+#include "mep_utils.h"
+#include "mep_rands.h"
+#include "string_validation.h"
 
-char possible_chars[] = "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|";
 //-----------------------------------------------------------------
 t_mep_data::t_mep_data(void)
 {
@@ -86,365 +89,7 @@ void t_mep_data::init(void)
 	num_classes = 0;
 
 	_modified = false;
-}
-//-----------------------------------------------------------------
-bool get_next_field(char *start_sir, char list_separator, char* dest, int & size, int &skipped)
-{
-	skipped = 0;
-	char *tmp_start = start_sir;
-	while (*tmp_start && (*tmp_start == ' ' || *tmp_start == '\t' || *tmp_start == list_separator)) {
-		tmp_start++;
-		skipped++;
-	}
-
-	size = 0;
-	while (tmp_start[size] && (tmp_start[size] != list_separator) && (tmp_start[size] != '\n')) {
-		size++;
-	}
-	if (!size && !tmp_start[size])
-		return false;
-	strncpy(dest, tmp_start, size);
-	dest[size] = '\0';
-	return true;
-}
-// ---------------------------------------------------------------------------
-int t_mep_data::from_xml(pugi::xml_node parent)
-{
-	clear_data();
-
-	pugi::xml_node node = parent.child("num_data");
-	if (node) {
-		const char *value_as_cstring = node.child_value();
-		num_data = atoi(value_as_cstring);
-	}
-	else
-		num_data = 0;
-
-	node = parent.child("num_variables");
-	if (node) {
-		const char *value_as_cstring = node.child_value();
-		int num_variables = atoi(value_as_cstring);
-		if (num_variables)
-			num_cols = num_variables + 1;
-		else
-			num_cols = 0;
-	}
-	else {
-		node = parent.child("num_cols");
-		if (node) {
-			const char *value_as_cstring = node.child_value();
-			num_cols = atoi(value_as_cstring);
-		}
-		else
-			num_cols = 0;
-	}
-
-	node = parent.child("num_outputs");
-	if (node) {
-		const char *value_as_cstring = node.child_value();
-		num_outputs = atoi(value_as_cstring);
-	}
-	else
-		num_outputs = 1;
-
-    
-    node = parent.child("num_classes");
-    if (node) {
-        const char *value_as_cstring = node.child_value();
-        num_classes = atoi(value_as_cstring);
-    }
-    else
-        num_classes = 0;
-    
-	node = parent.child("data_type");
-	if (node) {
-		const char *value_as_cstring = node.child_value();
-		data_type = atoi(value_as_cstring);
-	}
-	else
-		data_type = MEP_DATA_DOUBLE;// double by default
-	/*
-	node = parent.child("has_missing_values");
-	if (node) {
-	const char *value_as_cstring = node.child_value();
-	has_missing_values = atoi(value_as_cstring);
-	}
-	else
-	has_missing_values = 0;// double by default
-	*/
-	node = parent.child("list_separator");
-	if (node) {
-		const char *value_as_cstring = node.child_value();
-		list_separator = value_as_cstring[0];
-	}
-	else
-		list_separator = ' ';// blank space by default
-
-	if (data_type == MEP_DATA_DOUBLE) {
-		if (num_data) {
-			_data_double = new double*[num_data];
-			for (int r = 0; r < num_data; r++)
-				_data_double[r] = new double[num_cols];
-		}
-	}
-	else {
-		if (num_data) {
-			_data_string = new char**[num_data];
-			for (int r = 0; r < num_data; r++) {
-				_data_string[r] = new char*[num_cols];
-				for (int v = 0; v < num_cols; v++)
-					_data_string[r][v] = NULL;
-			}
-		}
-	}
-
-	pugi::xml_node node_data = parent.child("data");
-	if (!node_data)
-		return true;
-	int r = 0;
-	if (data_type == MEP_DATA_DOUBLE) {// double
-		for (pugi::xml_node row = node_data.child("row"); row; row = row.next_sibling("row"), r++) {
-			const char *value_as_cstring = row.child_value();
-			int num_jumped_chars = 0;
-
-			for (int c = 0; c < num_cols; c++) {
-				sscanf(value_as_cstring + num_jumped_chars, "%lf", &_data_double[r][c]);
-				long local_jump = strcspn(value_as_cstring + num_jumped_chars, " ");
-				num_jumped_chars += local_jump + 1;
-			}
-		}
-	}
-	else {// string
-		for (pugi::xml_node row = node_data.child("row"); row; row = row.next_sibling("row"), r++) {
-			const char *value_as_cstring = row.child_value();
-			char *buf = (char*)value_as_cstring;
-			char tmp_str[1000];
-			int size;
-			int c = 0;
-			int skipped;
-
-			bool result = get_next_field(buf, ' ', tmp_str, size, skipped);
-			while (result) {
-				if (c < num_cols) {
-					_data_string[r][c] = new char[strlen(tmp_str) + 1];
-					strcpy(_data_string[r][c], tmp_str);
-				}
-				buf = buf + size + 1 + skipped;
-				//if (buf - start_buf >= len)
-				//	break;
-				result = get_next_field(buf, ' ', tmp_str, size, skipped);
-
-				c++;
-			}
-		}
-	}
-
-	_modified = false;
-	return true;
-}
-//-----------------------------------------------------------------
-int t_mep_data::to_xml(pugi::xml_node parent)
-{
-	char *tmp_str = new char[MAX_ROW_CHARS];
-
-	pugi::xml_node node = parent.append_child("num_data");
-	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_data);
-	data.set_value(tmp_str);
-
-	node = parent.append_child("num_cols");
-	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_cols);
-	data.set_value(tmp_str);
-
-	node = parent.append_child("num_outputs");
-	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_outputs);
-	data.set_value(tmp_str);
-    
-    node = parent.append_child("num_classes");
-    data = node.append_child(pugi::node_pcdata);
-    sprintf(tmp_str, "%d", num_classes);
-    data.set_value(tmp_str);
-
-	node = parent.append_child("data_type");
-	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", data_type);
-	data.set_value(tmp_str);
-
-	node = parent.append_child("list_separator");
-	data = node.append_child(pugi::node_pcdata);
-	tmp_str[0] = list_separator;
-	tmp_str[1] = 0;
-	data.set_value(tmp_str);
-
-	if (!num_data || !num_cols) {
-		delete[] tmp_str;
-		return true;
-	}
-
-	for (int c = 0; c < num_cols; c++) {
-	}
-
-	pugi::xml_node node_data = parent.append_child("data");
-
-	if (_data_double)
-		for (int r = 0; r < num_data; r++) {
-			node = node_data.append_child("row");
-			data = node.append_child(pugi::node_pcdata);
-			tmp_str[0] = 0;
-			for (int c = 0; c < num_cols; c++) {
-				char tmp_s[30];
-				sprintf(tmp_s, "%lg", this->_data_double[r][c]);
-				strcat(tmp_str, tmp_s);
-				strcat(tmp_str, " ");
-			}
-			//now the target if there is one...
-			data.set_value(tmp_str);
-		}
-	else
-		if (_data_string) {
-			for (int r = 0; r < num_data; r++) {
-				node = node_data.append_child("row");
-				data = node.append_child(pugi::node_pcdata);
-				tmp_str[0] = 0;
-				for (int c = 0; c < num_cols; c++) {
-					strcat(tmp_str, _data_string[r][c]);
-					strcat(tmp_str, " ");
-				}
-				//now the target if there is one...
-
-				data.set_value(tmp_str);
-			}
-		}
-
-	delete[] tmp_str;
-	_modified = false;
-	return true;
-}
-//-----------------------------------------------------------------
-bool my_fgets(char*buf, int max_n, FILE *f)
-{
-	int i = 0;
-	buf[0] = 0;
-	while (!feof(f)) {
-		buf[i] = getc(f);
-		if (buf[i] == '\n') {
-			buf[i] = 0;
-			break;
-		}
-		else
-			if (buf[i] == '\r') {
-				// check what is next
-				buf[i + 1] = getc(f);
-				if (buf[i + 1] != '\n')
-					ungetc(buf[i + 1], f); // put it back
-				buf[i] = 0;
-				break;
-			}
-		i++;
-	}
-	if (feof(f))
-		if (i)
-			buf[i - 1] = 0;
-	return (i > 0);
-}
-//------------------------------------------------------------
-bool t_mep_data::to_csv(const char *filename, char list_separator)
-{
-	FILE *f = NULL;
-#ifdef WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	wchar_t *w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"w");
-	delete[] w_filename;
-
-#else
-	f = fopen(filename, "w");
-#endif
-
-	if (!f)
-		return false;
-
-	if (_data_double)
-		for (int d = 0; d < num_data; d++) {
-			for (int v = 0; v < num_cols; v++)
-				fprintf(f, "%lg%c", _data_double[d][v], list_separator);
-			fprintf(f, "\n");
-		}
-	else
-		if (_data_string)
-			for (int d = 0; d < num_data; d++) {
-				for (int v = 0; v < num_cols; v++)
-					fprintf(f, "%s%c", _data_string[d][v], list_separator);
-				fprintf(f, "\n");
-			}
-
-	fclose(f);
-
-	_modified = false;
-	return true;
-}
-//-----------------------------------------------------------------
-bool t_mep_data::detect_list_separator(const char *file_name)
-{
-	FILE *f = NULL;
-#ifdef WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, file_name, -1, NULL, 0);
-	wchar_t *w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, file_name, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"r");
-
-	delete[] w_filename;
-#else
-	f = fopen(file_name, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	char *buf = new char[MAX_ROW_CHARS];
-
-	my_fgets(buf, MAX_ROW_CHARS, f);
-	if (strlen(buf) < 1) {
-		delete[] buf;
-		return false;
-	}
-
-	// detect the ;
-	if (strchr(buf, ';')) {
-		list_separator = ';';
-		delete[] buf;
-		return true;
-	}
-	if (strchr(buf, ',')) {
-		list_separator = ',';
-		delete[] buf;
-		return true;
-	}
-	if (strchr(buf, ' ')) {
-		list_separator = ' ';
-		delete[] buf;
-		return true;
-	}
-	if (strchr(buf, '\t')) {
-		list_separator = '\t';
-		delete[] buf;
-		return true;
-	}
-
-	double x;
-	if (sscanf(buf, "%lf", &x) == 1) {// most likely there is only variable and no output
-		list_separator = ' ';
-		delete[] buf;
-		return true;
-	}
-
-	delete[] buf;
-	return false;
+	num_class_0 = 0;
 }
 //-----------------------------------------------------------------
 void t_mep_data::count_0_class(int target_col)
@@ -455,292 +100,25 @@ void t_mep_data::count_0_class(int target_col)
 			num_class_0++;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_PROBEN1_format(const char *filename, int num_classes)
+bool t_mep_data::to_double(void)
 {
-	FILE *f = NULL;
-#ifdef WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	wchar_t *w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
+	if (!_data_string)
+		return true;
 
-	f = _wfopen(w_filename, L"r");
+	delete_double_data();
 
-	delete[] w_filename;
-#else
-	f = fopen(filename, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	delete_data();
-
-	char *buf = new char[MAX_ROW_CHARS];
-	char * start_buf = buf;
-
-	num_data = 0;
-	data_type = MEP_DATA_DOUBLE;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		long len = strlen(buf);
-		if (len > 1)
-			num_data++;
-		if (num_data == 1) {
-			num_cols = 0;
-
-			char tmp_str[1000];
-			int size;
-			int skipped;
-			bool result = get_next_field(buf, ' ', tmp_str, size, skipped);
-			while (result) {
-				num_cols++;
-				if (!buf[size])
-					break;
-				buf = buf + size + skipped;
-				result = get_next_field(buf, ' ', tmp_str, size, skipped);
-
-			}
-			buf = start_buf;
-		}
-	}
-	num_cols -= num_classes;
-	if (num_classes)
-	  num_cols++;
-
-	rewind(f);
-
-	_data_double = new double*[num_data];
-
-	int out_class;
-	for (int r = 0; r < num_data; r++) {
+	_data_double = new double* [num_data];
+	for (int r = 0; r < num_data; r++)
 		_data_double[r] = new double[num_cols];
-		for (int c = 0; c < num_cols - 1; c++)
-			fscanf(f, "%lf", &_data_double[r][c]);
-		// now scan the outputs
-		if (num_classes) // classification problem
-		for (int c = 0; c < num_classes; c++) {
-			fscanf(f, "%d", &out_class);
-			if (out_class == 1)
-				_data_double[r][num_cols - 1] = c;
-		}
-		else// regression problem
-			fscanf(f, "%lf", &_data_double[r][num_cols - 1]);
-	}
-
-	fclose(f);
-	delete[] buf;
-	return true;
-
-}
-//-----------------------------------------------------------------
-
-bool t_mep_data::from_csv(const char *filename) 
-{
-
-	if (!detect_list_separator(filename))
-		return false;
-
-	FILE *f = NULL;
-#ifdef WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	wchar_t *w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"r");
-
-	delete[] w_filename;
-#else
-	f = fopen(filename, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	char buf[1000];
-	// lets see what is there
-	fgets(buf, 1000, f);
-	fclose(f);
-
-	_modified = true;
-
-	if (strpbrk(buf, "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|"))
-		return from_csv_string(filename);
-	else
-		return from_csv_double(filename);
-
-}
-//-----------------------------------------------------------------
-bool t_mep_data::from_csv_string(const char *filename) 
-{
-	FILE *f = NULL;
-#ifdef WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	wchar_t *w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"r");
-
-	delete[] w_filename;
-#else
-	f = fopen(filename, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	delete_data();
-
-	char *buf = new char[MAX_ROW_CHARS];
-	char * start_buf = buf;
-
-	data_type = MEP_DATA_STRING;
-	num_data = 0;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		long len = strlen(buf);
-		if (len > 1)
-			num_data++;
-		if (num_data == 1) {
-			num_cols = 0;
-			int skipped;
-
-			char tmp_str[1000];
-			int size;
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				num_cols++;
-				if (!buf[size + skipped])
-					break;
-				buf = buf + size + skipped;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
+	
+	for (int r = 0; r < num_data; r++)
+		for (int c = 0; c < num_cols; c++)
+			if (!is_valid_double(_data_string[r][c], &_data_double[r][c])) {
+				// must delete all data double
+				delete_double_data();
+				return false;
 			}
-			buf = start_buf;
-		}
-	}
-	//	num_cols--;
-	rewind(f);
 
-	_data_string = new char**[num_data];
-	int count_mep_data = 0;
-	//has_missing_values = 0;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		long len = strlen(buf);
-		if (len > 1) {
-			int col = 0;
-			char tmp_str[1000];
-			int size;
-			_data_string[count_mep_data] = new char*[num_cols];
-			for (int c = 0; c < num_cols; c++)
-				_data_string[count_mep_data][col] = NULL;
-
-			int skipped = 0;
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				if (col < num_cols) {
-					_data_string[count_mep_data][col] = new char[strlen(tmp_str) + 1];
-					strcpy(_data_string[count_mep_data][col], tmp_str);
-				}
-				else {
-					break;
-				}
-				buf = buf + size + skipped;
-				//if (buf - start_buf >= len)
-				//break;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-
-				col++;
-			}
-			count_mep_data++;
-		}
-		buf = start_buf;
-	}
-	fclose(f);
-	//delete[] start_buf;
-	delete[] buf;
-	return true;
-}
-//-----------------------------------------------------------------
-bool t_mep_data::from_csv_double(const char *filename) 
-{
-	FILE *f = NULL;
-#ifdef WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	wchar_t *w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"r");
-
-	delete[] w_filename;
-#else
-	f = fopen(filename, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	delete_data();
-
-	char *buf = new char[MAX_ROW_CHARS];
-	char * start_buf = buf;
-
-	num_data = 0;
-	data_type = MEP_DATA_DOUBLE;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		long len = strlen(buf);
-		if (len > 1)
-			num_data++;
-		if (num_data == 1) {
-			num_cols = 0;
-
-			char tmp_str[1000];
-			int size;
-			int skipped;
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				num_cols++;
-				if (!buf[size])
-					break;
-				buf = buf + size + skipped;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-
-			}
-			buf = start_buf;
-		}
-	}
-	//	num_cols--;
-	rewind(f);
-
-	_data_double = new double*[num_data];
-	int count_mep_data = 0;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		long len = strlen(buf);
-		if (len > 1) {
-			int col = 0;
-			char tmp_str[MAX_ROW_CHARS];
-			int size;
-			int skipped;
-			_data_double[count_mep_data] = new double[num_cols];
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				if (col < num_cols)
-					_data_double[count_mep_data][col] = atof(tmp_str);
-				else {
-					break;
-				}
-				buf = buf + size + skipped;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-
-				col++;
-			}
-			count_mep_data++;
-		}
-		buf = start_buf;
-	}
-	fclose(f);
-	delete[] buf;
 	return true;
 }
 //-----------------------------------------------------------------
@@ -778,82 +156,112 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 				other_data2->_data_double[r] = new double[other_data2->num_cols];
 		}
 
-		int k = 0; // this will be the replacement
+		//double tmp_double;
 		for (int v = 0; v < num_cols; v++) {
+			int k = 0; // this will be the replacement
 			//is this numeric or alpha ?
 			// search in the current dataset
+			double tmp_double;
 			for (int r = 0; r < num_data; r++)
-				if (strpbrk(_data_string[r][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
+				if (!is_valid_double(_data_string[r][v], &tmp_double)) {
+
+					bool found_previously = false;
+					for (int prev_r = 0; prev_r < r; prev_r++)
+						if (my_strcmp(_data_string[r][v], _data_string[prev_r][v]) == 0) {
+							found_previously = true;
+							break;
+						}
+					if (found_previously)
+						continue; // jump to the next cell
+
 					// search for it in the current set
 					for (int t = r; t < num_data; t++)
-						if (!my_strcmp(_data_string[r][v], _data_string[t][v]))
+						if (my_strcmp(_data_string[r][v], _data_string[t][v]) == 0)
 							_data_double[t][v] = k;
 					// replace it in the other datasets too
 					if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
 						for (int t = 0; t < other_data1->num_data; t++)
-							if (!my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]))
+							if (my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]) == 0)
 								other_data1->_data_double[t][v] = k;
 					// replace it in the other datasets too
 					if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
 						for (int t = 0; t < other_data2->num_data; t++)
-							if (!my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]))
-								other_data2->_data_double[t][v] = k;
-					_modified = true;
-					k++;
-				}
-				else 
-					// numeric - must be copy just like that
-					_data_double[r][v] = atof(_data_string[r][v]);
-				
-			// search in the other dataset
-			if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
-				for (int r = 0; r < other_data1->num_data; r++)
-					if (strpbrk(other_data1->_data_string[r][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
-					// search for it in the current set
-						for (int t = r; t < other_data1->num_data; t++)
-							if (!my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[t][v]))
-								other_data1->_data_double[t][v] = k;
-					// replace it in the other datasets too
-					if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
-						for (int t = 0; t < other_data2->num_data; t++)
-							if (!my_strcmp(other_data1->_data_string[r][v], other_data2->_data_string[t][v]))
+							if (my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]) == 0)
 								other_data2->_data_double[t][v] = k;
 					_modified = true;
 					k++;
 				}
 				else
-					// numeric - must be copy just like that
-					other_data1->_data_double[r][v] = atof(other_data1->_data_string[r][v]);
+					_data_double[r][v] = tmp_double;
 
 			// search in the other dataset
-			if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
-				for (int r = 0; r < other_data2->num_data; r++)
-					if (strpbrk(other_data2->_data_string[r][v], "abcdfghijklmnopqrstyvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ!$%^&*()_={}[]~#<>?/|")) {
+			
+			if (other_data1 && other_data1->data_type == MEP_DATA_STRING) {
+				double tmp_double1;
+				for (int r = 0; r < other_data1->num_data; r++)
+					if (!is_valid_double(other_data1->_data_string[r][v], &tmp_double1)) {
 						// search for it in the current set
+
+						bool found_previously = false;
+						for (int prev_r = 0; prev_r < r; prev_r++)
+							if (my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[prev_r][v]) == 0) {
+								found_previously = true;
+								break;
+							}
+						if (found_previously)
+							continue; // jump to the next cell
+
+						for (int t = r; t < other_data1->num_data; t++)
+							if (my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[t][v]) == 0)
+								other_data1->_data_double[t][v] = k;
+						// replace it in the other datasets too
+						if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
+							for (int t = 0; t < other_data2->num_data; t++)
+								if (my_strcmp(other_data1->_data_string[r][v], other_data2->_data_string[t][v]) == 0)
+									other_data2->_data_double[t][v] = k;
+						_modified = true;
+						k++;
+					}
+					else
+						other_data1->_data_double[r][v] = tmp_double1;
+			}
+
+			// search in the other dataset
+			if (other_data2 && other_data2->data_type == MEP_DATA_STRING) {
+				double tmp_double2;
+				for (int r = 0; r < other_data2->num_data; r++)
+					if (!is_valid_double(other_data2->_data_string[r][v], &tmp_double2)) {
+						// search for it in the current set
+						bool found_previously = false;
+						for (int prev_r = 0; prev_r < r; prev_r++)
+							if (my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[prev_r][v]) == 0) {
+								found_previously = true;
+								break;
+							}
+						if (found_previously)
+							continue; // jump to the next cell
+
 						for (int t = r; t < other_data2->num_data; t++)
-							if (!my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[t][v]))
+							if (my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[t][v]) == 0)
 								other_data2->_data_double[t][v] = k;
 						_modified = true;
 						k++;
 					}
 					else
-						// numeric - must be copy just like that
-						other_data2->_data_double[r][v] = atof(other_data2->_data_string[r][v]);
-
+						other_data2->_data_double[r][v] = tmp_double2;
+			}
 		}
 
 		data_type = MEP_DATA_DOUBLE;
 		if (other_data1)
-		  other_data1->data_type = MEP_DATA_DOUBLE;
+			other_data1->data_type = MEP_DATA_DOUBLE;
 		if (other_data2)
-		  other_data2->data_type = MEP_DATA_DOUBLE;
+			other_data2->data_type = MEP_DATA_DOUBLE;
 
 		return MEP_OK;
 	}
 	else
 		return E_NO_DATA;
-
-	
 }
 //-----------------------------------------------------------------
 int t_mep_data::to_interval_selected_col(double min, double max, int col, t_mep_data *other_data1, t_mep_data* other_data2)
@@ -1221,7 +629,7 @@ int t_mep_data::find_symbol_from_all_variables(const char *s_find_what, bool use
 }
 //-----------------------------------------------------------------
 void t_mep_data::shuffle(t_seed &seed)
-{	
+{
 	if (data_type == MEP_DATA_DOUBLE) { // double
 		for (int i = num_data - 1; i >= 1; i--) {
 			int j = mep_int_rand(seed, 0, i);
@@ -1242,7 +650,7 @@ void t_mep_data::shuffle(t_seed &seed)
 	_modified = true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::is_classification_problem(void)
+bool t_mep_data::is_classification_problem(void)const
 {
 	for (int i = 0; i < num_data; i++)
 		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 &&  fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)
@@ -1250,57 +658,57 @@ bool t_mep_data::is_classification_problem(void)
 	return true;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_num_rows(void)
+int t_mep_data::get_num_rows(void)const
 {
 	return num_data;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_num_cols(void)
+int t_mep_data::get_num_cols(void)const
 {
 	return num_cols;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_data_type(void)
+int t_mep_data::get_data_type(void)const
 {
 	return data_type;
 }
 //-----------------------------------------------------------------
-double* t_mep_data::get_row(int row)
+double* t_mep_data::get_row(int row)const
 {
 	return _data_double[row];
 }
 //-----------------------------------------------------------------
-double t_mep_data::get_value_double(int row, int col)
+double t_mep_data::get_value_double(int row, int col)const
 {
 	return _data_double[row][col];
 }
 //-----------------------------------------------------------------
-char* t_mep_data::get_value_string(int row, int col)
+char* t_mep_data::get_value_string(int row, int col)const
 {
 	return _data_string[row][col];
 }
 //-----------------------------------------------------------------
-bool t_mep_data::is_modified(void)
+bool t_mep_data::is_modified(void)const
 {
 	return _modified;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_num_outputs(void)
+int t_mep_data::get_num_outputs(void)const
 {
 	return num_outputs;
 }
 //-----------------------------------------------------------------
-double** t_mep_data::get_data_matrix_double(void)
+double** t_mep_data::get_data_matrix_double(void) const
 {
 	return _data_double;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_num_items_class_0(void)
+int t_mep_data::get_num_items_class_0(void)const
 {
 	return num_class_0;
 }
 //-----------------------------------------------------------------
-char*** t_mep_data::get_data_matrix_string(void)
+char*** t_mep_data::get_data_matrix_string(void)const
 {
 	return _data_string;
 }
@@ -1310,7 +718,7 @@ void t_mep_data::set_num_outputs(int new_num)
 	num_outputs = new_num;
 }
 //-----------------------------------------------------------------
-int t_mep_data::get_num_classes(void)
+int t_mep_data::get_num_classes(void)const
 {
 	return num_classes;
 }
@@ -1318,13 +726,184 @@ int t_mep_data::get_num_classes(void)
 void t_mep_data::count_num_classes(int target_col)
 {
 	if (num_outputs && num_data) {
-		int max_value = _data_double[0][target_col];
+		int max_value = (int)_data_double[0][target_col];
 		for (int i = 1; i < num_data; i++)
 			if (max_value < _data_double[i][target_col])
-				max_value = _data_double[i][target_col];
+				max_value = (int)_data_double[i][target_col];
 		num_classes = max_value + 1;
 	}
 	else
 		num_classes = 0;
+}
+//-----------------------------------------------------------------
+void t_mep_data::add_string_data(int row, int col, const char* data)
+{
+	if (row >= num_data) {
+		// must add some new rows
+		char*** new_data_string = new char** [row + 1];
+		for (int r = 0; r < num_data; r++)
+			new_data_string[r] = _data_string[r];
+		for (int r = num_data; r <= row; r++) {
+			if (num_cols) {
+				new_data_string[r] = new char* [num_cols];
+				for (int c = 0; c < num_cols; c++)
+					new_data_string[r][c] = NULL;
+			}
+			else
+				new_data_string[r] = NULL;
+		}
+
+		if (_data_string)
+			delete[] _data_string;
+		_data_string = new_data_string;
+
+		num_data = row + 1;
+	}
+
+	if (col >= num_cols) {
+		// must add some new cols
+		// previous rows must be updated
+		for (int r = 0; r < num_data; r++) {
+			char** old_row = _data_string[r];
+			_data_string[r] = new char* [col + 1];
+			for (int c = 0; c < num_cols; c++)
+				_data_string[r][c] = old_row[c];
+			for (int c = num_cols; c <= col; c++)
+				_data_string[r][c] = NULL;
+
+			if (old_row)
+				delete[] old_row;
+		}
+
+		num_cols = col + 1;
+	}
+
+	// now add the data
+	if (data) {
+		// must do TRIM first
+		_data_string[row][col] = new char[strlen(data) + 1];
+		
+		trim_and_strcpy(_data_string[row][col], data);
+	}
+}
+//-----------------------------------------------------------------
+void t_mep_data::add_string_data_to_row(int row, int col, const char* data)
+{
+	if (col >= num_cols) {
+		// must add some new cols
+		// previous rows must be updated
+		for (int r = 0; r < num_data; r++) {
+			char** old_row = _data_string[r];
+			_data_string[r] = new char* [col + 1];
+			for (int c = 0; c < num_cols; c++)
+				_data_string[r][c] = old_row[c];
+			for (int c = num_cols; c <= col; c++)
+				_data_string[r][c] = NULL;
+
+			if (old_row)
+				delete[] old_row;
+		}
+
+		num_cols = col + 1;
+	}
+
+	// now add the data
+	if (data) {
+		// must do TRIM first
+		_data_string[row][col] = new char[strlen(data) + 1];
+
+		trim_and_strcpy(_data_string[row][col], data);
+	}
+}
+//-----------------------------------------------------------------
+void t_mep_data::from_tab_separated_string(const char* s)
+{
+	clear_data();
+	
+	data_type = MEP_DATA_STRING;
+	get_csv_info_from_string(s, '\t', this);
+
+	remove_empty_rows();
+
+	// try to convert to double
+	if (to_double()) {
+		data_type = MEP_DATA_DOUBLE;
+	}
+
+	/*
+	int col = 0;
+	int row = 0;
+	if (strchr(s, '\n') != NULL) {
+		while (!s) {
+			s_current_row = wx_copied_data.BeforeFirst('\n');
+			bool was_empty = s_current_row.IsEmpty();
+			if (!s_current_row.IsEmpty() && can_add_rows && row == g->GetNumberRows()) {
+				g->AppendRows(1);
+			}
+			while (!s_current_row.IsEmpty()) {
+				s_current_field = s_current_row.BeforeFirst('\t');
+				g->SetCellValue(row, col, s_current_field);
+				col++;
+				s_current_row = s_current_row.AfterFirst('\t');
+			}
+			if (!was_empty)
+				row++;
+			col = start_col;
+			wx_copied_data = wx_copied_data.AfterFirst('\n');
+		}
+	}
+	else // search for \r
+		while (!s) {
+			s_current_row = wx_copied_data.BeforeFirst('\r');
+			bool was_empty = s_current_row.IsEmpty();
+
+			if (!s_current_row.IsEmpty() && can_add_rows && row == g->GetNumberRows()) {
+				g->AppendRows(1);
+			}
+
+			while (!s_current_row.IsEmpty()) {
+				s_current_field = s_current_row.BeforeFirst('\t');
+				g->SetCellValue(row, col, s_current_field);
+				col++;
+				s_current_row = s_current_row.AfterFirst('\t');
+			}
+			if (!was_empty)
+				row++;
+			col = start_col;
+			wx_copied_data = wx_copied_data.AfterFirst('\r');
+		}
+		*/
+}
+//-----------------------------------------------------------------
+void t_mep_data::remove_empty_rows(void)
+{
+	if (data_type == MEP_DATA_STRING) {
+		// try to remove the empty rows
+		if (num_data && num_cols) {
+			char*** _new_data_string = new char** [num_data];
+			int new_num_data = 0;
+			for (int r = 0; r < num_data; r++) {
+				if (_data_string[r]) {
+					bool is_empty = true;
+					for (int c = 0; c < num_cols; c++)
+						if (_data_string[r][c] && _data_string[r][c][0]) {
+							is_empty = false;
+							break;
+						}
+					if (!is_empty) {
+						_new_data_string[new_num_data] = _data_string[r];
+						new_num_data++;
+					}
+				}
+			}
+			if (new_num_data < num_data) {
+				delete[] _data_string;
+				_data_string = _new_data_string;
+				num_data = new_num_data;
+			}
+			else
+				delete[] _new_data_string;
+		}
+	}
 }
 //-----------------------------------------------------------------

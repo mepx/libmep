@@ -1,8 +1,16 @@
-#ifndef DATA_CLASS_H_INCLUDED
-#define DATA_CLASS_H_INCLUDED
+// Author: Mihai Oltean, mihai.oltean@gmail.com
+// https://mepx.org
+// https://github.com/mepx
+// License: MIT
+//-----------------------------------------------------------------
+#ifndef mep_DATA_CLASS_H
+#define mep_DATA_CLASS_H
 
+//-----------------------------------------------------------------
 #include "pugixml.hpp"
 #include "mep_rands.h"
+#include "csv_utils.h"
+//-----------------------------------------------------------------
 
 #define MEP_DATA_DOUBLE 0
 #define MEP_DATA_STRING 1
@@ -13,9 +21,9 @@
 #define E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
 
 
+
 //-----------------------------------------------------------------
-class t_mep_data
-{
+class t_mep_data: public t_setter_data_base {
 private:
 	int num_cols;
 	int num_data;
@@ -30,7 +38,7 @@ private:
 
 	int num_classes;
 
-	int data_type; // 0-double, 1- string
+	char data_type; // 0-double, 1- string
 
 	char list_separator;
 
@@ -38,43 +46,52 @@ private:
 
 	bool from_csv_double(const char *file_name);
 	bool from_csv_string(const char *file_name);
+	bool from_csv_string_old(const char* file_name);
 
 	void delete_double_data(void);
 	void delete_string_data(void);
+
+	// tries to convert strings to real values
+	bool to_double(void);
 
 public:
 
 	t_mep_data(void);
 	~t_mep_data();
 
+	void from_tab_separated_string(const char* s);
+
+	void add_string_data(int row, int col, const char* data);
+	void add_string_data_to_row(int row, int col, const char* data);
+	
 	// returns the number of rows training data
-	int get_num_rows(void);
+	int get_num_rows(void)const;
 
 	// returns the number of columns of the training data
-	int get_num_cols(void);
+	int get_num_cols(void)const;
 
 	// returns the data type of the data: 
 	// 0 for real
 	// 1 for string
-	int get_data_type(void);
+	int get_data_type(void)const;
 
-	int get_num_outputs(void);
+	int get_num_outputs(void)const;
 	void set_num_outputs(int new_num);
 
 	// returns a training data as double (if data type is 0)
 	// assumes that row and col are valid; no test for out of range are performed
-	double** get_data_matrix_double(void);
+	double** get_data_matrix_double(void) const;
 
 	// returns a training data as string (if data type is 1)
 	// assumes that row and col are valid; no test for out of range are performed
-	char*** get_data_matrix_string(void);
+	char*** get_data_matrix_string(void) const;
 	
 	// returns an entire row as a pointer to double
 	// data type must be 0,
-	double* get_row(int row);
+	double* get_row(int row)const;
 
-	double get_value_double(int row, int col);
-	char* get_value_string(int row, int col);
+	double get_value_double(int row, int col)const;
+	char* get_value_string(int row, int col)const;
 
 	// clears the data internal structures and deletes memory
 	void clear_data(void);
@@ -95,7 +112,7 @@ public:
 	// loads from PROBEN1 format
 	// num_classes must be known in advanced because it is an "1 of m" format
 	// if num_classes is 0, it means that is a regression problem
-	bool from_PROBEN1_format(const char *filename, int num_classes);
+	bool from_one_of_m_format(const char *filename, int num_classes);
 
 	// transform string values to real values
 	int to_numeric(t_mep_data *other_data1, t_mep_data* other_data2);
@@ -129,16 +146,19 @@ public:
 	void count_0_class(int target_col);
 
 	// returns true if the problem is a classification problem
-	bool is_classification_problem(void);
+	bool is_classification_problem(void)const;
+
+	// remove_empty_rows
+	void remove_empty_rows(void);
 
 	// returns true if data have been modified
-	bool is_modified(void);
+	bool is_modified(void)const;
 
 	// returns the number of items belonging to class 0
-	int get_num_items_class_0(void);
+	int get_num_items_class_0(void)const;
 
 	void count_num_classes(int target_col);
-	int get_num_classes(void);
+	int get_num_classes(void)const;
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED
