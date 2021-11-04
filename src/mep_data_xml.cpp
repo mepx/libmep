@@ -220,13 +220,13 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 				size_t s_tmp_row_len = 0;
 				for (int c = 0; c < num_cols; c++) 
 					if (_data_string[r][c]){
-						char* tmp_str = NULL;
 						char* str_ptr = NULL;
+						char* tmp_str = NULL;
 						if (strchr(_data_string[r][c], '\n') ||
 							strchr(_data_string[r][c], '\r') ||
 							strchr(_data_string[r][c], ' ') ||
 							strchr(_data_string[r][c], '"')) {
-
+							// put it inside ""
 							size_t len = strlen(_data_string[r][c]);
 							tmp_str = new char[2 + 2 * len + 1];
 							size_t tmp_pos = 0;
@@ -244,7 +244,7 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 							str_ptr = tmp_str;
 						}
 						else
-							str_ptr = _data_string[r][c];
+							str_ptr = _data_string[r][c];// no "", just data
 
 						size_t tmp_s_len = strlen(str_ptr);
 						if (tmp_s_len + s_tmp_row_len + 2 > s_CAPACITY) {
