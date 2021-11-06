@@ -565,7 +565,7 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 				strcat(prog, "  ' find the class\n");
 				strcat(prog, "  class_index = -1\n");
-				sprintf(tmp_s, "  For c = 0 To %ld\n", num_classes - 1);
+				sprintf(tmp_s, "  For c = 0 To %d\n", num_classes - 1);
 
 				strcat(prog, tmp_s);
 

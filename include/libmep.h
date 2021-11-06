@@ -202,6 +202,8 @@ public:
 	t_mep_statistics* get_stats_ptr(void);
 
 	void init_enabled_variables(void);
+
+	void clear(void);
 };
 //-----------------------------------------------------------------
 

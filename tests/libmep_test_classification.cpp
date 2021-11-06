@@ -16,7 +16,6 @@ void on_generation(void)
 //-----------------------------------------------------------------
 int main(void)
 {
-	
 	printf("libmep version = %s\n", mep.get_version());
 	t_mep_data* training_data = mep.get_training_data_ptr(); // store objects in some local variables for easier access
 	t_mep_functions* mep_functions = mep.get_functions_ptr();
@@ -24,7 +23,7 @@ int main(void)
 	//t_mep_constants* mep_constants = mep.get_constants_ptr();
 
 	printf("Loading data ...\n");
-	// take the input data from the https://github.com/mepx/libmep/tree/master/data folder
+	// sample input file taken from the https://github.com/mepx/libmep/tree/master/data folder
 	if (!training_data->from_csv("../data/cancer1.csv")) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
 		printf("Press Enter...");
@@ -34,7 +33,7 @@ int main(void)
 	else
 		printf("Loading data done\n");
 
-
+	
 	mep.init_enabled_variables();
 
 	mep_functions->set_addition(true);
@@ -67,7 +66,7 @@ int main(void)
 	printf("\nFinal Num incorreclty classified = %lf\n", num_incorrectly_classified_percent);
 
 	printf("Program = \n%s\n", mep.program_as_C(0, 0, training_data->get_row(0)));
-
+	
 	printf("Press Enter...");
 	
 	getchar();

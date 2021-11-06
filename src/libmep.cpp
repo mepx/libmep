@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.11.3.0-beta");
+	strcpy(version, "2021.11.5.0-beta");
 
 	num_selected_operators = 0;
 
@@ -44,6 +44,11 @@ t_mep::t_mep()
 }
 //---------------------------------------------------------------------------
 t_mep::~t_mep()
+{
+	clear();
+}
+//---------------------------------------------------------------------------
+void t_mep::clear(void)
 {
 	if (actual_enabled_variables) {
 		delete[] actual_enabled_variables;

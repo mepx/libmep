@@ -894,6 +894,12 @@ void t_mep_data::remove_empty_rows(void)
 						_new_data_string[new_num_data] = _data_string[r];
 						new_num_data++;
 					}
+					else {
+						for (int c = 0; c < num_cols; c++)
+							if (_data_string[r][c])
+								delete[] _data_string[r][c];
+						delete[] _data_string[r];
+					}
 				}
 			}
 			if (new_num_data < num_data) {
