@@ -135,7 +135,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 		Ch = getc(f);
 	}
 
-	if (Field[0]) {
+	if (Field && Field[0]) {
 		append_to_string(Field, 0, L, CAPACITY_L);
 		obj->add_string_data(R, C, Field);
 		C++;
@@ -250,7 +250,7 @@ bool get_csv_info_from_string_to_row(const char* input_string, const char list_s
 		Ch = input_string[index++];
 	}
 
-	if (Field[0]) {
+	if (Field && Field[0]) {
 		append_to_string(Field, 0, L, CAPACITY_L);
 		obj->add_string_data_to_row(R, C, Field);
 		C++;
@@ -366,7 +366,7 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 		Ch = input_string[index++];
 	}
 
-	if (Field[0]) {
+	if (Field && Field[0]) {
 		append_to_string(Field, 0, L, CAPACITY_L);
 		obj->add_string_data(R, C, Field);
 		C++;
