@@ -162,11 +162,11 @@ public:
 	// returns the number of classes
 	int get_num_classes(void)const;
 
-	// returns true is data could be a time serie
+	// transform the (1 row or 1 column) data into a matrix based on window size
 	bool to_time_serie(int window_size);
 
-	// transform the (1 row or 1 column) data into a matrix based on window size
-	bool is_time_serie(int window_size);
+	// returns true is data could be a time serie
+	bool is_time_serie(void);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

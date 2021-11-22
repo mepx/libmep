@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.11.22.0-beta");
+	strcpy(version, "2021.11.22.1-beta");
 
 	num_selected_operators = 0;
 
@@ -1464,7 +1464,7 @@ int t_mep::get_num_outputs(void)
 int t_mep::get_num_total_variables(void)
 {
 	if (!variables_enabled) {
-		num_total_variables = training_data.get_num_cols();
+		num_total_variables = training_data.get_num_cols() - 1;
 		num_actual_variables = num_total_variables;
 
 		variables_enabled = new bool[num_total_variables];
@@ -1522,7 +1522,7 @@ void t_mep::init_enabled_variables(void)
 		delete[] variables_enabled;
 		variables_enabled = NULL;
 	}
-	num_total_variables = training_data.get_num_cols();
+	num_total_variables = training_data.get_num_cols() - 1;
 	num_actual_variables = num_total_variables;
 
 	variables_enabled = new bool[num_total_variables];

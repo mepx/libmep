@@ -918,7 +918,7 @@ void t_mep_data::remove_empty_rows(void)
 	}
 }
 //-----------------------------------------------------------------
-bool t_mep_data::is_time_serie(int window_size)
+bool t_mep_data::is_time_serie(void)
 {
 	return (num_data == 1 && num_cols > 2 ||
 		num_cols == 1 && num_data > 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
@@ -953,14 +953,14 @@ bool t_mep_data::to_time_serie(int window_size)
 		}
 		else {// 1 col only
 			_tmp_data = new char** [num_data - window_size];
-			for (int r = 0; r < num_cols - window_size; r++) {
+			for (int r = 0; r < num_data - window_size; r++) {
 				_tmp_data[r] = new char*[window_size + 1];
 				for (int c = 0; c < window_size + 1; c++) {
 					_tmp_data[r][c] = NULL;
 					if (_data_string[r * (window_size + 1) + c][0]) {
-						size_t len = strlen(_data_string[r * (window_size + 1) + c][0]);
+						size_t len = strlen(_data_string[r + c][0]);
 						_tmp_data[r][c] = new char[len + 1];
-						strcpy(_tmp_data[r][c], _data_string[r * (window_size + 1) + c][0]);
+						strcpy(_tmp_data[r][c], _data_string[r + c][0]);
 					}
 				}
 			}
@@ -980,17 +980,17 @@ bool t_mep_data::to_time_serie(int window_size)
 			for (int r = 0; r < num_cols - window_size; r++) {
 				_tmp_data[r] = new double[window_size + 1];
 				for (int c = 0; c < window_size + 1; c++)
-					_tmp_data[r][c] = _data_double[0][r * (window_size + 1) + c];
+					_tmp_data[r][c] = _data_double[0][r + c];
 			}
 			delete[] _data_double[0];
 			delete[] _data_double;
 		}
 		else {// 1 col only
 			_tmp_data = new double* [num_data - window_size];
-			for (int r = 0; r < num_cols - window_size; r++) {
+			for (int r = 0; r < num_data - window_size; r++) {
 				_tmp_data[r] = new double[window_size + 1];
 				for (int c = 0; c < window_size + 1; c++)
-					_tmp_data[r][c] = _data_double[r * (window_size + 1) + c][0];
+					_tmp_data[r][c] = _data_double[r + c][0];
 			}
 			for (int r = 0; r < num_data; r++)
 				delete[] _data_double[r];
