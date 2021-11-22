@@ -6,10 +6,12 @@
 
 #ifndef lib_mep_H
 #define lib_mep_H
+//-----------------------------------------------------------------
 
 #include <thread>
 #include <mutex>
 
+//-----------------------------------------------------------------
 #include "pugixml.hpp"
 
 #include "mep_parameters.h"

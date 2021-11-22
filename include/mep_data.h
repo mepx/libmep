@@ -14,13 +14,12 @@
 
 #define MEP_DATA_DOUBLE 0
 #define MEP_DATA_STRING 1
+//-----------------------------------------------------------------
 
 #define E_OK 0
 #define E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
 #define E_NOT_ENOUGH_DATA_TO_MOVE 2
 #define E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
-
-
 
 //-----------------------------------------------------------------
 class t_mep_data: public t_setter_data_base {
@@ -53,16 +52,16 @@ private:
 
 	// tries to convert strings to real values
 	bool to_double(void);
+	void add_string_data(int row, int col, const char* data);
+	void add_string_data_to_row(int row, int col, const char* data);
 
 public:
 
 	t_mep_data(void);
 	~t_mep_data();
 
+	// fills the internal matrix wiht data from string s which must contain tab separated data
 	void from_tab_separated_string(const char* s);
-
-	void add_string_data(int row, int col, const char* data);
-	void add_string_data_to_row(int row, int col, const char* data);
 	
 	// returns the number of rows training data
 	int get_num_rows(void)const;
@@ -157,8 +156,17 @@ public:
 	// returns the number of items belonging to class 0
 	int get_num_items_class_0(void)const;
 
+	// counts the number of classes and stores them into an internal variable
 	void count_num_classes(int target_col);
+
+	// returns the number of classes
 	int get_num_classes(void)const;
+
+	// returns true is data could be a time serie
+	bool to_time_serie(int window_size);
+
+	// transform the (1 row or 1 column) data into a matrix based on window size
+	bool is_time_serie(int window_size);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED
