@@ -102,8 +102,10 @@ void t_mep_data::count_0_class(int target_col)
 //-----------------------------------------------------------------
 bool t_mep_data::to_double(void)
 {
-	if (!_data_string)
+	if (!_data_string) {
+		data_type = MEP_DATA_DOUBLE;
 		return true;
+	}
 
 	delete_double_data();
 
@@ -118,6 +120,9 @@ bool t_mep_data::to_double(void)
 				delete_double_data();
 				return false;
 			}
+
+	data_type = MEP_DATA_DOUBLE;
+	delete_string_data();
 
 	return true;
 }
@@ -911,5 +916,91 @@ void t_mep_data::remove_empty_rows(void)
 				delete[] _new_data_string;
 		}
 	}
+}
+//-----------------------------------------------------------------
+bool t_mep_data::is_time_serie(int window_size)
+{
+	return (num_data == 1 && num_cols > 2 ||
+		num_cols == 1 && num_data > 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
+}
+//-----------------------------------------------------------------
+bool t_mep_data::to_time_serie(int window_size)
+{
+	if (!(num_data == 1 && num_cols > window_size + 1 ||
+		num_cols == 1 && num_data > window_size + 1)) 
+		return false;
+	
+	if (data_type == MEP_DATA_STRING) {
+		char* ** _tmp_data;
+		if (num_data == 1) { // 1 row only
+			_tmp_data = new char** [num_cols - window_size];
+			for (int r = 0; r < num_cols - window_size; r++) {
+				_tmp_data[r] = new char*[window_size + 1];
+				for (int c = 0; c < window_size + 1; c++) {
+					_tmp_data[r][c] = NULL;
+					if (_data_string[0][r * (window_size + 1) + c]) {
+						size_t len = strlen(_data_string[0][r * (window_size + 1) + c]);
+						_tmp_data[r][c] = new char[len + 1];
+						strcpy(_tmp_data[r][c], _data_string[0][r * (window_size + 1) + c]);
+					}
+				}
+			}
+			for (int c = 0; c < num_cols; c++)
+				if (_data_string[0][c])
+					delete[] _data_string[0][c];
+			delete[] _data_string[0];
+			delete[] _data_string;
+		}
+		else {// 1 col only
+			_tmp_data = new char** [num_data - window_size];
+			for (int r = 0; r < num_cols - window_size; r++) {
+				_tmp_data[r] = new char*[window_size + 1];
+				for (int c = 0; c < window_size + 1; c++) {
+					_tmp_data[r][c] = NULL;
+					if (_data_string[r * (window_size + 1) + c][0]) {
+						size_t len = strlen(_data_string[r * (window_size + 1) + c][0]);
+						_tmp_data[r][c] = new char[len + 1];
+						strcpy(_tmp_data[r][c], _data_string[r * (window_size + 1) + c][0]);
+					}
+				}
+			}
+			for (int r = 0; r < num_data; r++) {
+				if (_data_string[r][0])
+					delete[] _data_string[r][0];
+				delete[] _data_double[r];
+			}
+			delete[] _data_double;
+		}
+		_data_string = _tmp_data;
+	}
+	else {// double
+		double** _tmp_data;
+		if (num_data == 1) { // 1 row only
+			_tmp_data = new double* [num_cols - window_size];
+			for (int r = 0; r < num_cols - window_size; r++) {
+				_tmp_data[r] = new double[window_size + 1];
+				for (int c = 0; c < window_size + 1; c++)
+					_tmp_data[r][c] = _data_double[0][r * (window_size + 1) + c];
+			}
+			delete[] _data_double[0];
+			delete[] _data_double;
+		}
+		else {// 1 col only
+			_tmp_data = new double* [num_data - window_size];
+			for (int r = 0; r < num_cols - window_size; r++) {
+				_tmp_data[r] = new double[window_size + 1];
+				for (int c = 0; c < window_size + 1; c++)
+					_tmp_data[r][c] = _data_double[r * (window_size + 1) + c][0];
+			}
+			for (int r = 0; r < num_data; r++)
+				delete[] _data_double[r];
+			delete[] _data_double;
+		}
+		_data_double = _tmp_data;
+		num_data = num_data - window_size;
+		num_cols = window_size + 1;
+	}
+
+	return true;
 }
 //-----------------------------------------------------------------
