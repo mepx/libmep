@@ -8,17 +8,17 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "mep_rands.h"
 #include "libmep.h"
-
-#ifdef _WIN32
-	#include <windows.h>
-#endif
 
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.11.22.1-beta");
+	strcpy(version, "2021.11.23.0-beta");
 
 	num_selected_operators = 0;
 
