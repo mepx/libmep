@@ -167,101 +167,151 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			//is this numeric or alpha ?
 			// search in the current dataset
 			double tmp_double;
-			for (int r = 0; r < num_data; r++)
+			for (int r = 0; r < num_data; r++) {
+				if (!_data_string[r][v])
+					continue;
 				if (!is_valid_double(_data_string[r][v], &tmp_double)) {
-
-					bool found_previously = false;
-					for (int prev_r = 0; prev_r < r; prev_r++)
-						if (my_strcmp(_data_string[r][v], _data_string[prev_r][v]) == 0) {
-							found_previously = true;
-							break;
-						}
-					if (found_previously)
-						continue; // jump to the next cell
-
 					// search for it in the current set
-					for (int t = r; t < num_data; t++)
-						if (my_strcmp(_data_string[r][v], _data_string[t][v]) == 0)
-							_data_double[t][v] = k;
+					for (int t = r + 1; t < num_data; t++)
+						if (_data_string[t][v])
+							if (my_strcmp(_data_string[r][v], _data_string[t][v]) == 0) {
+								_data_double[t][v] = k;
+								delete[] _data_string[t][v];
+								_data_string[t][v] = NULL;
+							}
+
 					// replace it in the other datasets too
 					if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
 						for (int t = 0; t < other_data1->num_data; t++)
-							if (my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]) == 0)
-								other_data1->_data_double[t][v] = k;
+							if (other_data1->_data_string[t][v])
+								if (my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]) == 0) {
+									other_data1->_data_double[t][v] = k;
+									delete[] other_data1->_data_string[t][v];
+									other_data1->_data_string[t][v] = NULL;
+								}
 					// replace it in the other datasets too
 					if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
 						for (int t = 0; t < other_data2->num_data; t++)
-							if (my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]) == 0)
-								other_data2->_data_double[t][v] = k;
+							if (other_data2->_data_string[t][v])
+								if (my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]) == 0) {
+									other_data2->_data_double[t][v] = k;
+									delete[] other_data2->_data_string[t][v];
+									other_data2->_data_string[t][v] = NULL;
+								}
+					// also replace the current value
+					_data_double[r][v] = k;
+					delete[] _data_string[r][v];
+					_data_string[r][v] = NULL;
+
 					_modified = true;
 					k++;
 				}
-				else
+				else {
 					_data_double[r][v] = tmp_double;
+					delete[] _data_string[r][v];
+					_data_string[r][v] = NULL;
+				}
+			}
 
 			// search in the other dataset
 			
 			if (other_data1 && other_data1->data_type == MEP_DATA_STRING) {
 				double tmp_double1;
-				for (int r = 0; r < other_data1->num_data; r++)
+				for (int r = 0; r < other_data1->num_data; r++) {
+					if (!other_data1->_data_string[r][v])
+						continue;
 					if (!is_valid_double(other_data1->_data_string[r][v], &tmp_double1)) {
 						// search for it in the current set
 
-						bool found_previously = false;
-						for (int prev_r = 0; prev_r < r; prev_r++)
-							if (my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[prev_r][v]) == 0) {
-								found_previously = true;
-								break;
-							}
-						if (found_previously)
-							continue; // jump to the next cell
-
-						for (int t = r; t < other_data1->num_data; t++)
-							if (my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[t][v]) == 0)
-								other_data1->_data_double[t][v] = k;
+						for (int t = r + 1; t < other_data1->num_data; t++)
+							if (other_data1->_data_string[t][v])
+								if (my_strcmp(other_data1->_data_string[r][v], other_data1->_data_string[t][v]) == 0) {
+									other_data1->_data_double[t][v] = k;
+									delete[] other_data1->_data_string[t][v];
+									other_data1->_data_string[t][v] = NULL;
+								}
 						// replace it in the other datasets too
 						if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
 							for (int t = 0; t < other_data2->num_data; t++)
-								if (my_strcmp(other_data1->_data_string[r][v], other_data2->_data_string[t][v]) == 0)
-									other_data2->_data_double[t][v] = k;
+								if (other_data2->_data_string[t][v])
+									if (my_strcmp(other_data1->_data_string[r][v], other_data2->_data_string[t][v]) == 0) {
+										other_data2->_data_double[t][v] = k;
+										delete[] other_data2->_data_string[t][v];
+										other_data2->_data_string[t][v] = NULL;
+									}
+
+						other_data1->_data_double[r][v] = k;
+						delete[] other_data1->_data_string[r][v];
+						other_data1->_data_string[r][v] = NULL;
+
 						_modified = true;
 						k++;
 					}
-					else
+					else {
 						other_data1->_data_double[r][v] = tmp_double1;
+						delete[] other_data1->_data_string[r][v];
+						other_data1->_data_string[r][v] = NULL;
+					}
+				}
 			}
 
 			// search in the other dataset
 			if (other_data2 && other_data2->data_type == MEP_DATA_STRING) {
 				double tmp_double2;
-				for (int r = 0; r < other_data2->num_data; r++)
+				for (int r = 0; r < other_data2->num_data; r++) {
+					if (!other_data2->_data_string[r][v])
+						continue;
 					if (!is_valid_double(other_data2->_data_string[r][v], &tmp_double2)) {
 						// search for it in the current set
-						bool found_previously = false;
-						for (int prev_r = 0; prev_r < r; prev_r++)
-							if (my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[prev_r][v]) == 0) {
-								found_previously = true;
-								break;
-							}
-						if (found_previously)
-							continue; // jump to the next cell
+						for (int t = r + 1; t < other_data2->num_data; t++)
+							if (other_data2->_data_string[t][v])
+								if (my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[t][v]) == 0) {
+									other_data2->_data_double[t][v] = k;
+									delete[] other_data2->_data_string[t][v];
+									other_data2->_data_string[t][v] = NULL;
+								}
 
-						for (int t = r; t < other_data2->num_data; t++)
-							if (my_strcmp(other_data2->_data_string[r][v], other_data2->_data_string[t][v]) == 0)
-								other_data2->_data_double[t][v] = k;
+						other_data2->_data_double[r][v] = k;
+						delete[] other_data2->_data_string[r][v];
+						other_data2->_data_string[r][v] = NULL;
+
 						_modified = true;
 						k++;
 					}
-					else
+					else {
 						other_data2->_data_double[r][v] = tmp_double2;
+						delete[] other_data2->_data_string[r][v];
+						other_data2->_data_string[r][v] = NULL;
+					}
+				}
 			}
 		}
 
 		data_type = MEP_DATA_DOUBLE;
-		if (other_data1)
+		if (_data_string) {
+			for (int r = 0; r < num_data; r++)
+				delete[] _data_string[r];
+			delete[] _data_string;
+			_data_string = NULL;
+		}
+		if (other_data1) {
+			if (other_data1->_data_string) {
+				for (int r = 0; r < other_data1->num_data; r++)
+					delete[] other_data1->_data_string[r];
+				delete[] other_data1->_data_string;
+				other_data1->_data_string = NULL;
+			}
 			other_data1->data_type = MEP_DATA_DOUBLE;
-		if (other_data2)
+		}
+		if (other_data2) {
+			if (other_data2->_data_string) {
+				for (int r = 0; r < other_data2->num_data; r++)
+					delete[] other_data2->_data_string[r];
+				delete[] other_data2->_data_string;
+				other_data2->_data_string = NULL;
+			}
 			other_data2->data_type = MEP_DATA_DOUBLE;
+		}
 
 		return MEP_OK;
 	}
