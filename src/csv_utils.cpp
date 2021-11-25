@@ -51,7 +51,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 
 	int R = 0;
 	int C = 0;
-	char Ch = getc(f);
+	int Ch = getc(f);
 	int L = 0;
 	while (Ch != EOF){
 
@@ -59,7 +59,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 			if (!Quoted)
 				Quoted = true;
 			else {
-				char ch2 = getc(f);
+				int ch2 = getc(f);
 				if (ch2 == '"') {
 					append_to_string(Field, Ch, L, CAPACITY_L);
 
