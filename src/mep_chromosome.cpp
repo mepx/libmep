@@ -739,15 +739,12 @@ delete[] line_of_constants;
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, int &index_error_gene)
 {
-	bool is_error_case;  // division by zero, other errors
-
 	double *eval_vect = new double[max_index_best_genes + 1];
 
-	for (int i = 0; i <= max_index_best_genes; i++)   // read the t_mep_chromosome from top to down
-	{
+	for (int i = 0; i <= max_index_best_genes; i++){   // read the t_mep_chromosome from top to down
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
-		is_error_case = false;
+		bool is_error_case = false;// division by zero, other errors
 		switch (prg[i].op) {
 		case  O_ADDITION:  // +
 			eval_vect[i] = eval_vect[prg[i].addr1] + eval_vect[prg[i].addr2];
@@ -886,18 +883,16 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, int &ind
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::get_first_max_index(double *inputs, int &max_index, int &index_error_gene)
 {
-	bool is_error_case;  // division by zero, other errors
-
 	double *eval_vect = new double[code_length];
 
 	max_index = -1;
 	double max_value = -DBL_MAX;
 
-	for (int i = 0; i < code_length; i++)   // read the t_mep_chromosome from top to down
-	{
+	for (int i = 0; i < code_length; i++){   // read the t_mep_chromosome from top to down
+	
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
-		is_error_case = false;
+		bool is_error_case = false;// division by zero, other errors
 		switch (prg[i].op) {
 		case  O_ADDITION:  // +
 			eval_vect[i] = eval_vect[prg[i].addr1] + eval_vect[prg[i].addr2];
