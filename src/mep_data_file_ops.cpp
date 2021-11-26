@@ -131,7 +131,10 @@ bool t_mep_data::from_csv(const char* filename)
 
 	_modified = true;
 
+	clear_data();
+
 	from_csv_string(filename);
+
 	// try to convert to double
 	if (to_double()) {
 		data_type = MEP_DATA_DOUBLE;
