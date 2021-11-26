@@ -343,12 +343,12 @@ bool t_mep_data::detect_list_separator(const char* file_name)
 	my_fgets(buf, MAX_ROW_CHARS, f);
 
 	while (!feof(f)){
-		if (strlen(buf) > 1)
+		if (strlen(buf) > 0)// lines with at least one character
 			break;
 		my_fgets(buf, MAX_ROW_CHARS, f);
 	}
 
-	if (feof(f)){
+	if (feof(f)){// nothing in the file
 		delete[] buf;
 		return false;
 	}
@@ -375,15 +375,18 @@ bool t_mep_data::detect_list_separator(const char* file_name)
 		return true;
 	}
 
+	// most likely there is only variable and no output
+	/*
 	double x;
-	if (sscanf(buf, "%lf", &x) == 1) {// most likely there is only variable and no output
+	if (sscanf(buf, "%lf", &x) == 1) {
 		list_separator = ';';
 		delete[] buf;
 		return true;
 	}
+	*/
 
 	delete[] buf;
-	return false;
+	return true;
 }
 //-----------------------------------------------------------------
 /*
