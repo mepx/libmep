@@ -127,12 +127,21 @@ bool t_mep_data::to_double(void)
 	return true;
 }
 //-----------------------------------------------------------------
+void t_mep_data::set_to_minus_one(void)
+{// data must be valid
+	for (int r = 0; r < num_data; r++)
+		for (int c = 0; c < num_cols; c++)
+			_data_double[r][c] = -1;
+}
+//-----------------------------------------------------------------
 int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 {
 	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data2->num_data) {
 
 		//		int count_new_strings = 0;
-		if (data_type != MEP_DATA_STRING && (!other_data1 || other_data1 && other_data1->data_type != MEP_DATA_STRING) && (other_data2 || other_data2 && other_data2->data_type != MEP_DATA_STRING))
+		if (data_type != MEP_DATA_STRING && 
+				(!other_data1 || other_data1 && other_data1->data_type != MEP_DATA_STRING) && 
+				(other_data2 || other_data2 && other_data2->data_type != MEP_DATA_STRING))
 			return E_DATA_MUST_HAVE_STRING_TYPE;
 
 		if (_data_string) {
@@ -141,6 +150,8 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			_data_double = new double*[num_data];
 			for (int r = 0; r < num_data; r++)
 				_data_double[r] = new double[num_cols];
+
+			set_to_minus_one();
 		}
 
 		if (other_data1 && other_data1->_data_string) {
@@ -150,6 +161,7 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			other_data1->_data_double = new double*[other_data1->num_data];
 			for (int r = 0; r < other_data1->num_data; r++)
 				other_data1->_data_double[r] = new double[other_data1->num_cols];
+			other_data1->set_to_minus_one();
 		}
 
 		if (other_data2 && other_data2->_data_string) {
@@ -159,59 +171,61 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			other_data2->_data_double = new double*[other_data2->num_data];
 			for (int r = 0; r < other_data2->num_data; r++)
 				other_data2->_data_double[r] = new double[other_data2->num_cols];
+			other_data2->set_to_minus_one();
 		}
 
-		//double tmp_double;
 		for (int v = 0; v < num_cols; v++) {
 			int k = 0; // this will be the replacement
 			//is this numeric or alpha ?
 			// search in the current dataset
-			double tmp_double;
-			for (int r = 0; r < num_data; r++) {
-				if (!_data_string[r][v]) {
-					_data_double[r][v] = -1; // invalid data
-					continue;
-				}
-				if (!is_valid_double(_data_string[r][v], &tmp_double)) {
-					// search for it in the current set
-					for (int t = r + 1; t < num_data; t++)
-						if (_data_string[t][v])
-							if (my_strcmp(_data_string[r][v], _data_string[t][v]) == 0) {
-								_data_double[t][v] = k;
-								delete[] _data_string[t][v];
-								_data_string[t][v] = NULL;
-							}
-
-					// replace it in the other datasets too
-					if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
-						for (int t = 0; t < other_data1->num_data; t++)
-							if (other_data1->_data_string[t][v])
-								if (my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]) == 0) {
-									other_data1->_data_double[t][v] = k;
-									delete[] other_data1->_data_string[t][v];
-									other_data1->_data_string[t][v] = NULL;
+			if (data_type == MEP_DATA_STRING) {
+				double tmp_double;
+				for (int r = 0; r < num_data; r++) {
+					if (!_data_string[r][v]) {
+						//_data_double[r][v] = -1; // invalid data
+						continue;
+					}
+					if (!is_valid_double(_data_string[r][v], &tmp_double)) {
+						// search for it in the current set
+						for (int t = r + 1; t < num_data; t++)
+							if (_data_string[t][v])
+								if (my_strcmp(_data_string[r][v], _data_string[t][v]) == 0) {
+									_data_double[t][v] = k;
+									delete[] _data_string[t][v];
+									_data_string[t][v] = NULL;
 								}
-					// replace it in the other datasets too
-					if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
-						for (int t = 0; t < other_data2->num_data; t++)
-							if (other_data2->_data_string[t][v])
-								if (my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]) == 0) {
-									other_data2->_data_double[t][v] = k;
-									delete[] other_data2->_data_string[t][v];
-									other_data2->_data_string[t][v] = NULL;
-								}
-					// also replace the current value
-					_data_double[r][v] = k;
-					delete[] _data_string[r][v];
-					_data_string[r][v] = NULL;
 
-					_modified = true;
-					k++;
-				}
-				else {
-					_data_double[r][v] = tmp_double;
-					delete[] _data_string[r][v];
-					_data_string[r][v] = NULL;
+						// replace it in the other datasets too
+						if (other_data1 && other_data1->data_type == MEP_DATA_STRING)
+							for (int t = 0; t < other_data1->num_data; t++)
+								if (other_data1->_data_string[t][v])
+									if (my_strcmp(_data_string[r][v], other_data1->_data_string[t][v]) == 0) {
+										other_data1->_data_double[t][v] = k;
+										delete[] other_data1->_data_string[t][v];
+										other_data1->_data_string[t][v] = NULL;
+									}
+						// replace it in the other datasets too
+						if (other_data2 && other_data2->data_type == MEP_DATA_STRING)
+							for (int t = 0; t < other_data2->num_data; t++)
+								if (other_data2->_data_string[t][v])
+									if (my_strcmp(_data_string[r][v], other_data2->_data_string[t][v]) == 0) {
+										other_data2->_data_double[t][v] = k;
+										delete[] other_data2->_data_string[t][v];
+										other_data2->_data_string[t][v] = NULL;
+									}
+						// also replace the current value
+						_data_double[r][v] = k;
+						delete[] _data_string[r][v];
+						_data_string[r][v] = NULL;
+
+						_modified = true;
+						k++;
+					}
+					else {
+						_data_double[r][v] = tmp_double;
+						delete[] _data_string[r][v];
+						_data_string[r][v] = NULL;
+					}
 				}
 			}
 
@@ -221,7 +235,7 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 				double tmp_double1;
 				for (int r = 0; r < other_data1->num_data; r++) {
 					if (!other_data1->_data_string[r][v]) {
-						other_data1->_data_double[r][v] = -1;
+						//other_data1->_data_double[r][v] = -1;
 						continue;
 					}
 					if (!is_valid_double(other_data1->_data_string[r][v], &tmp_double1)) {
@@ -264,7 +278,7 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 				double tmp_double2;
 				for (int r = 0; r < other_data2->num_data; r++) {
 					if (!other_data2->_data_string[r][v]) {
-						other_data2->_data_double[r][v] = -1;
+						//other_data2->_data_double[r][v] = -1;
 						continue;
 					}
 					if (!is_valid_double(other_data2->_data_string[r][v], &tmp_double2)) {
@@ -754,9 +768,9 @@ bool t_mep_data::is_multi_class_classification_problem(void)const
 		return false;
 
 	for (int i = 0; i < num_data; i++) {
-		if (_data_double[i][num_cols - 1] < 1E-6)
+		if (_data_double[i][num_cols - 1] < 0) // all must be greater than 0
 			return false;
-		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)
+		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)// all must be int
 			return false;
 	}
 

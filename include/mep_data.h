@@ -55,6 +55,8 @@ private:
 	void add_string_data(int row, int col, const char* data);
 	void add_string_data_to_row(int row, int col, const char* data);
 
+	void set_to_minus_one(void);
+
 public:
 
 	t_mep_data(void);
