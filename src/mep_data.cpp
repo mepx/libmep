@@ -711,11 +711,66 @@ void t_mep_data::shuffle(t_seed &seed)
 	_modified = true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::is_classification_problem(void)const
+bool t_mep_data::is_binary_classification_problem(void)const
 {
-	for (int i = 0; i < num_data; i++)
-		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 &&  fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)
+	if (num_cols < 2)
+		return false;
+	bool zero_class_exists = false;
+	bool one_class_exists = false;
+
+	for (int i = 0; i < num_data; i++) {
+		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 ||
+			fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)
 			return false;
+
+		if (fabs(_data_double[i][num_cols - 1]) < 1E-6)
+			zero_class_exists = true;
+		if (fabs(_data_double[i][num_cols - 1] - 1.0) < 1E-6)
+			one_class_exists = true;
+	}
+
+	if (!zero_class_exists || !one_class_exists)
+		return false;
+	return true;
+}
+//-----------------------------------------------------------------
+bool t_mep_data::is_multi_class_classification_problem(void)const
+{
+	if (num_cols < 2)
+		return false;
+
+	int tmp_num_classes;
+	if (num_outputs && num_data) {
+		int max_value = (int)_data_double[0][num_cols - 1];
+		for (int i = 1; i < num_data; i++)
+			if (max_value < _data_double[i][num_cols - 1])
+				max_value = (int)_data_double[i][num_cols - 1];
+		tmp_num_classes = max_value + 1;
+	}
+	else
+		tmp_num_classes = 0;
+
+	if (tmp_num_classes < 2)
+		return false;
+
+	for (int i = 0; i < num_data; i++) {
+		if (_data_double[i][num_cols - 1] < 1E-6)
+			return false;
+		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)
+			return false;
+	}
+
+	// lets mark all classes to see if all appears
+	bool *marked = new bool[tmp_num_classes];
+	for (int c = 0; c < tmp_num_classes; c++)
+		marked[c] = false;
+	for (int i = 0; i < num_data; i++)
+		marked[(int)_data_double[i][num_cols - 1]] = true;
+	for (int c = 0; c < tmp_num_classes; c++)
+		if (!marked[c])
+			return false;// a class does not appear
+
+	delete[] marked;
 	return true;
 }
 //-----------------------------------------------------------------

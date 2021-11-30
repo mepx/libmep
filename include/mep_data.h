@@ -144,8 +144,11 @@ public:
 	// computes how many row belong to the first class
 	void count_0_class(int target_col);
 
-	// returns true if the problem is a classification problem
-	bool is_classification_problem(void)const;
+	// returns true if the problem is a binary classification problem
+	bool is_binary_classification_problem(void)const;
+
+	// returns true if the problem is a multi classs classification problem
+	bool is_multi_class_classification_problem(void)const;
 
 	// remove_empty_rows
 	void remove_empty_rows(void);
