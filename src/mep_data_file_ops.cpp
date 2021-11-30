@@ -352,10 +352,11 @@ bool t_mep_data::detect_list_separator(const char* file_name)
 	}
 
 	if (feof(f)){// nothing in the file
+		fclose(f);
 		delete[] buf;
 		return false;
 	}
-
+	fclose(f);
 // detect the ;
 	if (strchr(buf, ';')) {
 		list_separator = ';';
