@@ -168,8 +168,10 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			// search in the current dataset
 			double tmp_double;
 			for (int r = 0; r < num_data; r++) {
-				if (!_data_string[r][v])
+				if (!_data_string[r][v]) {
+					_data_double[r][v] = -1; // invalid data
 					continue;
+				}
 				if (!is_valid_double(_data_string[r][v], &tmp_double)) {
 					// search for it in the current set
 					for (int t = r + 1; t < num_data; t++)
@@ -218,8 +220,10 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			if (other_data1 && other_data1->data_type == MEP_DATA_STRING) {
 				double tmp_double1;
 				for (int r = 0; r < other_data1->num_data; r++) {
-					if (!other_data1->_data_string[r][v])
+					if (!other_data1->_data_string[r][v]) {
+						other_data1->_data_double[r][v] = -1;
 						continue;
+					}
 					if (!is_valid_double(other_data1->_data_string[r][v], &tmp_double1)) {
 						// search for it in the current set
 
@@ -259,8 +263,10 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			if (other_data2 && other_data2->data_type == MEP_DATA_STRING) {
 				double tmp_double2;
 				for (int r = 0; r < other_data2->num_data; r++) {
-					if (!other_data2->_data_string[r][v])
+					if (!other_data2->_data_string[r][v]) {
+						other_data2->_data_double[r][v] = -1;
 						continue;
+					}
 					if (!is_valid_double(other_data2->_data_string[r][v], &tmp_double2)) {
 						// search for it in the current set
 						for (int t = r + 1; t < other_data2->num_data; t++)
