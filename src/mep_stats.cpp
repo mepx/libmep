@@ -395,6 +395,7 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 {
 	stddev_training_error = stddev_validation_error = stddev_test_error = stddev_runtime = 0;
 	mean_training_error = mean_validation_error = mean_test_error = mean_runtime = 0;
+	best_training_error = best_validation_error = best_test_error = best_runtime = -1;
 
 	if (num_runs > 0) {
 		best_training_error = stats[0].best_training_error[stats[0].last_generation];
@@ -453,8 +454,10 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 
 	if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION || 
 		problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
+
 		stddev_training_num_incorrect = stddev_validation_num_incorrect = stddev_test_num_incorrect = stddev_runtime = 0;
 		mean_training_num_incorrect = mean_validation_num_incorrect = mean_test_num_incorrect = mean_runtime = 0;
+		best_training_num_incorrect = best_validation_num_incorrect = best_test_num_incorrect = best_runtime = -1;
 
 		if (num_runs > 0) {
 			best_training_num_incorrect = stats[0].best_training_num_incorrect[stats[0].last_generation];
@@ -655,20 +658,104 @@ int t_mep_statistics::to_csv(const char *filename, int problem_type)
 	if (!f)
 		return false;
 	if (problem_type == MEP_PROBLEM_REGRESSION) {
-		fprintf(f, "#;training error; validation error; test error; running time (s)\n");
-		for (int r = 0; r < num_runs; r++)
-			fprintf(f, "%d;%lf;%lf;%lf;%lf\n", r, stats[r].best_training_error[stats[r].last_generation], stats[r].best_validation_error, stats[r].test_error, stats[r].running_time);
-		fprintf(f, "Best;%lf;%lf;%lf;%lf\n", best_training_error, best_validation_error, best_test_error, best_runtime);
-		fprintf(f, "Average;%lf;%lf;%lf;%lf\n", mean_training_error, mean_validation_error, mean_test_error, mean_runtime);
-		fprintf(f, "StdDev;%lf;%lf;%lf;%lf\n", stddev_training_error, stddev_validation_error, stddev_test_error, stddev_runtime);
+		fprintf(f, "Run #;training error; validation error; test error; running time (s)\n");
+		for (int r = 0; r < num_runs; r++) {
+			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_error[stats[r].last_generation]);
+			if (stats[r].best_validation_error > -1E-6)
+				fprintf(f, "%lf;", stats[r].best_validation_error);
+			else
+				fprintf(f, ";");
+			if (stats[r].test_error > -1E-6)
+				fprintf(f, "%lf;", stats[r].test_error);
+			else
+				fprintf(f, ";");
+			fprintf(f, "%lf\n", stats[r].running_time);
+		}
+		// best
+		fprintf(f, "Best;%lf;", best_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "%lf;", best_validation_error);
+		else
+			fprintf(f, ";");
+		if (best_test_error > -1E-6)
+			fprintf(f, "%lf;", best_test_error);
+		else
+			fprintf(f, ";");
+		fprintf(f, "%lf\n", best_runtime);
+		// average
+		fprintf(f, "Average;%lf;", mean_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "%lf;", mean_validation_error);
+		else
+			fprintf(f, ";");
+		if (best_test_error > -1E-6)
+			fprintf(f, "%lf;", mean_test_error);
+		else
+			fprintf(f, ";");
+		fprintf(f, "%lf\n", mean_runtime);
+
+		//std dev
+		fprintf(f, "StdDev;%lf;", stddev_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "%lf;", stddev_validation_error);
+		else
+			fprintf(f, ";");
+		if (best_test_error > -1E-6)
+			fprintf(f, "%lf;", stddev_test_error);
+		else
+			fprintf(f, ";");
+		fprintf(f, "%lf\n", stddev_runtime);
 	}
 	else {// MEP CLASSIFICATION
 		fprintf(f, "#;training num incorrect (%%); validation num incorrect (%%); test num incorrect (%%); running time (s)\n");
-		for (int r = 0; r < num_runs; r++)
-			fprintf(f, "%d;%lf;%lf;%lf;%lf\n", r, stats[r].best_training_num_incorrect[stats[r].last_generation], stats[r].best_validation_num_incorrect, stats[r].test_num_incorrect, stats[r].running_time);
-		fprintf(f, "Best;%lf;%lf;%lf;%lf\n", best_training_num_incorrect, best_validation_num_incorrect, best_test_num_incorrect, best_runtime);
-		fprintf(f, "Average;%lf;%lf;%lf;%lf\n", mean_training_num_incorrect, mean_validation_num_incorrect, mean_test_num_incorrect, mean_runtime);
-		fprintf(f, "StdDev;%lf;%lf;%lf;%lf\n", stddev_training_num_incorrect, stddev_validation_num_incorrect, stddev_test_num_incorrect, stddev_runtime);
+		for (int r = 0; r < num_runs; r++) {
+			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
+			if (stats[r].best_validation_num_incorrect > -1E-6)
+				fprintf(f, "%lf;", stats[r].best_validation_num_incorrect);
+			else
+				fprintf(f, ";");
+			if (stats[r].test_num_incorrect > -1E-6)
+				fprintf(f, "%lf;", stats[r].test_num_incorrect);
+			else
+				fprintf(f, ";");
+			fprintf(f, "%lf\n", stats[r].running_time);
+		}
+
+		// best
+		fprintf(f, "Best;%lf;", best_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "%lf;", best_validation_num_incorrect);
+		else
+			fprintf(f, ";");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "%lf;", best_test_num_incorrect);
+		else
+			fprintf(f, ";");
+		fprintf(f, "%lf\n", best_runtime);
+
+		// average
+		fprintf(f, "Average;%lf;", mean_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "%lf;", mean_validation_num_incorrect);
+		else
+			fprintf(f, ";");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "%lf;", mean_test_num_incorrect);
+		else
+			fprintf(f, ";");
+		fprintf(f, "%lf\n", mean_runtime);
+
+		//std dev
+		fprintf(f, "StdDev;%lf;", stddev_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "%lf;", stddev_validation_num_incorrect);
+		else
+			fprintf(f, ";");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "%lf;", stddev_test_num_incorrect);
+		else
+			fprintf(f, ";");
+		fprintf(f, "%lf\n", stddev_runtime);
 	}
 
 	fclose(f);
@@ -693,22 +780,111 @@ int t_mep_statistics::to_tex(const char *filename, int problem_type)
 	if (!f)
 		return false;
 
-	fprintf(f, "\\begin{tabular}\n");
+	fprintf(f, "\\begin{tabular}{c c c c c}\n");
 	if (problem_type == MEP_PROBLEM_REGRESSION) {
-		fprintf(f, "# & training error & validation error & test error & running time(s)\\\\ \n");
-		for (int r = 0; r < num_runs; r++)
-			fprintf(f, "%d & %lf & %lf & %lf & %lf\\\\ \n", r, stats[r].best_training_error[stats[r].last_generation], stats[r].best_validation_error, stats[r].test_error, stats[r].running_time);
-		fprintf(f, "Best;%lf;%lf;%lf;%lf\\\\ \n", best_training_error, best_validation_error, best_test_error, best_runtime);
-		fprintf(f, "Average;%lf;%lf;%lf;%lf\\\\ \n", mean_training_error, mean_validation_error, mean_test_error, mean_runtime);
-		fprintf(f, "StdDev;%lf;%lf;%lf;%lf\\\\ \n", stddev_training_error, stddev_validation_error, stddev_test_error, stddev_runtime);
+		fprintf(f, "Run \\# & training error & validation error & test error & running time(s)\\\\ \n");
+		for (int r = 0; r < num_runs; r++) {
+			fprintf(f, "%d & %lf & ", r + 1, stats[r].best_training_error[stats[r].last_generation]);
+
+			if (stats[r].best_validation_error > -1E-6)
+				fprintf(f, "%lf & ", stats[r].best_validation_error);
+			else
+				fprintf(f, "& ");
+			if (stats[r].test_error > -1E-6)
+				fprintf(f, "%lf & ", stats[r].test_error);
+			else
+				fprintf(f, "& ");
+
+			fprintf(f, "%lf\\\\ \n", stats[r].running_time);
+		}
+
+		// best
+		fprintf(f, "Best & %lf & ", best_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "%lf & ", best_validation_error);
+		else
+			fprintf(f, "& ");
+		if (best_test_error > -1E-6)
+			fprintf(f, "%lf & ", best_test_error);
+		else
+			fprintf(f, "& ");
+		fprintf(f, "%lf\\\\ \n", best_runtime);
+
+		// average
+		fprintf(f, "Average & %lf & ", mean_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "%lf & ", mean_validation_error);
+		else
+			fprintf(f, "& ");
+		if (best_test_error > -1E-6)
+			fprintf(f, "%lf & ", mean_test_error);
+		else
+			fprintf(f, "& ");
+		fprintf(f, "%lf\\\\ \n", mean_runtime);
+
+		//std dev
+		fprintf(f, "StdDev & %lf & ", stddev_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "%lf & ", stddev_validation_error);
+		else
+			fprintf(f, "& ");
+		if (best_test_error > -1E-6)
+			fprintf(f, "%lf & ", stddev_test_error);
+		else
+			fprintf(f, "& ");
+		fprintf(f, "%lf\\\\ \n", stddev_runtime);
 	}
 	else {// MEP CLASSIFICATION
-		fprintf(f, "# & training num incorrect (%%) & validation num incorrect (%%) & test num incorrect (%%) & running time(s)\\\\ \n");
-		for (int r = 0; r < num_runs; r++)
-			fprintf(f, "%d & %lf & %lf & %lf & %lf\\\\ \n", r, stats[r].best_training_num_incorrect[stats[r].last_generation], stats[r].best_validation_num_incorrect, stats[r].test_num_incorrect, stats[r].running_time);
-		fprintf(f, "Best & %lf & %lf & %lf & %lf\\\\ \n", best_training_num_incorrect, best_validation_num_incorrect, best_test_num_incorrect, best_runtime);
-		fprintf(f, "Average & %lf & %lf & %lf & %lf\\\\ \n", mean_training_num_incorrect, mean_validation_num_incorrect, mean_test_num_incorrect, mean_runtime);
-		fprintf(f, "StdDev & %lf & %lf & %lf & %lf\\\\ \n", stddev_training_num_incorrect, stddev_validation_num_incorrect, stddev_test_num_incorrect, stddev_runtime);
+		fprintf(f, "Run \\# & training num incorrect (\\%%) & validation num incorrect (\\%%) & test num incorrect (\\%%) & running time(s)\\\\ \n");
+		for (int r = 0; r < num_runs; r++) {
+			fprintf(f, "%d & %lf &", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
+			if (stats[r].best_validation_num_incorrect > -1E-6)
+				fprintf(f, "%lf & ", stats[r].best_validation_num_incorrect);
+			else
+				fprintf(f, "& ");
+
+			if (stats[r].test_error > -1E-6)
+				fprintf(f, "%lf &", stats[r].test_num_incorrect);
+			else
+				fprintf(f, "& ");
+			fprintf(f, "%lf\\\\ \n", stats[r].running_time);
+		}
+		
+		// best
+		fprintf(f, "Best & %lf & ", best_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "%lf & ", best_validation_num_incorrect);
+		else
+			fprintf(f, "& ");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "%lf & ", best_test_num_incorrect);
+		else
+			fprintf(f, "& ");
+		fprintf(f, "%lf\\\\ \n", best_runtime);
+
+		// average
+		fprintf(f, "Average & %lf & ", mean_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "%lf & ", mean_validation_num_incorrect);
+		else
+			fprintf(f, "& ");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "%lf & ", mean_test_num_incorrect);
+		else
+			fprintf(f, "& ");
+		fprintf(f, "%lf\\\\ \n", mean_runtime);
+
+		//std dev
+		fprintf(f, "StdDev & %lf & ", stddev_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "%lf & ", stddev_validation_num_incorrect);
+		else
+			fprintf(f, "& ");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "%lf & ", stddev_test_num_incorrect);
+		else
+			fprintf(f, "& ");
+		fprintf(f, "%lf\\\\ \n", stddev_runtime);
 	}
 
 	fprintf(f, "\\end{tabular}\n");
