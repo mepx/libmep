@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <locale.h>
 //---------------------------------------------------------------------------------
 #include "mep_chromosome.h"
 #include "mep_functions.h"
@@ -116,6 +116,8 @@ void print_instruction_to_C(int op, int adr1, int adr2, int adr3, int adr4, char
 char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 	int problem_type, int error_measure, int num_classes)
 {
+	setlocale(LC_NUMERIC, "C");
+
 	char* prog = new char[(code_length + num_constants + num_total_variables) * 100 + 1000];
 	char tmp_s[100];
 	prog[0] = 0;
@@ -308,6 +310,7 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 
 	strcat(prog, "}\n");
 
+	setlocale(LC_NUMERIC, "");
 	return prog;
 }
 //---------------------------------------------------------------------------
@@ -415,6 +418,8 @@ void print_instruction_to_Basic(int op, int adr1, int adr2, int adr3, int adr4, 
 char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 	int problem_type, int error_measure, int num_classes)
 {
+	setlocale(LC_NUMERIC, "C");
+
 	char* prog = new char[(code_length + num_constants + num_total_variables) * 100 + 1000];
 	char tmp_s[100];
 	prog[0] = 0;
@@ -583,6 +588,7 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 	strcat(prog, "\n");
 	strcat(prog, "End Function\n");
 
+	setlocale(LC_NUMERIC, "");
 	return prog;
 }
 //---------------------------------------------------------------------------

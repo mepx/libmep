@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <locale.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -18,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.11.30.0-beta");
+	strcpy(version, "2021.12.2.0-beta");
 
 	num_selected_operators = 0;
 
@@ -1310,6 +1311,8 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 //---------------------------------------------------------------------------
 int t_mep::to_xml(const char* filename)
 {
+	setlocale(LC_NUMERIC, "C");
+
 	pugi::xml_document doc;
 	// add node with some name
 	pugi::xml_node body = doc.append_child("project");
@@ -1327,6 +1330,8 @@ int t_mep::to_xml(const char* filename)
 
 	modified_project = false;
 
+	setlocale(LC_NUMERIC, "");
+
 #ifdef _WIN32
 	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
 	wchar_t* w_filename = new wchar_t[count_chars];
@@ -1343,6 +1348,8 @@ int t_mep::to_xml(const char* filename)
 //-----------------------------------------------------------------
 int t_mep::from_xml(const char* filename)
 {
+	setlocale(LC_NUMERIC, "C");
+
 	pugi::xml_document doc;
 
 	pugi::xml_parse_result result;
@@ -1358,13 +1365,19 @@ int t_mep::from_xml(const char* filename)
 	result = doc.load_file(filename);
 #endif
 
-	if (result.status != pugi::status_ok)
+	if (result.status != pugi::status_ok) {
+		setlocale(LC_NUMERIC, "");
+
 		return false;
+	}
 
 	pugi::xml_node body_node = doc.child("project");
 
-	if (!body_node)
+	if (!body_node) {
+		setlocale(LC_NUMERIC, "");
+
 		return false;
+	}
 
 	if (problem_description) {
 		delete[] problem_description;
@@ -1386,16 +1399,18 @@ int t_mep::from_xml(const char* filename)
 
 	pugi::xml_node alg_node = body_node.child("algorithm");
 
-	if (!alg_node)
+	if (!alg_node) {
+		setlocale(LC_NUMERIC, "");
 		return false;
+	}
 
 	from_pugixml_node(alg_node);
 
+	setlocale(LC_NUMERIC, "");
 
 	return true;
 }
 //-----------------------------------------------------------------
-
 void t_mep::compute_list_of_enabled_variables(void)
 {
 	if (actual_enabled_variables) {

@@ -40,7 +40,7 @@ void t_mep_constants::init(void)
 
 	constants_type = 1; // automatically generated
 	constants_can_evolve = true;
-	constants_mutation_max_deviation = 0.1;
+	constants_mutation_max_deviation = 1;
 
 	modified = false;
 }
