@@ -94,91 +94,91 @@ class t_mep_functions
 	int count_operators(void);
 
 	// returns true if the addition operator is enabled
-	bool get_addition(void);
+	bool get_addition(void)const;
 
 	// returns true if the subtraction operator is enabled
-	bool get_subtraction(void);
+	bool get_subtraction(void)const;
 
 	// returns true if the multiplication operator is enabled
-	bool get_multiplication(void);
+	bool get_multiplication(void)const;
 
 	// returns true if the division operator is enabled
-	bool get_division(void);
+	bool get_division(void)const;
 
 	// returns true if the power operator is enabled
-	bool get_power(void);
+	bool get_power(void)const;
 
 	// returns true if the sqrt operator is enabled
-	bool get_sqrt(void);
+	bool get_sqrt(void)const;
 
 	// returns true if the exp operator is enabled
-	bool get_exp(void);
+	bool get_exp(void)const;
 
 	// returns true if the pow10 operator is enabled
-	bool get_pow10(void);
+	bool get_pow10(void)const;
 
 	// returns true if the ln (natural logarithm) operator is enabled
-	bool get_ln(void);
+	bool get_ln(void)const;
 
 	// returns true if the log10 (log in base 10) operator is enabled
-	bool get_log10(void);
+	bool get_log10(void)const;
 
 	// returns true if the log2 (log in base 2) operator is enabled
-	bool get_log2(void);
+	bool get_log2(void)const;
 
 	// returns true if the floor operator is enabled
-	bool get_floor(void);
+	bool get_floor(void)const;
 
 	// returns true if the ceil operator is enabled
-	bool get_ceil(void);
+	bool get_ceil(void)const;
 
 	// returns true if the absolute operator is enabled
-	bool get_abs(void);
+	bool get_abs(void)const;
 
 	// returns true if the inv (1/x) operator is enabled
-	bool get_inv(void);
+	bool get_inv(void)const;
 
 	// returns true if the neg -x operator is enabled
-	bool get_neg(void);
+	bool get_neg(void)const;
 
 	// returns true if the x^2 operator is enabled
-	bool get_x2(void);
+	bool get_x2(void)const;
 
 	// returns true if the min (x, y) operator is enabled
-	bool get_min(void);
+	bool get_min(void)const;
 
 	// returns true if the max(x, y) operator is enabled
-	bool get_max(void);
+	bool get_max(void)const;
 
 	// returns true if the sin operator is enabled
-	bool get_sin(void);
+	bool get_sin(void)const;
 
 	// returns true if the cos operator is enabled
-	bool get_cos(void);
+	bool get_cos(void)const;
 
 	// returns true if the tan operator is enabled
-	bool get_tan(void);
+	bool get_tan(void)const;
 
 	// returns true if the asin operator is enabled
-	bool get_asin(void);
+	bool get_asin(void)const;
 
 	// returns true if the acos operator is enabled
-	bool get_acos(void);
+	bool get_acos(void)const;
 
 	// returns true if the atan operator is enabled
-	bool get_atan(void);
+	bool get_atan(void)const;
 
 	// returns true if the "if lower than zero" operator is enabled
-	bool get_iflz(void);
+	bool get_iflz(void)const;
 
 	// returns true if the "if a lower than b returns c else returns d" operator is enabled
-	bool get_ifalbcd(void);
+	bool get_ifalbcd(void)const;
 
 	// returns true if the "if a < 0 or b < 0 returns c else returns d" operator is enabled
-	bool get_if_a_or_b_cd(void);
+	bool get_if_a_or_b_cd(void)const;
 
 	// returns true if the "if a < 0 xor b < 0 returns c else returns d" operator is enabled
-	bool get_if_a_xor_b_cd(void);
+	bool get_if_a_xor_b_cd(void)const;
 
 	//bool get_inputs_average(void);
 	//bool get_num_inputs(void);

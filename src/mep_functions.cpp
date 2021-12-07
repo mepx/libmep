@@ -759,147 +759,147 @@ int t_mep_functions::count_operators(void)
 	return num_operators;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_addition(void)
+bool t_mep_functions::get_addition(void) const
 {
 	return use_addition;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_subtraction(void)
+bool t_mep_functions::get_subtraction(void)const
 {
 	return use_subtraction;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_multiplication(void)
+bool t_mep_functions::get_multiplication(void)const
 {
 	return use_multiplication;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_division(void)
+bool t_mep_functions::get_division(void)const
 {
 	return use_division;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_power(void)
+bool t_mep_functions::get_power(void)const
 {
 	return use_power;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_sqrt(void)
+bool t_mep_functions::get_sqrt(void)const
 {
 	return use_sqrt;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_exp(void)
+bool t_mep_functions::get_exp(void)const
 {
 	return use_exp;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_pow10(void)
+bool t_mep_functions::get_pow10(void)const
 {
 	return use_pow10;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_ln(void)
+bool t_mep_functions::get_ln(void)const
 {
 	return use_ln;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_log10(void)
+bool t_mep_functions::get_log10(void)const
 {
 	return use_log10;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_log2(void)
+bool t_mep_functions::get_log2(void)const
 {
 	return use_log2;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_floor(void)
+bool t_mep_functions::get_floor(void)const
 {
 	return use_floor;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_ceil(void)
+bool t_mep_functions::get_ceil(void)const
 {
 	return use_ceil;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_abs(void)
+bool t_mep_functions::get_abs(void)const
 {
 	return use_abs;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_inv(void)
+bool t_mep_functions::get_inv(void)const
 {
 	return use_inv;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_neg(void)
+bool t_mep_functions::get_neg(void)const
 {
 	return use_neg;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_x2(void)
+bool t_mep_functions::get_x2(void)const
 {
 	return use_x2;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_min(void)
+bool t_mep_functions::get_min(void)const
 {
 	return use_min;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_max(void)
+bool t_mep_functions::get_max(void)const
 {
 	return use_max;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_sin(void)
+bool t_mep_functions::get_sin(void)const
 {
 	return use_sin;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_cos(void)
+bool t_mep_functions::get_cos(void)const
 {
 	return use_cos;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_tan(void)
+bool t_mep_functions::get_tan(void)const
 {
 	return use_tan;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_asin(void)
+bool t_mep_functions::get_asin(void)const
 {
 	return use_asin;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_acos(void)
+bool t_mep_functions::get_acos(void)const
 {
 	return use_acos;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_atan(void)
+bool t_mep_functions::get_atan(void)const
 {
 	return use_atan;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_iflz(void)
+bool t_mep_functions::get_iflz(void)const
 {
 	return use_iflz;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_ifalbcd(void)
+bool t_mep_functions::get_ifalbcd(void)const
 {
 	return use_ifalbcd;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_if_a_or_b_cd(void)
+bool t_mep_functions::get_if_a_or_b_cd(void)const
 {
 	return use_if_a_or_b_cd;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_if_a_xor_b_cd(void)
+bool t_mep_functions::get_if_a_xor_b_cd(void)const
 {
 	return use_if_a_xor_b_cd;
 }
