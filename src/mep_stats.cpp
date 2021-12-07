@@ -397,60 +397,61 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 	mean_training_error = mean_validation_error = mean_test_error = mean_runtime = 0;
 	best_training_error = best_validation_error = best_test_error = best_runtime = -1;
 
-	if (num_runs > 0) {
-		best_training_error = stats[0].best_training_error[stats[0].last_generation];
-		if (compute_on_validation)
-			best_validation_error = stats[0].best_validation_error;
-		if (compute_on_test)
-			best_test_error = stats[0].test_error;
-		best_runtime = stats[0].running_time;
-		mean_training_error = stats[0].best_training_error[stats[0].last_generation];
-		if (compute_on_validation)
-			mean_validation_error = stats[0].best_validation_error;
-		if (compute_on_test)
-			mean_test_error = stats[0].test_error;
-		mean_runtime = stats[0].running_time;
+	if (!num_runs)
+		return;
 
-		for (int r = 1; r < num_runs; r++) {
-			mean_training_error += stats[r].best_training_error[stats[r].last_generation];
-			if (best_training_error > stats[r].best_training_error[stats[r].last_generation])
-				best_training_error = stats[r].best_training_error[stats[r].last_generation];
-			if (compute_on_validation) {
-				mean_validation_error += stats[r].best_validation_error;
-				if (best_validation_error > stats[r].best_validation_error)
-					best_validation_error = stats[r].best_validation_error;
-			}
-			if (compute_on_test) {
-				mean_test_error += stats[r].test_error;
-				if (best_test_error > stats[r].test_error)
-					best_test_error = stats[r].test_error;
-			}
+	best_training_error = stats[0].best_training_error[stats[0].last_generation];
+	if (compute_on_validation)
+		best_validation_error = stats[0].best_validation_error;
+	if (compute_on_test)
+		best_test_error = stats[0].test_error;
+	best_runtime = stats[0].running_time;
+	mean_training_error = stats[0].best_training_error[stats[0].last_generation];
+	if (compute_on_validation)
+		mean_validation_error = stats[0].best_validation_error;
+	if (compute_on_test)
+		mean_test_error = stats[0].test_error;
+	mean_runtime = stats[0].running_time;
 
-			if (best_runtime > stats[r].running_time)
-				best_runtime = stats[r].running_time;
-
-			mean_runtime += stats[r].running_time;
+	for (int r = 1; r < num_runs; r++) {
+		mean_training_error += stats[r].best_training_error[stats[r].last_generation];
+		if (best_training_error > stats[r].best_training_error[stats[r].last_generation])
+			best_training_error = stats[r].best_training_error[stats[r].last_generation];
+		if (compute_on_validation) {
+			mean_validation_error += stats[r].best_validation_error;
+			if (best_validation_error > stats[r].best_validation_error)
+				best_validation_error = stats[r].best_validation_error;
 		}
-		mean_training_error /= num_runs;
-		mean_validation_error /= num_runs;
-		mean_test_error /= num_runs;
-		mean_runtime /= num_runs;
-
-		// compute stddev
-
-		for (int r = 0; r < num_runs; r++) {
-			stddev_training_error += (mean_training_error - stats[r].best_training_error[stats[r].last_generation]) * (mean_training_error - stats[r].best_training_error[stats[r].last_generation]);
-			if (compute_on_validation)
-				stddev_validation_error += (mean_validation_error - stats[r].best_validation_error) * (mean_validation_error - stats[r].best_validation_error);
-			if (compute_on_test)
-				stddev_test_error += (mean_test_error - stats[r].test_error) * (mean_test_error - stats[r].test_error);
-			stddev_runtime += (mean_runtime - stats[r].running_time) * (mean_runtime - stats[r].running_time);
+		if (compute_on_test) {
+			mean_test_error += stats[r].test_error;
+			if (best_test_error > stats[r].test_error)
+				best_test_error = stats[r].test_error;
 		}
-		stddev_training_error = sqrt(stddev_training_error / num_runs);
-		stddev_validation_error = sqrt(stddev_validation_error / num_runs);
-		stddev_test_error = sqrt(stddev_test_error / num_runs);
-		stddev_runtime = sqrt(stddev_runtime / num_runs);
+
+		if (best_runtime > stats[r].running_time)
+			best_runtime = stats[r].running_time;
+
+		mean_runtime += stats[r].running_time;
 	}
+	mean_training_error /= num_runs;
+	mean_validation_error /= num_runs;
+	mean_test_error /= num_runs;
+	mean_runtime /= num_runs;
+
+	// compute stddev
+
+	for (int r = 0; r < num_runs; r++) {
+		stddev_training_error += (mean_training_error - stats[r].best_training_error[stats[r].last_generation]) * (mean_training_error - stats[r].best_training_error[stats[r].last_generation]);
+		if (compute_on_validation)
+			stddev_validation_error += (mean_validation_error - stats[r].best_validation_error) * (mean_validation_error - stats[r].best_validation_error);
+		if (compute_on_test)
+			stddev_test_error += (mean_test_error - stats[r].test_error) * (mean_test_error - stats[r].test_error);
+		stddev_runtime += (mean_runtime - stats[r].running_time) * (mean_runtime - stats[r].running_time);
+	}
+	stddev_training_error = sqrt(stddev_training_error / num_runs);
+	stddev_validation_error = sqrt(stddev_validation_error / num_runs);
+	stddev_test_error = sqrt(stddev_test_error / num_runs);
+	stddev_runtime = sqrt(stddev_runtime / num_runs);
 
 	if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION || 
 		problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION) {
@@ -459,7 +460,7 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 		mean_training_num_incorrect = mean_validation_num_incorrect = mean_test_num_incorrect = mean_runtime = 0;
 		best_training_num_incorrect = best_validation_num_incorrect = best_test_num_incorrect = best_runtime = -1;
 
-		if (num_runs > 0) {
+		if (stats[0].best_training_num_incorrect) {
 			best_training_num_incorrect = stats[0].best_training_num_incorrect[stats[0].last_generation];
 			if (compute_on_validation)
 				best_validation_num_incorrect = stats[0].best_validation_num_incorrect;
