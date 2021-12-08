@@ -35,7 +35,7 @@ public:
 	void allocate_memory(long num_generations);
 	void delete_memory(void);
 
-	t_mep_run_statistics& operator=(t_mep_run_statistics& source);
+	t_mep_run_statistics& operator=(const t_mep_run_statistics& source);
 
 	int to_xml(pugi::xml_node parent);
 	int from_xml(pugi::xml_node parent, int problem_type);
@@ -60,51 +60,51 @@ public:
 
 	t_mep_statistics();
 
-	t_mep_statistics& operator=(t_mep_statistics& source);
+	t_mep_statistics& operator=(const t_mep_statistics& source);
 
-	t_mep_run_statistics *get_stat_ptr(int index);
+	t_mep_run_statistics *get_stat_ptr(int index)  const;
 
-	void get_best_error(double &training, double &validation, double &test, double &running_time);
-	void get_mean_error(double &training, double &validation, double &test, double &running_time);
-	void get_sttdev_error(double &training, double &validation, double &test, double &running_time);
+	void get_best_error(double &training, double &validation, double &test, double &running_time) const;
+	void get_mean_error(double &training, double &validation, double &test, double &running_time) const;
+	void get_sttdev_error(double &training, double &validation, double &test, double &running_time) const;
 
-	void get_best_num_incorrect(double &training, double &validation, double &test, double &running_time);
-	void get_mean_num_incorrect(double &training, double &validation, double &test, double &running_time);
-	void get_sttdev_num_incorrect(double &training, double &validation, double &test, double &running_time);
+	void get_best_num_incorrect(double &training, double &validation, double &test, double &running_time) const;
+	void get_mean_num_incorrect(double &training, double &validation, double &test, double &running_time) const;
+	void get_sttdev_num_incorrect(double &training, double &validation, double &test, double &running_time) const;
 
 	// returns the best training error
-	double get_best_training_error(int run, int generation);
+	double get_best_training_error(int run, int generation) const;
 
 	// returns the best validation error
-	double get_best_validation_error(int run);
+	double get_best_validation_error(int run) const;
 
 	// returns the average (over the entire population) training error
-	double get_average_training_error(int run, int generation);
+	double get_average_training_error(int run, int generation) const;
 
 	// returns the best training num incorreclty classified
-	double get_best_training_num_incorrectly_classified(int run, int generation);
+	double get_best_training_num_incorrectly_classified(int run, int generation) const;
 
 	// returns the best validation num incorreclty classified
-	double get_best_validation_num_incorrectly_classified(int run);
+	double get_best_validation_num_incorrectly_classified(int run) const;
 
 	// returns the average (over the entire population) training num incorreclty classified
-	double get_mean_training_num_incorrectly_classified(int run, int generation);
+	double get_mean_training_num_incorrectly_classified(int run, int generation) const;
 
 	// returns the average (over the entire population) training num incorreclty classified
 	double get_stddev_training_num_incorrectly_classified(int run, int generation);
 
 	// returns the running time
-	double get_running_time(int run);
+	double get_running_time(int run) const;
 
 	// returns the error on the test data
-	double get_test_error(int run);
+	double get_test_error(int run) const;
 
 	// returns the num incorreclty classified on the test data
-	double get_test_num_incorrectly_classified(int run);
+	double get_test_num_incorrectly_classified(int run) const;
 
 	// save statistics to csv file
-	int to_csv(const char* file_name, int problem_type);
-	int to_tex(const char* file_name, int problem_type);
+	int to_csv(const char* file_name, int problem_type)const;
+	int to_tex(const char* file_name, int problem_type)const;
 
 	void sort_stats_by_running_time(bool ascending);
 	void sort_stats_by_training_error(bool ascending);
@@ -112,7 +112,7 @@ public:
 	void sort_stats_by_test_error(bool ascending);
 
 	// returns the last generation of a given run (useful when the run has been stopped earlier)
-	int get_latest_generation(int run);
+	int get_latest_generation(int run) const;
 
 	void delete_memory(void);
 	void append(int num_generations);

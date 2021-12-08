@@ -1110,7 +1110,7 @@ void t_mep_functions::set_if_a_xor_b_cd(bool value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::is_modified(void)
+bool t_mep_functions::is_modified(void) const
 {
 	return modified;
 }
@@ -1139,7 +1139,7 @@ modified = true;
 }
 //---------------------------------------------------------------------------
 */
-bool t_mep_functions::operator==(t_mep_functions &other)
+bool t_mep_functions::operator==(const t_mep_functions &other)
 {
 	if (use_addition != other.use_addition)
 		return false;

@@ -258,7 +258,7 @@ bool t_mep_data::from_csv_double(const char* filename)
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_csv(const char* filename, char _list_separator)
+bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 {
 	// this list separator is sent from outside
 
@@ -319,7 +319,7 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator)
 
 	fclose(f);
 
-	_modified = false;
+	//_modified = false;
 	return true;
 }
 //-----------------------------------------------------------------

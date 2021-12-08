@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.12.7.0-beta");
+	strcpy(version, "2021.12.8.0-beta");
 
 	num_selected_operators = 0;
 
@@ -115,12 +115,12 @@ void t_mep::allocate_sub_population(t_sub_population & a_pop)
 				&mep_constants, num_outputs);
 }
 //---------------------------------------------------------------------------
-void t_mep::get_best(t_mep_chromosome & dest)
+void t_mep::get_best(t_mep_chromosome & dest) const
 {
 	dest = pop[best_subpopulation_index].individuals[best_individual_index];
 }
 //---------------------------------------------------------------------------
-bool t_mep::get_output(int run_index, double* inputs, double* outputs)
+bool t_mep::get_output(int run_index, double* inputs, double* outputs) const
 {
 	int index_error_gene;
 	int max_index;
@@ -1433,12 +1433,12 @@ void t_mep::compute_list_of_enabled_variables(void)
 	}
 }
 //---------------------------------------------------------------------------
-bool t_mep::is_running(void)
+bool t_mep::is_running(void) const
 {
 	return !_stopped;
 }
 //---------------------------------------------------------------------------
-int t_mep::get_last_run_index(void)
+int t_mep::get_last_run_index(void) const
 {
 	return last_run_index;
 }
@@ -1455,7 +1455,7 @@ void t_mep::clear_stats(void)
 	}
 }
 //---------------------------------------------------------------------------
-char* t_mep::program_as_C(int run_index, bool simplified, double* inputs)
+char* t_mep::program_as_C(int run_index, bool simplified, double* inputs) const
 {
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_double(
 			simplified, inputs, mep_parameters.get_problem_type(), 
@@ -1463,7 +1463,7 @@ char* t_mep::program_as_C(int run_index, bool simplified, double* inputs)
 		);
 }
 //---------------------------------------------------------------------------
-char* t_mep::program_as_Excel_function(int run_index, bool simplified, double* inputs)
+char* t_mep::program_as_Excel_function(int run_index, bool simplified, double* inputs)const
 {
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Excel_function_double(
 		simplified, inputs, mep_parameters.get_problem_type(),
@@ -1471,7 +1471,7 @@ char* t_mep::program_as_Excel_function(int run_index, bool simplified, double* i
 	);
 }
 //---------------------------------------------------------------------------
-int t_mep::get_num_outputs(void)
+int t_mep::get_num_outputs(void) const
 {
 	return 1;
 }
@@ -1561,12 +1561,12 @@ void t_mep::init_enabled_variables(void)
 		variables_enabled[i] = 1;
 }
 //---------------------------------------------------------------------------
-int t_mep::get_num_actual_variables(void)
+int t_mep::get_num_actual_variables(void) const
 {
 	return num_actual_variables;
 }
 //---------------------------------------------------------------------------
-bool t_mep::is_variable_enabled(int index)
+bool t_mep::is_variable_enabled(int index) const
 {
 	return variables_enabled[index];
 }
@@ -1579,7 +1579,7 @@ void t_mep::set_variable_enable(int index, bool new_state)
 	}
 }
 //---------------------------------------------------------------------------
-bool t_mep::is_project_modified(void)
+bool t_mep::is_project_modified(void) const
 {
 	return modified_project;
 }
@@ -1602,7 +1602,7 @@ void t_mep::set_problem_description(const char* value)
 	}
 }
 //---------------------------------------------------------------------------
-char* t_mep::get_problem_description(void)
+char* t_mep::get_problem_description(void) const
 {
 	return problem_description;
 }
@@ -1613,12 +1613,12 @@ void t_mep::set_enable_cache_results_for_all_training_data(bool value)
 		cache_results_for_all_training_data = value;
 }
 //---------------------------------------------------------------------------
-bool t_mep::get_enable_cache_results_for_all_training_data(void)
+bool t_mep::get_enable_cache_results_for_all_training_data(void) const
 {
 	return cache_results_for_all_training_data;
 }
 //---------------------------------------------------------------------------
-long long t_mep::get_memory_consumption(void)
+long long t_mep::get_memory_consumption(void) const
 {
 	// for chromosomes
 	//	long long chromosomes_memory = 0;
@@ -1686,12 +1686,12 @@ void t_mep::stop(void)
 	_stopped_signal_sent = true;
 }
 //---------------------------------------------------------------------------
-t_mep_statistics* t_mep::get_stats_ptr(void)
+const t_mep_statistics* t_mep::get_stats_ptr(void)const 
 {
 	return &statistics;
 }
 //---------------------------------------------------------------------------
-const char* t_mep::get_version(void)
+const char* t_mep::get_version(void) const
 {
 	return version;
 }

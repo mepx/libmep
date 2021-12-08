@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 
 #include "mep_utils.h"
-#include <cstring>
+#include <string.h>
 
 //---------------------------------------------------------------------------
 int sort_function_value_class(const void *a, const void *b)

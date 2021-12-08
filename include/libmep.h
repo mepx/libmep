@@ -3,14 +3,11 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-
 #ifndef lib_mep_H
 #define lib_mep_H
 //-----------------------------------------------------------------
-
 #include <thread>
 #include <mutex>
-
 //-----------------------------------------------------------------
 #include "pugixml.hpp"
 
@@ -110,10 +107,10 @@ public:
 	t_mep_data *get_test_data_ptr(void);
 
 	// returns the version of the library
-	const char * get_version(void);
+	const char * get_version(void) const;
 
 	// returns the index of the last run (if multiple runs are performed)
-	int get_last_run_index(void);
+	int get_last_run_index(void) const;
 
 	// returns the number of variables
 	int get_num_total_variables(void);
@@ -122,7 +119,7 @@ public:
 	void set_num_total_variables(int value);
 
 	// returns true if the process is running, false otherwise
-	bool is_running(void);
+	bool is_running(void) const;
 
 	// starts the optimization process
 	int start(f_on_progress on_generation, f_on_progress on_new_evaluation, f_on_progress on_complete_run);
@@ -131,10 +128,10 @@ public:
 	void stop(void);
 
 	// gets the best chromosome
-	void get_best(t_mep_chromosome& dest);
+	void get_best(t_mep_chromosome& dest) const;
 
 	// gets the output obtaining by running the best program in a given run against in input
-	bool get_output(int run_index, double *inputs, double *outputs);
+	bool get_output(int run_index, double *inputs, double *outputs) const;
 
 	// saves everything to an xml file
 	int to_xml(const char* file_name);
@@ -156,52 +153,52 @@ public:
 	void clear_stats(void);
 
 	// returns the chromosome as a C program
-	char* program_as_C(int run_index, bool simplified, double *inputs);
+	char* program_as_C(int run_index, bool simplified, double *inputs) const;
 
 	// returns the chromosome as an Excel function
-	char* program_as_Excel_function(int run_index, bool simplified, double* inputs);
+	char* program_as_Excel_function(int run_index, bool simplified, double* inputs) const;
 
 	// returns the number of outputs of the program/
 	// currently only problems with 1 output are handled
-	int get_num_outputs(void);
+	int get_num_outputs(void) const;
 
 	// init operators, parameters and clears all data
 	void init(void);
 
 	// returns the number of enabled variables
-	int get_num_actual_variables(void);
+	int get_num_actual_variables(void) const;
 
 	// returns true if a particular variable is enable
-	bool is_variable_enabled(int index);
+	bool is_variable_enabled(int index) const;
 
 	// sets if a particular variable is enabled or not
 	void set_variable_enable(int index, bool new_state);
 
 	// returns true if the project has been modified
-	bool is_project_modified(void);
+	bool is_project_modified(void) const;
 
 	// sets the problem description
 	void set_problem_description(const char* value);
 
 	// returns the problem description
-	char* get_problem_description(void);
+	char* get_problem_description(void) const;
 
 	// sets if the results are cached for all training data
 	// caching will speed up the process, but will take much more memmory
 	void set_enable_cache_results_for_all_training_data(bool value);
 
 	// gets if the results are cached for all training data
-	bool get_enable_cache_results_for_all_training_data(void);
+	bool get_enable_cache_results_for_all_training_data(void) const;
 
 	// returns the memory consumption in bytes
-	long long get_memory_consumption(void);
+	long long get_memory_consumption(void) const;
 
 	// returns true if parameters are correct
 	bool validate_project(char*);
 
 	void compute_list_of_enabled_variables(void);
 
-	t_mep_statistics* get_stats_ptr(void);
+	const t_mep_statistics* get_stats_ptr(void) const;
 
 	void init_enabled_variables(void);
 

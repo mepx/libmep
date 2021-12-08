@@ -105,7 +105,7 @@ public:
     int to_xml(pugi::xml_node parent);
 
 	// saves the training data to a csv files
-	bool to_csv(const char *file_name, char ListSeparator);
+	bool to_csv(const char *file_name, char ListSeparator) const;
 	
 	// loads the data from a csv file
 	bool from_csv(const char *filename);
@@ -171,7 +171,7 @@ public:
 	bool to_time_serie(int window_size);
 
 	// returns true is data could be a time serie
-	bool is_time_serie(void);
+	bool is_time_serie(void) const;
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

@@ -3,12 +3,12 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#include "mep_parameters.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "mep_parameters.h"
 
+//---------------------------------------------------------------------------
 t_mep_parameters::t_mep_parameters(void)
 {
 	init();

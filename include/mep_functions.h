@@ -83,7 +83,7 @@ class t_mep_functions
 	bool modified;
 
 	t_mep_functions(void);
-	bool operator==(t_mep_functions&other);
+	bool operator==(const t_mep_functions& other);
 	
 	void init(void);
 
@@ -276,7 +276,7 @@ class t_mep_functions
 	//void set_num_inputs(bool value);
 
 	// returns true if the state of some operator is modified
-	bool is_modified(void);
+	bool is_modified(void) const;
 
 };
 //-----------------------------------------------------------------
