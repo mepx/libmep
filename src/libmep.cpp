@@ -94,7 +94,9 @@ void t_mep::allocate_values(double**** eval_double, s_value_class*** array_value
 void t_mep::allocate_sub_population(t_sub_population & a_pop)
 {
 	int num_outputs = 0;
-	if (mep_parameters.get_problem_type() == MEP_PROBLEM_REGRESSION || mep_parameters.get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
+	if (mep_parameters.get_problem_type() == MEP_PROBLEM_REGRESSION || 
+		mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE ||
+		mep_parameters.get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
 		num_outputs = 1;
 	else // MEP_PROBLEM_MULTICLASS
 		if (mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR || mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR)
@@ -127,6 +129,7 @@ bool t_mep::get_output(int run_index, double* inputs, double* outputs) const
 	if (run_index > -1) {
 		switch (mep_parameters.get_problem_type()) {
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 			if (!statistics.get_stat_ptr(run_index)->best_program.evaluate_double(inputs, outputs, index_error_gene))
 				return false;
 			break;
@@ -202,7 +205,8 @@ void t_mep::compute_cached_eval_matrix_double2(s_value_class * array_value_class
 {
 	double** data = training_data.get_data_matrix_double();
 
-	if (mep_parameters.get_problem_type() == MEP_PROBLEM_REGRESSION) {
+	if (mep_parameters.get_problem_type() == MEP_PROBLEM_REGRESSION ||
+		mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE) {
 		for (int v = 0; v < num_actual_variables; v++) {
 			cached_sum_of_errors[actual_enabled_variables[v]] = 0;
 			if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
@@ -387,6 +391,7 @@ double t_mep::compute_validation_error(int& best_subpopulation_index_for_validat
 
 	switch (mep_parameters.get_problem_type()){
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 					result = true;
 					if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 						result = pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_regression_error_on_double_data_return_error(
@@ -648,6 +653,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int* current_subpop_inde
 				// compute fitness
 				switch (mep_parameters.get_problem_type()) {
 				case MEP_PROBLEM_REGRESSION:
+				case MEP_PROBLEM_TIME_SERIE:
 					if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 						for (int i = 0; i < subpopulation_size; i++)
 							pop[pop_index].individuals[i].fitness_regression(
@@ -712,6 +718,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int* current_subpop_inde
 				if (recompute_fitness) {
 					switch (mep_parameters.get_problem_type()) {
 					case MEP_PROBLEM_REGRESSION:
+					case MEP_PROBLEM_TIME_SERIE:
 						if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 							for (int i = 0; i < subpopulation_size; i++)
 								pop[pop_index].individuals[i].fitness_regression(
@@ -803,6 +810,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int* current_subpop_inde
 							actual_enabled_variables, num_actual_variables, seeds[pop_index]);
 					switch (mep_parameters.get_problem_type()) {
 					case MEP_PROBLEM_REGRESSION:
+					case MEP_PROBLEM_TIME_SERIE:
 						if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 							a_sub_population->offspring1.fitness_regression(training_data, 
 									random_subset_indexes, mep_parameters.get_random_subset_selection_size(), 
@@ -856,6 +864,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(int* current_subpop_inde
 
 					switch (mep_parameters.get_problem_type()) {
 					case MEP_PROBLEM_REGRESSION:
+					case MEP_PROBLEM_TIME_SERIE:
 						if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 							a_sub_population->offspring2.fitness_regression(training_data, 
 									random_subset_indexes, 
@@ -1042,6 +1051,7 @@ bool t_mep::start_steady_state(int run, t_seed * seeds, double*** eval_double,
 		// I must run all solutions for the test data and choose the best one
 		switch (mep_parameters.get_problem_type()) {
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 			if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR) {
 				if (statistics.get_stat_ptr(run)->best_program.compute_regression_error_on_double_data(
 					test_data.get_data_matrix_double(),
@@ -1694,5 +1704,20 @@ const t_mep_statistics* t_mep::get_stats_ptr(void)const
 const char* t_mep::get_version(void) const
 {
 	return version;
+}
+//---------------------------------------------------------------------------
+bool t_mep::is_time_serie(void)
+{
+	return training_data.is_time_serie() &&
+		!validation_data.get_num_rows() &&
+		!test_data.get_num_rows();
+}
+//---------------------------------------------------------------------------
+bool t_mep::to_time_serie(int window_size)
+{
+	bool result = training_data.to_time_serie(window_size);
+	if (result)
+		mep_parameters.set_problem_type(MEP_PROBLEM_TIME_SERIE);
+	return result;
 }
 //---------------------------------------------------------------------------

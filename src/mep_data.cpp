@@ -1045,12 +1045,12 @@ void t_mep_data::remove_empty_rows(void)
 //-----------------------------------------------------------------
 bool t_mep_data::is_time_serie(void) const
 {
-	return (num_cols == 1 && num_data > 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
+	return (num_cols == 1 && num_data >= 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
 }
 //-----------------------------------------------------------------
 bool t_mep_data::to_time_serie(int window_size)
 {
-	if (!(num_cols == 1 && num_data > window_size + 1)) 
+	if (!(num_cols == 1 && num_data >= window_size + 1)) 
 		return false;
 	
 	if (data_type == MEP_DATA_STRING) {
@@ -1062,7 +1062,7 @@ bool t_mep_data::to_time_serie(int window_size)
 			_tmp_data[r] = new char*[window_size + 1];
 			for (int c = 0; c < window_size + 1; c++) {
 				_tmp_data[r][c] = NULL;
-				if (_data_string[r * (window_size + 1) + c][0]) {
+				if (_data_string[r + c][0]) {
 					size_t len = strlen(_data_string[r + c][0]);
 					_tmp_data[r][c] = new char[len + 1];
 					strcpy(_tmp_data[r][c], _data_string[r + c][0]);
@@ -1095,6 +1095,7 @@ bool t_mep_data::to_time_serie(int window_size)
 		num_data = num_data - window_size;
 		num_cols = window_size + 1;
 	}
+	
 	return true;
 }
 //-----------------------------------------------------------------

@@ -658,7 +658,7 @@ int t_mep_statistics::to_csv(const char *filename, int problem_type)const
 
 	if (!f)
 		return false;
-	if (problem_type == MEP_PROBLEM_REGRESSION) {
+	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
 		fprintf(f, "Run #;training error; validation error; test error; running time (s)\n");
 		for (int r = 0; r < num_runs; r++) {
 			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_error[stats[r].last_generation]);
@@ -782,7 +782,7 @@ int t_mep_statistics::to_tex(const char *filename, int problem_type) const
 		return false;
 
 	fprintf(f, "\\begin{tabular}{c c c c c}\n");
-	if (problem_type == MEP_PROBLEM_REGRESSION) {
+	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
 		fprintf(f, "Run \\# & training error & validation error & test error & running time(s)\\\\ \n");
 		for (int r = 0; r < num_runs; r++) {
 			fprintf(f, "%d & %lf & ", r + 1, stats[r].best_training_error[stats[r].last_generation]);

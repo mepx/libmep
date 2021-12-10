@@ -203,6 +203,9 @@ public:
 	void init_enabled_variables(void);
 
 	void clear(void);
+
+	bool is_time_serie(void);
+	bool to_time_serie(int window_size);
 };
 //-----------------------------------------------------------------
 #endif 

@@ -178,7 +178,8 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 		}
 
 		strcat(prog, "\n");
-		if (problem_type == MEP_PROBLEM_REGRESSION)
+		if (problem_type == MEP_PROBLEM_REGRESSION || 
+			problem_type == MEP_PROBLEM_TIME_SERIE)
 			sprintf(tmp_s, "  outputs[0] = prg[%d];", num_utilized_genes - 1);
 		else
 			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION)
@@ -222,6 +223,7 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 		strcat(prog, "\n");
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 			sprintf(tmp_s, "  outputs[0] = prg[%d];", index_best_genes[0]);
 			strcat(prog, tmp_s);
 			break;
@@ -475,7 +477,7 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 		}
 
 		strcat(prog, "\n");
-		if (problem_type == MEP_PROBLEM_REGRESSION)
+		if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE)
 			sprintf(tmp_s, "  mepx = prg(%d)", num_utilized_genes - 1);
 		else
 			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION)
@@ -519,6 +521,7 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 		strcat(prog, "\n");
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 			sprintf(tmp_s, "  mepx = prg(%d)", index_best_genes[0]);
 			strcat(prog, tmp_s);
 			break;

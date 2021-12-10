@@ -284,6 +284,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 		int value = atoi(value_as_cstring);
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 			if (value == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR || value == MEP_REGRESSION_MEAN_SQUARED_ERROR)
 				error_measure = value;
 			else
@@ -307,6 +308,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	else
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
+		case MEP_PROBLEM_TIME_SERIE:
 			error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 			break;
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
@@ -454,6 +456,7 @@ void t_mep_parameters::set_problem_type(long value)
 	problem_type = value;
 	switch (problem_type) {
 	case MEP_PROBLEM_REGRESSION:
+	case MEP_PROBLEM_TIME_SERIE:
 		error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 		break;
 	case  MEP_PROBLEM_BINARY_CLASSIFICATION:
@@ -535,6 +538,7 @@ void t_mep_parameters::set_error_measure(int value)
 {
 	switch (problem_type) {
 	case MEP_PROBLEM_REGRESSION:
+	case MEP_PROBLEM_TIME_SERIE:
 		if (value == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR || value == MEP_REGRESSION_MEAN_SQUARED_ERROR)
 			error_measure = value;
 		else
