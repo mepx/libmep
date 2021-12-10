@@ -1045,8 +1045,7 @@ void t_mep_data::remove_empty_rows(void)
 //-----------------------------------------------------------------
 bool t_mep_data::is_time_serie(void) const
 {
-	return (num_data == 1 && num_cols > 2 ||
-		num_cols == 1 && num_data > 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
+	return (num_cols == 1 && num_data > 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
 }
 //-----------------------------------------------------------------
 bool t_mep_data::to_time_serie(int window_size)
