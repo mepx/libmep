@@ -204,7 +204,7 @@ public:
 
 	void clear(void);
 
-	bool is_time_serie(void);
+	bool could_be_time_serie(void);
 	bool to_time_serie(int window_size);
 };
 //-----------------------------------------------------------------

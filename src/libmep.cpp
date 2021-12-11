@@ -1706,7 +1706,7 @@ const char* t_mep::get_version(void) const
 	return version;
 }
 //---------------------------------------------------------------------------
-bool t_mep::is_time_serie(void)
+bool t_mep::could_be_time_serie(void)
 {
 	return training_data.could_be_time_serie() &&
 		!validation_data.get_num_rows() &&
