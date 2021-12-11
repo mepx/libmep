@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.12.10.0-beta");
+	strcpy(version, "2021.12.11.0-beta");
 
 	num_selected_operators = 0;
 
@@ -1708,7 +1708,7 @@ const char* t_mep::get_version(void) const
 //---------------------------------------------------------------------------
 bool t_mep::is_time_serie(void)
 {
-	return training_data.is_time_serie() &&
+	return training_data.could_be_time_serie() &&
 		!validation_data.get_num_rows() &&
 		!test_data.get_num_rows();
 }

@@ -167,11 +167,14 @@ public:
 	// returns the number of classes
 	int get_num_classes(void)const;
 
-	// transform the (1 row or 1 column) data into a matrix based on window size
-	bool to_time_serie(int window_size);
-
 	// returns true is data could be a time serie
-	bool is_time_serie(void) const;
+	bool could_be_time_serie(void) const;
+
+	// transform the (1 row or 1 column) data into a matrix based on window size
+	// do not call it from here
+	// use the method from the t_mep class because validation and test must be empty
+	// also the method from t_mep sets the problem_type to MEP_PROBLEM_TIME_SERIE
+	bool to_time_serie(int window_size);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED
