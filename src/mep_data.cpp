@@ -1111,7 +1111,8 @@ void t_mep_data::append_and_steal(t_mep_data& other)
 		for (int r = 0; r < other.num_data; r++)
 			new_data_double[r + num_data] = other._data_double[r];
 
-		delete[] _data_double;
+		if (_data_double)
+			delete[] _data_double;
 		delete[] other._data_double;
 		other._data_double = NULL;
 		_data_double = new_data_double;
@@ -1124,7 +1125,8 @@ void t_mep_data::append_and_steal(t_mep_data& other)
 			for (int r = 0; r < other.num_data; r++)
 				new_data_string[r + num_data] = other._data_string[r];
 
-			delete[] _data_string;
+			if (_data_string)
+				delete[] _data_string;
 			delete[] other._data_string;
 			other._data_string = NULL;
 			_data_string = new_data_string;
@@ -1143,8 +1145,10 @@ void t_mep_data::reverse_time_serie(void)
 			new_data_double[r] = new double[1];
 		for (int c = 0; c < num_cols - 1; c++)
 			new_data_double[c][0] = _data_double[0][c];
-		for (int r = 0; r < num_data; r++)
+		for (int r = 0; r < num_data; r++) {
 			new_data_double[r + num_cols - 1][0] = _data_double[r][num_cols - 1];
+			delete[] _data_double[r];
+		}
 
 		delete[] _data_double;
 		_data_double = new_data_double;
@@ -1156,8 +1160,16 @@ void t_mep_data::reverse_time_serie(void)
 				new_data_string[r] = new char*[1];
 			for (int c = 0; c < num_cols - 1; c++)
 				new_data_string[c][0] = _data_string[0][c];
-			for (int r = 0; r < num_data; r++)
+			for (int r = 0; r < num_data; r++) {
 				new_data_string[r + num_cols - 1][0] = _data_string[r][num_cols - 1];
+				for (int c = 0; c < num_cols; c++)
+					if (_data_string[r])
+						delete[] _data_string[r][c];
+				delete[] _data_string[r];
+			}
+
+			delete[] _data_string;
+			_data_string = new_data_string;
 		}
 	num_data += num_cols - 1;
 	num_cols = 1;
