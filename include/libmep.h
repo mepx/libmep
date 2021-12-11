@@ -206,6 +206,7 @@ public:
 
 	bool could_be_time_serie(void);
 	bool to_time_serie(int window_size);
+	bool change_window_size_time_serie(int new_window_size);
 };
 //-----------------------------------------------------------------
 #endif 

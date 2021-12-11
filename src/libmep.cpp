@@ -1721,3 +1721,23 @@ bool t_mep::to_time_serie(int window_size)
 	return result;
 }
 //---------------------------------------------------------------------------
+bool t_mep::change_window_size_time_serie(int new_window_size)
+{
+	if (training_data.get_num_rows() - 1 < new_window_size)
+		return false;
+
+	if (new_window_size == training_data.get_num_cols() - 1)
+		return true;
+
+	// move all data in training
+	training_data.append_and_steal(validation_data);
+	training_data.append_and_steal(test_data);
+
+	// move all data in training in 1 column
+	training_data.reverse_time_serie();
+
+	bool result = training_data.to_time_serie(new_window_size);
+
+	return result;
+}
+//---------------------------------------------------------------------------

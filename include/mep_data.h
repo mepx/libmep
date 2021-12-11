@@ -175,6 +175,11 @@ public:
 	// use the method from the t_mep class because validation and test must be empty
 	// also the method from t_mep sets the problem_type to MEP_PROBLEM_TIME_SERIE
 	bool to_time_serie(int window_size);
+
+	// append another data and steal all rows from it
+	void append_and_steal(t_mep_data& other);
+
+	void reverse_time_serie(void);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

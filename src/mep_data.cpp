@@ -1099,3 +1099,67 @@ bool t_mep_data::to_time_serie(int window_size)
 	return true;
 }
 //-----------------------------------------------------------------
+void t_mep_data::append_and_steal(t_mep_data& other)
+{
+	if (other.num_data <= 0 || other.num_cols <= 0)
+		return;
+
+	if (data_type == MEP_DATA_DOUBLE){
+		double** new_data_double = new double* [num_data + other.num_data];
+		for (int r = 0; r < num_data; r++)
+			new_data_double[r] = _data_double[r];
+		for (int r = 0; r < other.num_data; r++)
+			new_data_double[r + num_data] = other._data_double[r];
+
+		delete[] _data_double;
+		delete[] other._data_double;
+		other._data_double = NULL;
+		_data_double = new_data_double;
+	}
+	else
+		if (data_type == MEP_DATA_STRING) {
+			char*** new_data_string = new char** [num_data + other.num_data];
+			for (int r = 0; r < num_data; r++)
+				new_data_string[r] = _data_string[r];
+			for (int r = 0; r < other.num_data; r++)
+				new_data_string[r + num_data] = other._data_string[r];
+
+			delete[] _data_string;
+			delete[] other._data_string;
+			other._data_string = NULL;
+			_data_string = new_data_string;
+		}
+
+	num_data += other.num_data;
+	other.num_data = 0;
+	other.num_cols = 0;
+}
+//-----------------------------------------------------------------
+void t_mep_data::reverse_time_serie(void)
+{
+	if (data_type == MEP_DATA_DOUBLE) {
+		double** new_data_double = new double* [num_data + num_cols - 1];
+		for (int r = 0; r < num_data + num_cols - 1; r++)
+			new_data_double[r] = new double[1];
+		for (int c = 0; c < num_cols - 1; c++)
+			new_data_double[c][0] = _data_double[0][c];
+		for (int r = 0; r < num_data; r++)
+			new_data_double[r + num_cols - 1][0] = _data_double[r][num_cols - 1];
+
+		delete[] _data_double;
+		_data_double = new_data_double;
+	}
+	else
+		if (data_type == MEP_DATA_STRING) {
+			char*** new_data_string = new char** [num_data + num_cols - 1];
+			for (int r = 0; r < num_data + num_cols - 1; r++)
+				new_data_string[r] = new char*[1];
+			for (int c = 0; c < num_cols - 1; c++)
+				new_data_string[c][0] = _data_string[0][c];
+			for (int r = 0; r < num_data; r++)
+				new_data_string[r + num_cols - 1][0] = _data_string[r][num_cols - 1];
+		}
+	num_data += num_cols - 1;
+	num_cols = 1;
+}
+//-----------------------------------------------------------------
