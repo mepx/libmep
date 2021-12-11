@@ -464,7 +464,12 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 			}
 			else { // a variable
 				if (simplified_prg[i].op < num_total_variables) {
-					sprintf(tmp_s, "x(1,%d).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
+					if (problem_type == MEP_PROBLEM_REGRESSION)
+						sprintf(tmp_s, "x(1,%d).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
+					else
+						if (problem_type == MEP_PROBLEM_TIME_SERIE)
+							sprintf(tmp_s, "x(%d,1).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
+
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -506,7 +511,11 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 			}
 			else { // a variable
 				if (prg[i].op < num_total_variables) {
-					sprintf(tmp_s, "x(1,%d).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
+					if (problem_type == MEP_PROBLEM_REGRESSION)
+						sprintf(tmp_s, "x(1,%d).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
+					else
+						if (problem_type == MEP_PROBLEM_TIME_SERIE)
+							sprintf(tmp_s, "x(%d,1).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
