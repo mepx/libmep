@@ -90,8 +90,8 @@ class t_mep_functions
     int to_xml(pugi::xml_node parent);
     int from_xml(pugi::xml_node parent);
 
-    int get_list_of_operators(int *actual_operators);
-	int count_operators(void);
+	unsigned int get_list_of_operators(int *actual_operators);
+	unsigned int count_operators(void);
 
 	// returns true if the addition operator is enabled
 	bool get_addition(void)const;

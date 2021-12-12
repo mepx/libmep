@@ -39,16 +39,16 @@ t_mep_chromosome::t_mep_chromosome()
 	best_class_threshold = 0;
 
 	num_incorrectly_classified = 0;
-	max_index_best_genes = -1;
+	max_index_best_genes = 0;
 	code_length = 0;
 	num_total_variables = 0;
 	num_utilized_genes = 0;
 	num_outputs = 0;
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::allocate_memory(long _code_length, int num_vars,
-		bool use_constants, t_mep_constants *  constants,
-		int _num_outputs)
+void t_mep_chromosome::allocate_memory(unsigned int _code_length, unsigned int num_vars,
+		bool use_constants, const t_mep_constants *  constants,
+	unsigned int _num_outputs)
 {
 	this->code_length = _code_length;
 	prg = new t_code3[code_length];
@@ -70,7 +70,7 @@ void t_mep_chromosome::allocate_memory(long _code_length, int num_vars,
 	else
 		num_constants = 0;
 	if (_num_outputs)
-		index_best_genes = new int[num_outputs];
+		index_best_genes = new unsigned int[num_outputs];
 }
 //---------------------------------------------------------------------------
 t_mep_chromosome::~t_mep_chromosome()
@@ -105,7 +105,7 @@ void t_mep_chromosome::clear(void)
 	}
 
 	num_incorrectly_classified = 0;
-	max_index_best_genes = -1;
+	max_index_best_genes = 0;
 }
 //---------------------------------------------------------------------------
 t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
@@ -122,16 +122,16 @@ t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
 		//		if (!simplified_prg)// I do this for stats only
 		//			simplified_prg = new code3[code_length];        // a string of genes
 		//!!!!!!!!!!!!!!!!!!!! this is not efficient. I must delete memory only when it is needed, at the end of all runs.!!!!!!!!!!!!!!!!!!!!!!!
-		for (int i = 0; i < code_length; i++) {
+		for (unsigned int i = 0; i < code_length; i++) {
 			prg[i] = source.prg[i];
 			//			simplified_prg[i] = source.simplified_prg[i];
 		}
 		fitness = source.fitness;        // the fitness
 
 		if (!index_best_genes)
-			index_best_genes = new int[num_outputs];
+			index_best_genes = new unsigned int[num_outputs];
 
-		for (int i = 0; i < num_outputs; i++)
+		for (unsigned int i = 0; i < num_outputs; i++)
 			index_best_genes[i] = source.index_best_genes[i];          // the index of the best expression in t_mep_chromosome
 
 		max_index_best_genes = source.max_index_best_genes;
@@ -142,7 +142,7 @@ t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
 			if (!real_constants)
 				real_constants = new double[num_constants];
 			//!!!!!!!!!!!!!!!!!!!! this is not efficient. I must delete memory only when it is needed, at the end of all runs.!!!!!!!!!!!!!!!!!!!!!!!
-			for (int i = 0; i < num_constants; i++)
+			for (unsigned int i = 0; i < num_constants; i++)
 				real_constants[i] = source.real_constants[i];
 		}
 
@@ -166,7 +166,7 @@ void t_mep_chromosome::swap_pointers(t_mep_chromosome& source)
 
 	fitness = source.fitness; // the fitness
 
-	int* tmp_index_best_genes = index_best_genes;
+	unsigned int* tmp_index_best_genes = index_best_genes;
 	index_best_genes = source.index_best_genes;
 	source.index_best_genes = tmp_index_best_genes;
 
@@ -187,26 +187,26 @@ int t_mep_chromosome::to_xml(pugi::xml_node parent)
 
 	pugi::xml_node node = parent.append_child("code_length");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", code_length);
+	sprintf(tmp_str, "%u", code_length);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_variables");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_total_variables);
+	sprintf(tmp_str, "%u", num_total_variables);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_outputs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_outputs);
+	sprintf(tmp_str, "%u", num_outputs);
 	data.set_value(tmp_str);
 
 	pugi::xml_node node_code = parent.append_child("code");
 
-	for (int i = 0; i < code_length; i++) {
+	for (unsigned int i = 0; i < code_length; i++) {
 		node = node_code.append_child("i");
 		data = node.append_child(pugi::node_pcdata);
 		if (prg[i].op < 0) // operator
-			sprintf(tmp_str, "%d %d %d %d %d", prg[i].op, prg[i].addr1, prg[i].addr2, prg[i].addr3, prg[i].addr4);
+			sprintf(tmp_str, "%u %u %u %u %u", prg[i].op, prg[i].addr1, prg[i].addr2, prg[i].addr3, prg[i].addr4);
 		else
 			sprintf(tmp_str, "%d", prg[i].op);
 		data.set_value(tmp_str);
@@ -218,8 +218,8 @@ int t_mep_chromosome::to_xml(pugi::xml_node parent)
 		char tmp_s[30];
 		char *tmp_genes_str = new char[num_outputs * 12 + 1]; // 30 digits for each constant !!!
 		tmp_genes_str[0] = 0;
-		for (int c = 0; c < num_outputs; c++) {
-			sprintf(tmp_s, "%d", index_best_genes[c]);
+		for (unsigned int c = 0; c < num_outputs; c++) {
+			sprintf(tmp_s, "%u", index_best_genes[c]);
 			strcat(tmp_genes_str, tmp_s);
 			strcat(tmp_genes_str, " ");
 		}
@@ -250,7 +250,7 @@ int t_mep_chromosome::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("num_constants");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", num_constants);
+	sprintf(tmp_str, "%u", num_constants);
 	data.set_value(tmp_str);
 
 	if (num_constants) {
@@ -263,7 +263,7 @@ int t_mep_chromosome::to_xml(pugi::xml_node parent)
 			char tmp_s[30];
 			tmp_cst_str = new char[num_constants * 30]; // 30 digits for each constant !!!
 			tmp_cst_str[0] = 0;
-			for (int c = 0; c < num_constants; c++) {
+			for (unsigned int c = 0; c < num_constants; c++) {
 				sprintf(tmp_s, "%lg", real_constants[c]);
 				strcat(tmp_cst_str, tmp_s);
 				strcat(tmp_cst_str, " ");
@@ -283,7 +283,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	pugi::xml_node node = parent.child("code_length");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		code_length = atoi(value_as_cstring);
+		code_length = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		code_length = 0;
@@ -291,7 +291,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	node = parent.child("num_variables");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_total_variables = atoi(value_as_cstring);
+		num_total_variables = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_total_variables = 1;
@@ -305,7 +305,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 				const char *value_as_cstring = row.child_value();
 				sscanf(value_as_cstring, "%d", &prg[i].op);
 				if (prg[i].op < 0) { // operator
-					int num_read = sscanf(value_as_cstring, "%d%d%d%d%d", &prg[i].op, &prg[i].addr1, &prg[i].addr2, &prg[i].addr3, &prg[i].addr4);
+					int num_read = sscanf(value_as_cstring, "%d%u%u%u%u", &prg[i].op, &prg[i].addr1, &prg[i].addr2, &prg[i].addr3, &prg[i].addr4);
 					if (num_read < 4) {
 						prg[i].addr3 = 0;
 						prg[i].addr4 = 0;
@@ -319,7 +319,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 					const char *value_as_cstring = row.child_value();
 					sscanf(value_as_cstring, "%d", &prg[i].op);
 					if (prg[i].op < 0) { // operator
-						int num_read = sscanf(value_as_cstring, "%d%d%d%d%d", &prg[i].op, &prg[i].addr1, &prg[i].addr2, &prg[i].addr3, &prg[i].addr4);
+						int num_read = sscanf(value_as_cstring, "%d%u%u%u%u", &prg[i].op, &prg[i].addr1, &prg[i].addr2, &prg[i].addr3, &prg[i].addr4);
 						if (num_read < 4) {
 							prg[i].addr3 = 0;
 							prg[i].addr4 = 0;
@@ -336,20 +336,20 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	node = parent.child("num_outputs");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_outputs = atoi(value_as_cstring);
+		num_outputs = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_outputs = 1;
 
 	if (num_outputs)
-		index_best_genes = new int[num_outputs];
+		index_best_genes = new unsigned int[num_outputs];
 
 	node = parent.child("best_genes");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
 		size_t num_jumped_chars = 0;
-		for (int c = 0; c < num_outputs; c++) {
-			sscanf(value_as_cstring + num_jumped_chars, "%d", &index_best_genes[c]);
+		for (unsigned int c = 0; c < num_outputs; c++) {
+			sscanf(value_as_cstring + num_jumped_chars, "%u", &index_best_genes[c]);
 			size_t local_jump = strcspn(value_as_cstring + num_jumped_chars, " ");
 			num_jumped_chars += local_jump + 1;
 		}
@@ -359,7 +359,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 		node = parent.child("best");
 		if (node) {
 			const char *value_as_cstring = node.child_value();
-			index_best_genes[0] = atoi(value_as_cstring);
+			index_best_genes[0] = (unsigned int)atoi(value_as_cstring);
 			max_index_best_genes = index_best_genes[0];
 		}
 	}
@@ -367,7 +367,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	node = parent.child("max_index_best_genes");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		max_index_best_genes = atoi(value_as_cstring);
+		max_index_best_genes = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("error");
@@ -395,14 +395,14 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	node = parent.child("num_constants");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_constants = atoi(value_as_cstring);
+		num_constants = (unsigned int)atoi(value_as_cstring);
 	}
 	node = parent.child("constants");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
 		size_t num_jumped_chars = 0;
 		real_constants = new double[num_constants];
-		for (int c = 0; c < num_constants; c++) {
+		for (unsigned int c = 0; c < num_constants; c++) {
 			sscanf(value_as_cstring + num_jumped_chars, "%lf", &real_constants[c]);
 			size_t local_jump = strcspn(value_as_cstring + num_jumped_chars, " ");
 			num_jumped_chars += local_jump + 1;
@@ -411,7 +411,7 @@ int t_mep_chromosome::from_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::mark(int position, bool* marked)
+void t_mep_chromosome::mark(unsigned int position, bool* marked)
 {
 	if ((prg[position].op < 0) && !marked[position]) {
 		mark(prg[position].addr1, marked);
@@ -457,17 +457,17 @@ void t_mep_chromosome::mark(int position, bool* marked)
 void t_mep_chromosome::simplify(void)
 {
 	bool *marked = new bool[code_length];
-	for (int i = 0; i < code_length; marked[i++] = false);
+	for (unsigned int i = 0; i < code_length; marked[i++] = false);
 
-	int *skipped = new int[code_length];
-	for (int o = 0; o < num_outputs; o++) {
+	unsigned int *skipped = new unsigned int[code_length];
+	for (unsigned int o = 0; o < num_outputs; o++) {
 		mark(index_best_genes[o], marked);
 
 		if (!marked[0])
 			skipped[0] = 1;
 		else
 			skipped[0] = 0;
-		for (int i = 1; i <= index_best_genes[o]; i++)
+		for (unsigned int i = 1; i <= index_best_genes[o]; i++)
 			if (!marked[i])
 				skipped[i] = skipped[i - 1] + 1;
 			else
@@ -478,8 +478,8 @@ void t_mep_chromosome::simplify(void)
 	simplified_prg = new t_code3[code_length];
 
 	num_utilized_genes = 0;
-	for (int o = 0; o < num_outputs; o++)
-	for (int i = 0; i <= index_best_genes[o]; i++)
+	for (unsigned int o = 0; o < num_outputs; o++)
+	for (unsigned int i = 0; i <= index_best_genes[o]; i++)
 		if (marked[i]) {
 			simplified_prg[num_utilized_genes] = prg[i];
 			if (prg[i].op < 0) {
@@ -508,18 +508,18 @@ int t_mep_chromosome::compare(const t_mep_chromosome &other, bool /*minimize_ope
 //---------------------------------------------------------------------------
 void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 		const t_mep_constants & mep_constants,
-		const int *actual_operators, int num_actual_operators,
-	const int *actual_variables, int num_actual_variables, t_seed& seed)
+		const int *actual_operators, unsigned int num_actual_operators,
+	const unsigned int *actual_variables, unsigned int num_actual_variables, t_seed& seed)
 // randomly initializes the individuals
 {
 	// I have to generate the constants for this individuals
 	if (parameters.get_constants_probability() > 1E-6) {
 		if (mep_constants.get_constants_type() == USER_DEFINED_CONSTANTS) {
-			for (int c = 0; c < num_constants; c++)
+			for (unsigned int c = 0; c < num_constants; c++)
 				real_constants[c] = mep_constants.get_constants_double(c);
 		}
 		else {// automatic constants
-			for (int c = 0; c < num_constants; c++)
+			for (unsigned int c = 0; c < num_constants; c++)
 				real_constants[c] = mep_real_rand(seed, mep_constants.get_min_constants_interval_double(),
 											mep_constants.get_max_constants_interval_double());
 		}
@@ -529,31 +529,31 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 	double p = mep_real_rand(seed, 0, sum);
 
 	if (p <= parameters.get_variables_probability())
-		prg[0].op = actual_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];
+		prg[0].op = (int)actual_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];
 	else
-		prg[0].op = num_total_variables + mep_int_rand(seed, 0, num_constants - 1);
+		prg[0].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants - 1);
 
-	for (int i = 1; i < parameters.get_code_length(); i++) {
+	for (unsigned int i = 1; i < parameters.get_code_length(); i++) {
 		p = mep_real_rand(seed, 0, 1);
 
 		if (p <= parameters.get_operators_probability())
-			prg[i].op = actual_operators[mep_int_rand(seed, 0, num_actual_operators - 1)];
+			prg[i].op = (int)actual_operators[mep_unsigned_int_rand(seed, 0, num_actual_operators - 1)];
 		else
 			if (p <= parameters.get_operators_probability() + parameters.get_variables_probability())
-				prg[i].op = actual_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];
+				prg[i].op = (int)actual_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];
 			else
-				prg[i].op = num_total_variables + mep_int_rand(seed, 0, num_constants - 1);
+				prg[i].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants - 1);
 
-		prg[i].addr1 = mep_int_rand(seed, 0, i - 1);
-		prg[i].addr2 = mep_int_rand(seed, 0, i - 1);
-		prg[i].addr3 = mep_int_rand(seed, 0, i - 1);
-		prg[i].addr4 = mep_int_rand(seed, 0, i - 1);
+		prg[i].addr1 = mep_unsigned_int_rand(seed, 0, i - 1);
+		prg[i].addr2 = mep_unsigned_int_rand(seed, 0, i - 1);
+		prg[i].addr3 = mep_unsigned_int_rand(seed, 0, i - 1);
+		prg[i].addr4 = mep_unsigned_int_rand(seed, 0, i - 1);
 	}
 }
 //---------------------------------------------------------------------------
 void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_constants & mep_constants,
-		const int *actual_operators, int num_actual_operators,
-	const int *actual_variables, int num_actual_variables,
+		const int *actual_operators, unsigned int num_actual_operators,
+	const unsigned int *actual_variables, unsigned int num_actual_variables,
 	t_seed& seed)
 // mutate the individual
 {
@@ -565,48 +565,48 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_
 		double q = mep_real_rand(seed, 0, sum);
 
 		if (q <= parameters.get_variables_probability())
-			prg[0].op = actual_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];
+			prg[0].op = (int)actual_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];
 		else
-			prg[0].op = num_total_variables + mep_int_rand(seed, 0, num_constants - 1);
+			prg[0].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants - 1);
 	}
 
-	for (int i = 1; i < code_length; i++) {
+	for (unsigned int i = 1; i < code_length; i++) {
 		p = mep_real_rand(seed, 0, 1);      // mutate the operator
 		if (p < parameters.get_mutation_probability()) {
 			double q = mep_real_rand(seed, 0, 1);
 
 			if (q <= parameters.get_operators_probability())
-				prg[i].op = actual_operators[mep_int_rand(seed, 0, num_actual_operators - 1)];
+				prg[i].op = actual_operators[mep_unsigned_int_rand(seed, 0, num_actual_operators - 1)];
 			else
 				if (q <= parameters.get_operators_probability() + parameters.get_variables_probability())
-					prg[i].op = actual_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];
+					prg[i].op = (int)actual_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];
 				else
-					prg[i].op = num_total_variables + mep_int_rand(seed, 0, num_constants - 1);
+					prg[i].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants - 1);
 		}
 
 		p = mep_real_rand(seed, 0, 1);      // mutate the first address  (adr1)
 		if (p < parameters.get_mutation_probability())
-			prg[i].addr1 = mep_int_rand(seed, 0, i - 1);
+			prg[i].addr1 = mep_unsigned_int_rand(seed, 0, i - 1);
 
 		p = mep_real_rand(seed, 0, 1);      // mutate the second address   (adr2)
 		if (p < parameters.get_mutation_probability())
-			prg[i].addr2 = mep_int_rand(seed, 0, i - 1);
+			prg[i].addr2 = mep_unsigned_int_rand(seed, 0, i - 1);
 		p = mep_real_rand(seed, 0, 1);      // mutate the 3rd address   (adr3)
 		if (p < parameters.get_mutation_probability())
-			prg[i].addr3 = mep_int_rand(seed, 0, i - 1);
+			prg[i].addr3 = mep_unsigned_int_rand(seed, 0, i - 1);
 		p = mep_real_rand(seed, 0, 1);      // mutate the 4th address   (adr4)
 		if (p < parameters.get_mutation_probability())
-			prg[i].addr4 = mep_int_rand(seed, 0, i - 1);
+			prg[i].addr4 = mep_unsigned_int_rand(seed, 0, i - 1);
 	}
 	// lets see if I can evolve constants
 
 	if (mep_constants.get_constants_can_evolve() && mep_constants.get_constants_type() == AUTOMATIC_CONSTANTS)
-		for (int c = 0; c < num_constants; c++) {
+		for (unsigned int c = 0; c < num_constants; c++) {
 			p = mep_real_rand(seed, 0, 1);      // mutate the operator
 			double tmp_cst_d = mep_real_rand(seed, 0, mep_constants.get_constants_mutation_max_deviation());
 
 			if (p < parameters.get_mutation_probability()) {
-				if (mep_int_rand(seed, 0, 1)) {// coin
+				if (rand_int_01(seed)) {// coin
 					if (real_constants[c] + tmp_cst_d <= mep_constants.get_max_constants_interval_double())
 						real_constants[c] += tmp_cst_d;
 				}
@@ -628,8 +628,8 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2,
 	offspring1.num_total_variables = num_total_variables;
 	offspring2.num_total_variables = num_total_variables;
 
-	int pct, i;
-	pct = 1 + mep_int_rand(seed, 0, code_length - 3);
+	unsigned int pct, i;
+	pct = 1 + mep_unsigned_int_rand(seed, 0, code_length - 3);
 	for (i = 0; i < pct; i++) {
 		offspring1.prg[i] = prg[i];
 		offspring2.prg[i] = parent2.prg[i];
@@ -641,12 +641,12 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2,
 
 	if (num_constants && mep_constants.get_constants_can_evolve() &&
 			mep_constants.get_constants_type() == AUTOMATIC_CONSTANTS) {
-		pct = 1 + mep_int_rand(seed, 0, num_constants - 3);
-		for (int c = 0; c < pct; c++) {
+		pct = 1 + mep_unsigned_int_rand(seed, 0, num_constants - 3);
+		for (unsigned int c = 0; c < pct; c++) {
 			offspring1.real_constants[c] = real_constants[c];
 			offspring2.real_constants[c] = parent2.real_constants[c];
 		}
-		for (int c = pct; c < num_constants; c++) {
+		for (unsigned int c = pct; c < num_constants; c++) {
 			offspring1.real_constants[c] = parent2.real_constants[c];
 			offspring2.real_constants[c] = real_constants[c];
 		}
@@ -664,8 +664,8 @@ void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2,
 	offspring1.num_total_variables = num_total_variables;
 	offspring2.num_total_variables = num_total_variables;
 
-	for (int i = 0; i < code_length; i++)
-		if (mep_int_rand(seed, 0, 1)) {
+	for (unsigned int i = 0; i < code_length; i++)
+		if (rand_int_01(seed)) {
 			offspring1.prg[i] = prg[i];
 			offspring2.prg[i] = parent2.prg[i];
 		}
@@ -676,7 +676,7 @@ void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2,
 
     if (mep_constants.get_constants_can_evolve() &&
         mep_constants.get_constants_type() == AUTOMATIC_CONSTANTS)
-        for (int c = 0; c < num_constants; c++) {
+        for (unsigned int c = 0; c < num_constants; c++) {
             offspring1.real_constants[c] = real_constants[c];
             offspring2.real_constants[c] = parent2.real_constants[c];
         }
@@ -737,11 +737,11 @@ delete[] line_of_constants;
 }
 */
 //---------------------------------------------------------------------------
-bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, int &index_error_gene)
+bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, unsigned int &index_error_gene)
 {
 	double *eval_vect = new double[max_index_best_genes + 1];
 
-	for (int i = 0; i <= max_index_best_genes; i++){   // read the t_mep_chromosome from top to down
+	for (unsigned int i = 0; i <= max_index_best_genes; i++){   // read the t_mep_chromosome from top to down
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
 		bool is_error_case = false;// division by zero, other errors
@@ -862,7 +862,7 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, int &ind
 			break;
 
 		default:  // a variable
-			if (prg[i].op < num_total_variables)
+			if (prg[i].op < (int)num_total_variables)
 				eval_vect[i] = inputs[prg[i].op];
 			else
 				eval_vect[i] = real_constants[prg[i].op - num_total_variables];
@@ -881,14 +881,14 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, int &ind
 
 }
 //---------------------------------------------------------------------------
-bool t_mep_chromosome::get_first_max_index(double *inputs, int &max_index, int &index_error_gene)
+bool t_mep_chromosome::get_first_max_index(double *inputs, unsigned int &max_index, unsigned int &index_error_gene)
 {
 	double *eval_vect = new double[code_length];
 
-	max_index = -1;
+	max_index = 0;
 	double max_value = -DBL_MAX;
 
-	for (int i = 0; i < code_length; i++){   // read the t_mep_chromosome from top to down
+	for (unsigned int i = 0; i < code_length; i++){   // read the t_mep_chromosome from top to down
 	
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
@@ -1005,7 +1005,7 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, int &max_index, int &
 
 
 		default:  // a variable
-			if (prg[i].op < num_total_variables)
+			if (prg[i].op < (int)num_total_variables)
 				eval_vect[i] = inputs[prg[i].op];
 			else
 				eval_vect[i] = real_constants[prg[i].op - num_total_variables];
@@ -1028,14 +1028,14 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, int &max_index, int &
 	return true;
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
-			double **cached_variables_eval_matrix, int num_actual_variables, int * actual_enabled_variables,
+void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data,
+			double **cached_variables_eval_matrix, 
+			unsigned int num_actual_variables, unsigned int * actual_enabled_variables,
 			int *line_of_constants, double ** eval_double, t_seed & seed)
 {
 	//	bool is_error_case;  // division by zero, other errors
 
-	for (int i = 0; i < code_length; i++)   // read the t_mep_chromosome from top to down
-	{
+	for (unsigned int i = 0; i < code_length; i++){   // read the t_mep_chromosome from top to down
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
 		double *arg1, *arg2, *arg3, *arg4;
@@ -1044,7 +1044,7 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 
 		if (prg[i].op < 0) {// an operator
 			if (prg[prg[i].addr1].op >= 0)
-				if (prg[prg[i].addr1].op < num_total_variables)
+				if (prg[prg[i].addr1].op < (int)num_total_variables)
 					arg1 = cached_variables_eval_matrix[prg[prg[i].addr1].op];
 				else
 					arg1 = eval_double[line_of_constants[prg[prg[i].addr1].op - num_total_variables]];
@@ -1052,7 +1052,7 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 				arg1 = eval_double[prg[i].addr1];
 
 			if (prg[prg[i].addr2].op >= 0)
-				if (prg[prg[i].addr2].op < num_total_variables)
+				if (prg[prg[i].addr2].op < (int)num_total_variables)
 					arg2 = cached_variables_eval_matrix[prg[prg[i].addr2].op];
 				else
 					arg2 = eval_double[line_of_constants[prg[prg[i].addr2].op - num_total_variables]];
@@ -1060,7 +1060,7 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 				arg2 = eval_double[prg[i].addr2];
 
 			if (prg[prg[i].addr3].op >= 0)
-				if (prg[prg[i].addr3].op < num_total_variables)
+				if (prg[prg[i].addr3].op < (int)num_total_variables)
 					arg3 = cached_variables_eval_matrix[prg[prg[i].addr3].op];
 				else
 					arg3 = eval_double[line_of_constants[prg[prg[i].addr3].op - num_total_variables]];
@@ -1068,7 +1068,7 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 				arg3 = eval_double[prg[i].addr3];
 
 			if (prg[prg[i].addr4].op >= 0)
-				if (prg[prg[i].addr4].op < num_total_variables)
+				if (prg[prg[i].addr4].op < (int)num_total_variables)
 					arg4 = cached_variables_eval_matrix[prg[prg[i].addr4].op];
 				else
 					arg4 = eval_double[line_of_constants[prg[prg[i].addr4].op - num_total_variables]];
@@ -1081,42 +1081,42 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 
 		switch (prg[i].op) {
 		case  O_ADDITION: {  // +
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] + arg2[k];
 		}
 			break;
 		case  O_SUBTRACTION: {  // -
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] - arg2[k];
 		}
 			break;
 		case  O_MULTIPLICATION: {  // *
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] * arg2[k];
 		}
 			break;
 		case  O_DIVISION:  //  /
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (fabs(arg2[k]) < DIVISION_PROTECT) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
 				else
 					eval[k] = arg1[k] / arg2[k];
 			break;
 		case O_POWER:
-			for (int k = 0; k < num_training_data; k++) {
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = pow(arg1[k], arg2[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 			}
 			break;
 		case O_SQRT:
-			for (int k = 0; k < num_training_data; k++) {
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				if (arg1[k] <= 0) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1124,28 +1124,28 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 			}
 			break;
 		case O_EXP:
-			for (int k = 0; k < num_training_data; k++) {
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = exp(arg1[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 			}
 
 			break;
 		case O_POW10:
-			for (int k = 0; k < num_training_data; k++) {
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = pow(10, arg1[k]);
 				if (errno || isnan(eval[k]) || isinf(eval[k])) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 			}
 			break;
 		case O_LN:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1153,9 +1153,9 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 
 			break;
 		case O_LOG10:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1163,68 +1163,68 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 
 			break;
 		case O_lOG2:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (arg1[k] <= 0) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 				else
 					eval[k] = log2(arg1[k]);
 			break;
 		case O_FLOOR:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = floor(arg1[k]);
 			break;
 		case O_CEIL:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = ceil(arg1[k]);
 			break;
 		case O_ABS:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = fabs(arg1[k]);
 			break;
 		case O_INV:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (fabs(arg1[k]) < DIVISION_PROTECT) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
 				else
 					eval[k] = 1.0 / arg1[k];
 			break;
 		case O_NEG:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = -arg1[k];
 			break;
 		case O_X2:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] * arg1[k];
 			break;
 		case O_MIN:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] < arg2[k] ? arg1[k] : arg2[k];
 			break;
 		case O_MAX:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] > arg2[k] ? arg1[k] : arg2[k];
 			break;
 		case O_SIN:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = sin(arg1[k]);
 			break;
 		case O_COS:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = cos(arg1[k]);
 			break;
 		case O_TAN:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = tan(arg1[k]);
 			break;
 
 		case O_ASIN:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (arg1[k] < -1 || arg1[k] > 1) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1232,9 +1232,9 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 
 			break;
 		case O_ACOS:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				if (arg1[k] < -1 || arg1[k] > 1) {
-					prg[i].op = actual_enabled_variables[mep_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
 				else
@@ -1242,33 +1242,33 @@ void t_mep_chromosome::compute_eval_matrix_double(int num_training_data,
 
 			break;
 		case O_ATAN:
-			for (int k = 0; k < num_training_data; k++) {
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = atan(arg1[k]);
 			}
 			break;
 		case O_IFLZ:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] < 0 ? arg2[k] : arg3[k];
 			break;
 		case O_IFALBCD:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] < arg2[k] ? arg3[k] : arg4[k];
 			break;
 		case O_IF_A_OR_B_CD:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = arg1[k] < 0 || arg2[k] < 0 ? arg3[k] : arg4[k];
 			break;
 		case O_IF_A_XOR_B_CD:
-			for (int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = (arg1[k] < 0) != (arg2[k] < 0) ? arg3[k] : arg4[k];
 			break;
 
 		default:  // a constant
-			if (prg[i].op >= num_total_variables)
+			if (prg[i].op >= (int)num_total_variables)
 				if (line_of_constants[prg[i].op - num_total_variables] == -1) {
-					line_of_constants[prg[i].op - num_total_variables] = i;
-					int constant_index = prg[i].op - num_total_variables;
-					for (int k = 0; k < num_training_data; k++)
+					line_of_constants[prg[i].op - num_total_variables] = (int)i;
+					unsigned int constant_index = (unsigned int)prg[i].op - num_total_variables;
+					for (unsigned int k = 0; k < num_training_data; k++)
 						eval[k] = real_constants[constant_index];
 				}
 
@@ -1299,7 +1299,7 @@ double t_mep_chromosome::get_fitness(void)
 	return fitness;
 }
 //---------------------------------------------------------------------------
-int t_mep_chromosome::get_index_best_gene(int output_index)
+unsigned int t_mep_chromosome::get_index_best_gene(unsigned int output_index)
 {
 	return index_best_genes[output_index];
 }
@@ -1309,7 +1309,7 @@ double t_mep_chromosome::get_best_class_threshold(void)
 	return best_class_threshold;
 }
 //---------------------------------------------------------------------------
-void t_mep_chromosome::set_gene_operation(int gene_index, int new_operation)
+void t_mep_chromosome::set_gene_operation(unsigned int gene_index, int new_operation)
 {
 	if (prg)
 		prg[gene_index].op = new_operation;

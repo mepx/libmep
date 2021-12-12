@@ -32,15 +32,15 @@ private:
 	t_sub_population* pop; // array of subpopulations
 	double **cached_eval_variables_matrix_double;
 	double *cached_sum_of_errors, *cached_threashold;
-	int best_individual_index;
-	int best_subpopulation_index;
+	unsigned int best_individual_index;
+	unsigned int best_subpopulation_index;
 
-	int best_individual_index_for_test;
-	int best_subpopulation_index_for_test;
+	unsigned int best_individual_index_for_test;
+	unsigned int best_subpopulation_index_for_test;
 
 	t_mep_functions mep_operators;
 
-	int num_selected_operators;
+	unsigned int num_selected_operators;
 
 	int actual_operators[MAX_OPERATORS];
 
@@ -54,13 +54,13 @@ private:
 
 	t_mep_statistics statistics;
 
-	int num_total_variables;
-	int target_col;
+	unsigned int num_total_variables;
+	unsigned int target_col;
 
-	int num_actual_variables;
+	unsigned int num_actual_variables;
 	bool *variables_enabled;
 
-	int *actual_enabled_variables;
+	unsigned int *actual_enabled_variables;
 
 	bool modified_project;
 
@@ -68,14 +68,14 @@ private:
 
 	bool cache_results_for_all_training_data;
 
-	int *random_subset_indexes;
+	unsigned int *random_subset_indexes;
 
-	bool start_steady_state(int run, t_seed *seeds, double ***, 
+	bool start_steady_state(unsigned int run, t_seed *seeds, double ***,
 			s_value_class **array_value_class, 
 			f_on_progress on_generation, f_on_progress on_new_evaluation);       // Steady-State MEP
-	long tournament(const t_sub_population &pop, t_seed &seed);
+	unsigned int tournament(const t_sub_population &pop, t_seed &seed);
 
-	double compute_validation_error(int &, int&, 
+	double compute_validation_error(unsigned int &, unsigned int&,
 			double **eval_double, s_value_class *tmp_value_class, 
 			t_seed *seeds, double &num_incorrectly_classified);
 
@@ -91,11 +91,11 @@ private:
 
 	void delete_sub_population(t_sub_population &pop);
 
-	void evolve_one_subpopulation_for_one_generation(int *current_subpop_index, 
+	void evolve_one_subpopulation_for_one_generation(unsigned int *current_subpop_index, 
 			std::mutex* mutex, t_sub_population * sub_populations, 
 			int generation_index, bool recompute_fitness, 
 			double ** eval_double, s_value_class *tmp_value_class, t_seed* seeds);
-	void get_random_subset(int count, int *indecses, t_seed& seed);
+	void get_random_subset(unsigned int count, unsigned int *indecses, t_seed& seed);
 
 public:
 
@@ -113,10 +113,10 @@ public:
 	int get_last_run_index(void) const;
 
 	// returns the number of variables
-	int get_num_total_variables(void);
+	unsigned int get_num_total_variables(void);
 
 	// sets the number of variables
-	void set_num_total_variables(int value);
+	void set_num_total_variables(unsigned int value);
 
 	// returns true if the process is running, false otherwise
 	bool is_running(void) const;
@@ -131,7 +131,7 @@ public:
 	void get_best(t_mep_chromosome& dest) const;
 
 	// gets the output obtaining by running the best program in a given run against in input
-	bool get_output(int run_index, double *inputs, double *outputs) const;
+	bool get_output(unsigned int run_index, double *inputs, double *outputs) const;
 
 	// saves everything to an xml file
 	int to_xml(const char* file_name);
@@ -153,26 +153,26 @@ public:
 	void clear_stats(void);
 
 	// returns the chromosome as a C program
-	char* program_as_C(int run_index, bool simplified, double *inputs) const;
+	char* program_as_C(unsigned int run_index, bool simplified, double *inputs) const;
 
 	// returns the chromosome as an Excel function
-	char* program_as_Excel_function(int run_index, bool simplified, double* inputs) const;
+	char* program_as_Excel_function(unsigned int run_index, bool simplified, double* inputs) const;
 
 	// returns the number of outputs of the program/
 	// currently only problems with 1 output are handled
-	int get_num_outputs(void) const;
+	unsigned int get_num_outputs(void) const;
 
 	// init operators, parameters and clears all data
 	void init(void);
 
 	// returns the number of enabled variables
-	int get_num_actual_variables(void) const;
+	unsigned int get_num_actual_variables(void) const;
 
 	// returns true if a particular variable is enable
-	bool is_variable_enabled(int index) const;
+	bool is_variable_enabled(unsigned int index) const;
 
 	// sets if a particular variable is enabled or not
-	void set_variable_enable(int index, bool new_state);
+	void set_variable_enable(unsigned int index, bool new_state);
 
 	// returns true if the project has been modified
 	bool is_project_modified(void) const;
@@ -205,8 +205,8 @@ public:
 	void clear(void);
 
 	bool could_be_time_serie(void);
-	bool to_time_serie(int window_size);
-	bool change_window_size_time_serie(int new_window_size);
+	bool to_time_serie(unsigned int window_size);
+	bool change_window_size_time_serie(unsigned int new_window_size);
 };
 //-----------------------------------------------------------------
 #endif 

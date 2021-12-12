@@ -15,13 +15,13 @@
 //-----------------------------------------------------------------
 class t_mep_constants{
 private:
-	long num_automatic_constants;
-	long num_user_defined_constants;
+	unsigned int num_automatic_constants;
+	unsigned int num_user_defined_constants;
 	double min_constants_interval_double, max_constants_interval_double;
 
 	double *constants_double;
 
-	int constants_type;
+	unsigned int constants_type;
 	bool constants_can_evolve;
 	double constants_mutation_max_deviation;
 
@@ -39,10 +39,10 @@ public:
 	t_mep_constants& operator=(const t_mep_constants &source);
 
 	// returns the number of automatic constants
-	long get_num_automatic_constants(void)const;
+	unsigned int get_num_automatic_constants(void)const;
 
 	// returns the number of user defined constants
-	long get_num_user_defined_constants(void)const;
+	unsigned int get_num_user_defined_constants(void)const;
 
 	// returns the min interval for automatic constants
 	double get_min_constants_interval_double(void)const;
@@ -51,12 +51,12 @@ public:
 	double get_max_constants_interval_double(void)const;
 
 	// returns a constant
-	double get_constants_double(long index)const;
+	double get_constants_double(unsigned int index)const;
 
 	// returns the constants type
 	// 0 - USER_DEFINED_CONSTANTS
 	// 1- AUTOMATIC_CONSTANTS
-	long get_constants_type(void)const;
+	unsigned int get_constants_type(void)const;
 
 	// returns true if the constants can evolve
 	bool get_constants_can_evolve(void)const;
@@ -65,10 +65,10 @@ public:
 	double get_constants_mutation_max_deviation(void)const;
 
 	// sets the number of automatically generated constants
-	void set_num_automatic_constants(long value);
+	void set_num_automatic_constants(unsigned int value);
 
 	// sets the number of user defined constants
-	void set_num_user_defined_constants(long value);
+	void set_num_user_defined_constants(unsigned int value);
 
 	// sets the lower bound of the constants interval
 	void set_min_constants_interval_double(double value);
@@ -77,12 +77,12 @@ public:
 	void set_max_constants_interval_double(double value);
 
 	// sets a particular user-defined constant
-	void set_constants_double(long index, double value);
+	void set_constants_double(unsigned int index, double value);
 
 	// sets the constants type
 	// 0 - USER_DEFINED_CONSTANTS
 	// 1- AUTOMATIC_CONSTANTS
-	void set_constants_type(long value);
+	void set_constants_type(unsigned int value);
 
 	// sets if the constants can evolve
 	void  set_constants_can_evolve(bool value);

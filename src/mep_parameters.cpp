@@ -55,42 +55,42 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("crossover_type");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", crossover_type);
+	sprintf(tmp_str, "%u", crossover_type);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("chromosome_length");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", code_length);
+	sprintf(tmp_str, "%u", code_length);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("subpopulation_size");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", subpopulation_size);
+	sprintf(tmp_str, "%u", subpopulation_size);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_subpopulations");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", num_subpopulations);
+	sprintf(tmp_str, "%u", num_subpopulations);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("tournament_size");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", tournament_size);
+	sprintf(tmp_str, "%u", tournament_size);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("number_of_generations");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", num_generations);
+	sprintf(tmp_str, "%u", num_generations);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("problem_type");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", problem_type);
+	sprintf(tmp_str, "%u", problem_type);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("random_seed");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", random_seed);
+	sprintf(tmp_str, "%u", random_seed);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("operators_probability");
@@ -110,12 +110,12 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("num_runs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", num_runs);
+	sprintf(tmp_str, "%u", num_runs);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_validation_data");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_validation_data);
+	sprintf(tmp_str, "%u", use_validation_data);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("simplified");
@@ -125,7 +125,7 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("num_threads");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", num_threads);
+	sprintf(tmp_str, "%u", num_threads);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("random_subset_selection_size");
@@ -135,7 +135,7 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("error_measure");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", error_measure);
+	sprintf(tmp_str, "%u", error_measure);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_generations_for_which_random_subset_is_kept_fixed");
@@ -165,25 +165,25 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("chromosome_length");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		code_length = atoi(value_as_cstring);
+		code_length = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("crossover_type");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		crossover_type = atoi(value_as_cstring);
+		crossover_type = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("subpopulation_size");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		subpopulation_size = atoi(value_as_cstring);
+		subpopulation_size = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("num_subpopulations");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_subpopulations = atoi(value_as_cstring);
+		num_subpopulations = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("operators_probability");
@@ -207,25 +207,25 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("number_of_generations");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_generations = atoi(value_as_cstring);
+		num_generations = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("tournament_size");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		tournament_size = atoi(value_as_cstring);
+		tournament_size = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("problem_type");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		problem_type = atoi(value_as_cstring);
+		problem_type = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("random_seed");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		random_seed = atoi(value_as_cstring);
+		random_seed = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		random_seed = 0;
@@ -233,7 +233,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("num_runs");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_runs = atoi(value_as_cstring);
+		num_runs = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_runs = 1;
@@ -241,7 +241,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("use_validation_data");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		use_validation_data = atoi(value_as_cstring);
+		use_validation_data = (bool)atoi(value_as_cstring);
 	}
 	else
 		use_validation_data = 0;
@@ -249,7 +249,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("simplified");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		simplified_programs = atoi(value_as_cstring);
+		simplified_programs = (bool)atoi(value_as_cstring);
 	}
 	else
 		simplified_programs = 0;
@@ -257,7 +257,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("num_threads");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_threads = atoi(value_as_cstring);
+		num_threads = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_threads = 1;
@@ -265,7 +265,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("random_subset_selection_size");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		random_subset_selection_size = atoi(value_as_cstring);
+		random_subset_selection_size = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		random_subset_selection_size = 0;
@@ -273,7 +273,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("num_generations_for_which_random_subset_is_kept_fixed");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_generations_for_which_random_subset_is_kept_fixed = atoi(value_as_cstring);
+		num_generations_for_which_random_subset_is_kept_fixed = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_generations_for_which_random_subset_is_kept_fixed = 1;
@@ -281,7 +281,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	node = parent.child("error_measure");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		int value = atoi(value_as_cstring);
+		unsigned int value = (unsigned int)atoi(value_as_cstring);
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
 		case MEP_PROBLEM_TIME_SERIE:
@@ -334,37 +334,37 @@ double t_mep_parameters::get_crossover_probability(void) const
 	return crossover_probability;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_code_length(void) const
+unsigned int t_mep_parameters::get_code_length(void) const
 {
 	return code_length;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_subpopulation_size(void) const
+unsigned int t_mep_parameters::get_subpopulation_size(void) const
 {
 	return subpopulation_size;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_num_threads(void) const
+unsigned int t_mep_parameters::get_num_threads(void) const
 {
 	return num_threads;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_tournament_size(void) const
+unsigned int t_mep_parameters::get_tournament_size(void) const
 {
 	return tournament_size;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_num_generations(void) const
+unsigned int t_mep_parameters::get_num_generations(void) const
 {
 	return num_generations;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_problem_type(void) const
+unsigned int t_mep_parameters::get_problem_type(void) const
 {
 	return problem_type;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_num_subpopulations(void) const
+unsigned int t_mep_parameters::get_num_subpopulations(void) const
 {
 	return num_subpopulations;
 }
@@ -389,17 +389,17 @@ bool t_mep_parameters::get_use_validation_data(void) const
 	return use_validation_data;
 }
 //---------------------------------------------------------------------------
-int t_mep_parameters::get_crossover_type(void) const
+unsigned int t_mep_parameters::get_crossover_type(void) const
 {
 	return crossover_type;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_random_seed(void) const
+unsigned int t_mep_parameters::get_random_seed(void) const
 {
 	return random_seed;
 }
 //---------------------------------------------------------------------------
-long t_mep_parameters::get_num_runs(void) const
+unsigned int t_mep_parameters::get_num_runs(void) const
 {
 	return num_runs;
 }
@@ -421,37 +421,37 @@ void t_mep_parameters::set_crossover_probability(double value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_code_length(long value)
+void t_mep_parameters::set_code_length(unsigned int value)
 {
 	code_length = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_subpopulation_size(long value)
+void t_mep_parameters::set_subpopulation_size(unsigned int value)
 {
 	subpopulation_size = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_num_threads(long value)
+void t_mep_parameters::set_num_threads(unsigned int value)
 {
 	num_threads = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_tournament_size(long value)
+void t_mep_parameters::set_tournament_size(unsigned int value)
 {
 	tournament_size = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_num_generations(long value)
+void t_mep_parameters::set_num_generations(unsigned int value)
 {
 	num_generations = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_problem_type(long value)
+void t_mep_parameters::set_problem_type(unsigned int value)
 {
 	problem_type = value;
 	switch (problem_type) {
@@ -469,7 +469,7 @@ void t_mep_parameters::set_problem_type(long value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_num_subpopulations(long value)
+void t_mep_parameters::set_num_subpopulations(unsigned int value)
 {
 	num_subpopulations = value;
 	modified = true;
@@ -499,19 +499,19 @@ void t_mep_parameters::set_use_validation_data(bool value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_crossover_type(int value)
+void t_mep_parameters::set_crossover_type(unsigned int value)
 {
 	crossover_type = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_random_seed(long value)
+void t_mep_parameters::set_random_seed(unsigned int value)
 {
 	random_seed = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_num_runs(long value)
+void t_mep_parameters::set_num_runs(unsigned int value)
 {
 	num_runs = value;
 	modified = true;
@@ -523,18 +523,18 @@ void t_mep_parameters::set_simplified_programs(bool value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_random_subset_selection_size(int value)
+void t_mep_parameters::set_random_subset_selection_size(unsigned int value)
 {
 	random_subset_selection_size = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-int t_mep_parameters::get_random_subset_selection_size(void)  const
+unsigned int t_mep_parameters::get_random_subset_selection_size(void)  const
 {
 	return random_subset_selection_size;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_error_measure(int value)
+void t_mep_parameters::set_error_measure(unsigned int value)
 {
 	switch (problem_type) {
 	case MEP_PROBLEM_REGRESSION:
@@ -561,7 +561,7 @@ void t_mep_parameters::set_error_measure(int value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-int t_mep_parameters::get_error_measure(void) const
+unsigned int t_mep_parameters::get_error_measure(void) const
 {
 	return error_measure;
 }

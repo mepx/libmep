@@ -13,13 +13,13 @@ class t_sub_population {
 public:
 	t_mep_chromosome* individuals; // array of individuals
 	t_mep_chromosome offspring1, offspring2;
-	int worst_index, best_index;
+	unsigned int worst_index, best_index;
 
 	t_sub_population();
 
-	void compute_worst_index(int pop_size);
+	void compute_worst_index(unsigned int pop_size);
 
-	void compute_best_index(int pop_size);
+	void compute_best_index(unsigned int pop_size);
 };
 //-----------------------------------------------------------------
 #endif

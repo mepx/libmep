@@ -16,7 +16,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	pugi::xml_node node = parent.child("num_data");
 	if (node) {
 		const char* value_as_cstring = node.child_value();
-		num_data = atoi(value_as_cstring);
+		num_data = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_data = 0;
@@ -24,7 +24,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	node = parent.child("num_variables");
 	if (node) {
 		const char* value_as_cstring = node.child_value();
-		int num_variables = atoi(value_as_cstring);
+		unsigned int num_variables = (unsigned int)atoi(value_as_cstring);
 		if (num_variables)
 			num_cols = num_variables + 1;
 		else
@@ -34,7 +34,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 		node = parent.child("num_cols");
 		if (node) {
 			const char* value_as_cstring = node.child_value();
-			num_cols = atoi(value_as_cstring);
+			num_cols = (unsigned int)atoi(value_as_cstring);
 		}
 		else
 			num_cols = 0;
@@ -43,7 +43,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	node = parent.child("num_outputs");
 	if (node) {
 		const char* value_as_cstring = node.child_value();
-		num_outputs = atoi(value_as_cstring);
+		num_outputs = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_outputs = 1;
@@ -52,7 +52,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	node = parent.child("num_classes");
 	if (node) {
 		const char* value_as_cstring = node.child_value();
-		num_classes = atoi(value_as_cstring);
+		num_classes = (unsigned int)atoi(value_as_cstring);
 	}
 	else
 		num_classes = 0;
@@ -60,7 +60,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	node = parent.child("data_type");
 	if (node) {
 		const char* value_as_cstring = node.child_value();
-		data_type = (char)atoi(value_as_cstring);
+		data_type = (unsigned char)atoi(value_as_cstring);
 	}
 	else
 		data_type = MEP_DATA_DOUBLE;// double by default
@@ -84,16 +84,16 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	if (data_type == MEP_DATA_DOUBLE) {
 		if (num_data) {
 			_data_double = new double* [num_data];
-			for (int r = 0; r < num_data; r++)
+			for (unsigned int r = 0; r < num_data; r++)
 				_data_double[r] = new double[num_cols];
 		}
 	}
 	else {
 		if (num_data) {
 			_data_string = new char** [num_data];
-			for (int r = 0; r < num_data; r++) {
+			for (unsigned int r = 0; r < num_data; r++) {
 				_data_string[r] = new char* [num_cols];
-				for (int v = 0; v < num_cols; v++)
+				for (unsigned int v = 0; v < num_cols; v++)
 					_data_string[r][v] = NULL;
 			}
 		}
@@ -102,13 +102,13 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	pugi::xml_node node_data = parent.child("data");
 	if (!node_data)
 		return true;
-	int r = 0;
+	unsigned int r = 0;
 	if (data_type == MEP_DATA_DOUBLE) {// double
 		for (pugi::xml_node row = node_data.child("row"); row; row = row.next_sibling("row"), r++) {
 			const char* value_as_cstring = row.child_value();
 			size_t num_jumped_chars = 0;
 
-			for (int c = 0; c < num_cols; c++) {
+			for (unsigned int c = 0; c < num_cols; c++) {
 				_data_double[r][c] = 0;
 				sscanf(value_as_cstring + num_jumped_chars, "%lf", &_data_double[r][c]);
 				size_t local_jump = strcspn(value_as_cstring + num_jumped_chars, " ");
@@ -139,27 +139,27 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 
 	pugi::xml_node node = parent.append_child("num_data");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(temp_str, "%d", num_data);
+	sprintf(temp_str, "%u", num_data);
 	data.set_value(temp_str);
 
 	node = parent.append_child("num_cols");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(temp_str, "%d", num_cols);
+	sprintf(temp_str, "%u", num_cols);
 	data.set_value(temp_str);
 
 	node = parent.append_child("num_outputs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(temp_str, "%d", num_outputs);
+	sprintf(temp_str, "%u", num_outputs);
 	data.set_value(temp_str);
 
 	node = parent.append_child("num_classes");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(temp_str, "%d", num_classes);
+	sprintf(temp_str, "%u", num_classes);
 	data.set_value(temp_str);
 
 	node = parent.append_child("data_type");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(temp_str, "%d", data_type);
+	sprintf(temp_str, "%u", data_type);
 	data.set_value(temp_str);
 
 	node = parent.append_child("list_separator");
@@ -172,7 +172,7 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 		return true;
 	}
 
-	for (int c = 0; c < num_cols; c++) {
+	for (unsigned int c = 0; c < num_cols; c++) {
 	}
 
 	pugi::xml_node node_data = parent.append_child("data");
@@ -182,13 +182,13 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 		char* s_tmp_row = new char[s_CAPACITY];
 		
 		char tmp_s[300];
-		for (int r = 0; r < num_data; r++) {
+		for (unsigned int r = 0; r < num_data; r++) {
 			node = node_data.append_child("row");
 			data = node.append_child(pugi::node_pcdata);
 			s_tmp_row[0] = 0;
 			size_t s_tmp_row_len = 0;
 
-			for (int c = 0; c < num_cols; c++) {
+			for (unsigned int c = 0; c < num_cols; c++) {
 				size_t tmp_s_len = sprintf(tmp_s, "%lg", this->_data_double[r][c]);
 				if (tmp_s_len + s_tmp_row_len + 2 > s_CAPACITY) {
 					// must increase the string capacity
@@ -213,12 +213,12 @@ int t_mep_data::to_xml(pugi::xml_node parent)
 			size_t s_CAPACITY = num_cols * 10; // how to test?: set this to 1; not 0 because I should not do new[0]
 			char* s_tmp_row = new char[s_CAPACITY];
 
-			for (int r = 0; r < num_data; r++) {
+			for (unsigned int r = 0; r < num_data; r++) {
 				node = node_data.append_child("row");
 				data = node.append_child(pugi::node_pcdata);
 				s_tmp_row[0] = 0;
 				size_t s_tmp_row_len = 0;
-				for (int c = 0; c < num_cols; c++) 
+				for (unsigned int c = 0; c < num_cols; c++)
 					if (_data_string[r][c]){
 						char* str_ptr = NULL;
 						char* tmp_str = NULL;

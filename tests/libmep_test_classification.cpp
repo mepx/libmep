@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------
 #include "libmep.h"
 
-static int generation_index;
+static unsigned int generation_index;
 t_mep mep;
 //-----------------------------------------------------------------
 void on_generation(void)

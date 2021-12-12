@@ -4,7 +4,7 @@
 #include "csv_utils.h"
 
 //--------------------------------------------------------------------------
-void append_to_string(char* &Field, char Ch, int L, int &CAPACITY_L)
+void append_to_string(char* &Field, char Ch, size_t L, size_t &CAPACITY_L)
 {
 	if (L + 1 > CAPACITY_L) {
 		char* new_Field = new char[L + 10];
@@ -34,9 +34,9 @@ void AddData(t_setter_data_base *obj, const char* Field, int R, int C)
 */
 bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_base* obj)
 {
-	int max_R = 0;
-	int max_C = 0;
-	int max_L = 0;
+	unsigned int max_R = 0;
+	unsigned int max_C = 0;
+	size_t max_L = 0;
 
 	char buf[4];
 	fgets(buf, 4, f);
@@ -47,12 +47,12 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 
 	bool Quoted = false;
 	char *Field = NULL;
-	int CAPACITY_L = 0;
+	size_t CAPACITY_L = 0;
 
-	int R = 0;
-	int C = 0;
+	unsigned int R = 0;
+	unsigned int C = 0;
 	int Ch = getc(f);
-	int L = 0;
+	size_t L = 0;
 	while (Ch != EOF){
 
 		if (Ch == '"') {
@@ -61,7 +61,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 			else {
 				int ch2 = getc(f);
 				if (ch2 == '"') {
-					append_to_string(Field, Ch, L, CAPACITY_L);
+					append_to_string(Field, (char)Ch, L, CAPACITY_L);
 
 					L++;
 					if (max_L < L)
@@ -88,7 +88,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 						max_C = C;
 				}
 				else {
-					append_to_string(Field, Ch, L, CAPACITY_L);
+					append_to_string(Field, (char)Ch, L, CAPACITY_L);
 					L++;
 					if (max_L < L)
 						max_L = L;
@@ -125,7 +125,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 						//just skip
 					}
 					else {
-						append_to_string(Field, Ch, L, CAPACITY_L);
+						append_to_string(Field, (char)Ch, L, CAPACITY_L);
 						L++;
 						if (max_L < L)
 							max_L = L;
@@ -151,21 +151,21 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 	return true;
 }
 //--------------------------------------------------------------------------
-bool get_csv_info_from_string_to_row(const char* input_string, const char list_separator, int R, t_setter_data_base* obj)
+bool get_csv_info_from_string_to_row(const char* input_string, const char list_separator, unsigned int R, t_setter_data_base* obj)
 {
-	int max_R = 0;
-	int max_C = 0;
-	int max_L = 0;
+	unsigned int max_R = 0;
+	unsigned int max_C = 0;
+	size_t max_L = 0;
 
 	bool Quoted = false;
 	char* Field = NULL;
-	int CAPACITY_L = 0;
+	size_t CAPACITY_L = 0;
 
 	int index = 0;
 
-	int C = 0;
+	unsigned int C = 0;
 	char Ch = input_string[index++];
-	int L = 0;
+	size_t L = 0;
 	while (Ch) {
 
 		if (Ch == '"') {
@@ -268,20 +268,20 @@ bool get_csv_info_from_string_to_row(const char* input_string, const char list_s
 //--------------------------------------------------------------------------
 bool get_csv_info_from_string(const char* input_string, const char list_separator, t_setter_data_base* obj)
 {
-	int max_R = 0;
-	int max_C = 0;
-	int max_L = 0;
+	unsigned int max_R = 0;
+	unsigned int max_C = 0;
+	size_t max_L = 0;
 
 	bool Quoted = false;
 	char* Field = NULL;
-	int CAPACITY_L = 0;
+	size_t CAPACITY_L = 0;
 
 	int index = 0;
 
-	int C = 0;
-	int R = 0;
+	unsigned int C = 0;
+	unsigned int R = 0;
 	char Ch = input_string[index++];
-	int L = 0;
+	size_t L = 0;
 	while (Ch) {
 
 		if (Ch == '"') {
@@ -384,7 +384,7 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 //--------------------------------------------------------------------------
 
 
-bool get_next_field(char* start_sir, char list_separator, char* dest, int& size, int& skipped)
+bool get_next_field(char* start_sir, char list_separator, char* dest, size_t& size, int& skipped)
 {
 	skipped = 0;
 	char* tmp_start = start_sir;

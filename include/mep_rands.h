@@ -11,7 +11,10 @@ struct t_seed{
 };
 
 
-int mep_int_rand(t_seed &seed, int _min, int _max);
+//int mep_int_rand(t_seed &seed, int _min, int _max);
+
+int rand_int_01(t_seed& seed);
+unsigned int mep_unsigned_int_rand(t_seed& seed, unsigned int _min, unsigned int _max);
 double mep_real_rand(t_seed &seed, double _min, double _max);
 
 #endif

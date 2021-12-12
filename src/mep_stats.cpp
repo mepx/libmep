@@ -34,7 +34,7 @@ t_mep_run_statistics::t_mep_run_statistics(void)
 	num_generations = 0;
 }
 //---------------------------------------------------------------------------
-void t_mep_run_statistics::allocate_memory(long _num_generations)
+void t_mep_run_statistics::allocate_memory(unsigned int _num_generations)
 {
 	num_generations = _num_generations;
 	best_training_error = new double[num_generations];
@@ -170,7 +170,7 @@ int t_mep_run_statistics::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("num_generations");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str2, "%d", num_generations);
+	sprintf(tmp_str2, "%u", num_generations);
 	data.set_value(tmp_str2);
 
 	node = parent.append_child("program");
@@ -181,7 +181,7 @@ int t_mep_run_statistics::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_run_statistics::from_xml(pugi::xml_node parent, int problem_type)
+int t_mep_run_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type)
 {
 	delete_memory();
 
@@ -203,13 +203,13 @@ int t_mep_run_statistics::from_xml(pugi::xml_node parent, int problem_type)
 	node = parent.child("num_generations");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_generations = atoi(value_as_cstring);
+		num_generations = (unsigned int) atoi(value_as_cstring);
 	}
 	else
 		num_generations = 0;
 
 	if (num_generations == 0)
-		num_generations = last_generation + 1;
+		num_generations = (unsigned int)(last_generation + 1);
 
 	// evolution
 	pugi::xml_node best_training_error_node = parent.child("best_training_error");
@@ -368,7 +368,7 @@ t_mep_run_statistics& t_mep_run_statistics::operator=(const t_mep_run_statistics
 		allocate_memory(source.num_generations);
 
 		running_time = source.running_time;
-		for (int i = 0; i < num_generations; i++) {
+		for (unsigned int i = 0; i < num_generations; i++) {
 			best_training_error[i] = source.best_training_error[i];
 			average_training_error[i] = source.average_training_error[i];
 			best_training_num_incorrect[i] = source.best_training_num_incorrect[i];
@@ -391,7 +391,7 @@ t_mep_statistics::t_mep_statistics()
 	stats = NULL;
 }
 //---------------------------------------------------------------------------
-void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool compute_on_test, int problem_type)
+void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool compute_on_test, unsigned int problem_type)
 {
 	stddev_training_error = stddev_validation_error = stddev_test_error = stddev_runtime = 0;
 	mean_training_error = mean_validation_error = mean_test_error = mean_runtime = 0;
@@ -413,7 +413,7 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 		mean_test_error = stats[0].test_error;
 	mean_runtime = stats[0].running_time;
 
-	for (int r = 1; r < num_runs; r++) {
+	for (unsigned int r = 1; r < num_runs; r++) {
 		mean_training_error += stats[r].best_training_error[stats[r].last_generation];
 		if (best_training_error > stats[r].best_training_error[stats[r].last_generation])
 			best_training_error = stats[r].best_training_error[stats[r].last_generation];
@@ -440,7 +440,7 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 
 	// compute stddev
 
-	for (int r = 0; r < num_runs; r++) {
+	for (unsigned int r = 0; r < num_runs; r++) {
 		stddev_training_error += (mean_training_error - stats[r].best_training_error[stats[r].last_generation]) * (mean_training_error - stats[r].best_training_error[stats[r].last_generation]);
 		if (compute_on_validation)
 			stddev_validation_error += (mean_validation_error - stats[r].best_validation_error) * (mean_validation_error - stats[r].best_validation_error);
@@ -474,7 +474,7 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 				mean_test_num_incorrect = stats[0].test_num_incorrect;
 			mean_runtime = stats[0].running_time;
 
-			for (int r = 1; r < num_runs; r++) {
+			for (unsigned int r = 1; r < num_runs; r++) {
 				mean_training_num_incorrect += stats[r].best_training_num_incorrect[stats[r].last_generation];
 				if (best_training_num_incorrect > stats[r].best_training_num_incorrect[stats[r].last_generation])
 					best_training_num_incorrect = stats[r].best_training_num_incorrect[stats[r].last_generation];
@@ -501,7 +501,7 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 
 			// compute stddev
 
-			for (int r = 0; r < num_runs; r++) {
+			for (unsigned int r = 0; r < num_runs; r++) {
 				stddev_training_num_incorrect += (mean_training_num_incorrect - stats[r].best_training_num_incorrect[stats[r].last_generation]) * (mean_training_num_incorrect - stats[r].best_training_num_incorrect[stats[r].last_generation]);
 				if (compute_on_validation)
 					stddev_validation_num_incorrect += (mean_validation_num_incorrect - stats[r].best_validation_num_incorrect) * (mean_validation_num_incorrect - stats[r].best_validation_num_incorrect);
@@ -566,10 +566,10 @@ void t_mep_statistics::get_best_num_incorrect(double &training, double &validati
 }
 //---------------------------------------------------------------------------
 // returns the best training num incorreclty classified
-double t_mep_statistics::get_best_training_num_incorrectly_classified(int run, int generation) const
+double t_mep_statistics::get_best_training_num_incorrectly_classified(unsigned int run, unsigned int generation) const
 {
 	if (stats[run].best_training_num_incorrect)
-		if (generation <= stats[run].last_generation)
+		if ((int)generation <= stats[run].last_generation)
 			return stats[run].best_training_num_incorrect[generation];
 		else
 			return stats[run].best_training_num_incorrect[stats[run].last_generation];
@@ -578,31 +578,31 @@ double t_mep_statistics::get_best_training_num_incorrectly_classified(int run, i
 }
 //---------------------------------------------------------------------------
 // returns the best validation num incorreclty classified
-double t_mep_statistics::get_best_validation_num_incorrectly_classified(int run) const
+double t_mep_statistics::get_best_validation_num_incorrectly_classified(unsigned int run) const
 {
 	return stats[run].best_validation_num_incorrect;
 }
 //---------------------------------------------------------------------------
 // returns the average (over the entire population) training num incorreclty classified
-double t_mep_statistics::get_mean_training_num_incorrectly_classified(int run, int generation) const
+double t_mep_statistics::get_mean_training_num_incorrectly_classified(unsigned int run, unsigned int generation) const
 {
 	return stats[run].average_training_num_incorrect[generation];
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_stddev_training_num_incorrectly_classified(int /*run*/, int /*generation*/)
+double t_mep_statistics::get_stddev_training_num_incorrectly_classified(unsigned int /*run*/, unsigned int /*generation*/)
 {
 	return 0;// stats[run].stddev_training_num_incorrect[generation];
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_test_num_incorrectly_classified(int run) const
+double t_mep_statistics::get_test_num_incorrectly_classified(unsigned int run) const
 {
 	return stats[run].test_num_incorrect;
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_best_training_error(int run, int gen) const
+double t_mep_statistics::get_best_training_error(unsigned int run, unsigned int gen) const
 {
 	if (stats[run].best_training_error)
-		if (gen <= stats[run].last_generation)
+		if ((int)gen <= stats[run].last_generation)
 			return stats[run].best_training_error[gen];
 		else
 			return stats[run].best_training_error[stats[run].last_generation];
@@ -610,20 +610,20 @@ double t_mep_statistics::get_best_training_error(int run, int gen) const
 		return -1;
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_best_validation_error(int run) const
+double t_mep_statistics::get_best_validation_error(unsigned int run) const
 {
 	return stats[run].best_validation_error;
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_test_error(int run) const
+double t_mep_statistics::get_test_error(unsigned int run) const
 {
 	return stats[run].test_error;
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_average_training_error(int run, int gen) const
+double t_mep_statistics::get_average_training_error(unsigned int run, unsigned int gen) const
 {
 	if (stats[run].average_training_error)
-		if (gen <= stats[run].last_generation)
+		if ((int)gen <= stats[run].last_generation)
 			return stats[run].average_training_error[gen];
 		else
 			return stats[run].average_training_error[stats[run].last_generation];
@@ -631,17 +631,17 @@ double t_mep_statistics::get_average_training_error(int run, int gen) const
 		return -1;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::get_latest_generation(int run) const
+int t_mep_statistics::get_latest_generation(unsigned int run) const
 {
 	return stats[run].last_generation;
 }
 //---------------------------------------------------------------------------
-double t_mep_statistics::get_running_time(int run) const
+double t_mep_statistics::get_running_time(unsigned int run) const
 {
 	return stats[run].running_time;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::to_csv(const char *filename, int problem_type)const
+int t_mep_statistics::to_csv(const char *filename, unsigned int problem_type)const
 {
 	FILE *f = NULL;
 #ifdef _WIN32
@@ -660,7 +660,7 @@ int t_mep_statistics::to_csv(const char *filename, int problem_type)const
 		return false;
 	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
 		fprintf(f, "Run #;training error; validation error; test error; running time (s)\n");
-		for (int r = 0; r < num_runs; r++) {
+		for (unsigned int r = 0; r < num_runs; r++) {
 			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_error[stats[r].last_generation]);
 			if (stats[r].best_validation_error > -1E-6)
 				fprintf(f, "%lf;", stats[r].best_validation_error);
@@ -709,7 +709,7 @@ int t_mep_statistics::to_csv(const char *filename, int problem_type)const
 	}
 	else {// MEP CLASSIFICATION
 		fprintf(f, "#;training num incorrect (%%); validation num incorrect (%%); test num incorrect (%%); running time (s)\n");
-		for (int r = 0; r < num_runs; r++) {
+		for (unsigned int r = 0; r < num_runs; r++) {
 			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
 			if (stats[r].best_validation_num_incorrect > -1E-6)
 				fprintf(f, "%lf;", stats[r].best_validation_num_incorrect);
@@ -763,7 +763,7 @@ int t_mep_statistics::to_csv(const char *filename, int problem_type)const
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::to_tex(const char *filename, int problem_type) const
+int t_mep_statistics::to_tex(const char *filename, unsigned int problem_type) const
 {
 	FILE *f = NULL;
 #ifdef _WIN32
@@ -784,7 +784,7 @@ int t_mep_statistics::to_tex(const char *filename, int problem_type) const
 	fprintf(f, "\\begin{tabular}{c c c c c}\n");
 	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
 		fprintf(f, "Run \\# & training error & validation error & test error & running time(s)\\\\ \n");
-		for (int r = 0; r < num_runs; r++) {
+		for (unsigned int r = 0; r < num_runs; r++) {
 			fprintf(f, "%d & %lf & ", r + 1, stats[r].best_training_error[stats[r].last_generation]);
 
 			if (stats[r].best_validation_error > -1E-6)
@@ -837,7 +837,7 @@ int t_mep_statistics::to_tex(const char *filename, int problem_type) const
 	}
 	else {// MEP CLASSIFICATION
 		fprintf(f, "Run \\# & training num incorrect (\\%%) & validation num incorrect (\\%%) & test num incorrect (\\%%) & running time(s)\\\\ \n");
-		for (int r = 0; r < num_runs; r++) {
+		for (unsigned int r = 0; r < num_runs; r++) {
 			fprintf(f, "%d & %lf &", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
 			if (stats[r].best_validation_num_incorrect > -1E-6)
 				fprintf(f, "%lf & ", stats[r].best_validation_num_incorrect);
@@ -1016,7 +1016,7 @@ void t_mep_statistics::sort_stats_by_test_error(bool ascending)
 		qsort((void*)stats, num_runs, sizeof(t_mep_run_statistics), test_error_comparator_descending);
 }
 //---------------------------------------------------------------------------
-t_mep_run_statistics *t_mep_statistics::get_stat_ptr(int index) const
+t_mep_run_statistics *t_mep_statistics::get_stat_ptr(unsigned int index) const
 {
 	return &stats[index];
 }
@@ -1030,14 +1030,14 @@ void t_mep_statistics::delete_memory(void)
 	}
 }
 //---------------------------------------------------------------------------
-void t_mep_statistics::create(int _num_runs)
+void t_mep_statistics::create(unsigned int _num_runs)
 {
 	delete_memory();
 	if (_num_runs > 0)
 		stats = new t_mep_run_statistics[_num_runs];
 }
 //---------------------------------------------------------------------------
-void t_mep_statistics::append(int num_generations)
+void t_mep_statistics::append(unsigned int num_generations)
 {
 	stats[num_runs].allocate_memory(num_generations);
 	num_runs++;
@@ -1045,14 +1045,14 @@ void t_mep_statistics::append(int num_generations)
 //---------------------------------------------------------------------------
 int t_mep_statistics::to_xml(pugi::xml_node parent)
 {
-	for (int r = 0; r < num_runs; r++) {
+	for (unsigned int r = 0; r < num_runs; r++) {
 		pugi::xml_node run_node = parent.append_child("run");
 		stats[r].to_xml(run_node);
 	}
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::from_xml(pugi::xml_node parent, int problem_type)
+int t_mep_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type)
 {
 	num_runs = 0;
 	pugi::xml_node node_results = parent.child("results");
@@ -1076,7 +1076,7 @@ t_mep_statistics& t_mep_statistics::operator=(const t_mep_statistics& source)
 
 		if (num_runs) {
 			stats = new t_mep_run_statistics[num_runs];
-			for (int i = 0; i < num_runs; i++)
+			for (unsigned int i = 0; i < num_runs; i++)
 				stats[i] = source.stats[i];
 
 			stddev_training_error = source.stddev_training_error;

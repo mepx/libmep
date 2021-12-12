@@ -10,10 +10,11 @@
 #include "mep_chromosome.h"
 #include "mep_functions.h"
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_binary_classification(const t_mep_data& mep_dataset, int* random_subset_indexes,
-	int random_subset_selection_size,
+void t_mep_chromosome::fitness_binary_classification(const t_mep_data& mep_dataset, 
+	unsigned int* random_subset_indexes,
+	unsigned int random_subset_selection_size,
 	double** cached_variables_eval_matrix, double* cached_sum_of_errors, double* cached_threashold,
-	int num_actual_variables, int* actual_enabled_variables,
+	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
 	double** eval_matrix_double, s_value_class* tmp_value_class, t_seed& seed)
 {
 	fitness_binary_classification_double_cache_all_training_data(mep_dataset,
@@ -25,10 +26,10 @@ void t_mep_chromosome::fitness_binary_classification(const t_mep_data& mep_datas
 //---------------------------------------------------------------------------
 void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_data(
 	const t_mep_data& mep_dataset,
-	int* random_subset_indexes, int random_subset_selection_size,
+	unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
 	double** cached_variables_eval_matrix, double* cached_sum_of_errors,
 	double* cached_threashold,
-	int num_actual_variables, int* actual_enabled_variables,
+	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
 	double** eval_matrix_double, s_value_class* tmp_value_class, t_seed& seed)
 {
 
@@ -36,16 +37,16 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 	// partial results are stored and used later in other sub-expressions
 
 	double** data = mep_dataset.get_data_matrix_double();
-	int num_rows = mep_dataset.get_num_rows();
+	unsigned int num_rows = mep_dataset.get_num_rows();
 
 	fitness = DBL_MAX;
-	index_best_genes[0] = -1;
+	//index_best_genes[0] = -1; //Do I need this?????
 	num_incorrectly_classified = 100;// max
 
 	int* line_of_constants = NULL;
 	if (num_constants) {
 		line_of_constants = new int[num_constants];// line where a constant was firstly computed
-		for (int i = 0; i < num_constants; i++)
+		for (unsigned int i = 0; i < num_constants; i++)
 			line_of_constants[i] = -1;
 	}
 
@@ -53,10 +54,10 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 		num_actual_variables, actual_enabled_variables, line_of_constants, eval_matrix_double, seed);
 
 	double best_threshold;
-	for (int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
+	for (unsigned int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 		if (prg[i].op >= 0)// a vairable
-			if (prg[i].op < num_total_variables) { // a variable, which is cached already
+			if (prg[i].op < (int)num_total_variables) { // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 				best_threshold = cached_threashold[prg[i].op];
 			}
@@ -76,7 +77,7 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 			double* eval = eval_matrix_double[i];
 
 			int num_0_incorrect = 0;
-			for (int k = 0; k < random_subset_selection_size; k++) {
+			for (unsigned int k = 0; k < random_subset_selection_size; k++) {
 				tmp_value_class[k].value = eval[random_subset_indexes[k]];
 				tmp_value_class[k].data_class = (int)data[random_subset_indexes[k]][num_total_variables];
 				if (data[random_subset_indexes[k]][num_total_variables] < 0.5)
@@ -89,13 +90,13 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 			best_threshold = tmp_value_class[0].value - 1;// all are classified to class 1 in this case
 			sum_of_errors = num_0_incorrect;
 
-			for (int t = 0; t < random_subset_selection_size; t++) {
-				int j = t + 1;
+			for (unsigned int t = 0; t < random_subset_selection_size; t++) {
+				unsigned int j = t + 1;
 				while (j < random_subset_selection_size && fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
 				// le verific pe toate intre i si j si le cataloghez ca apartinant la clasa 0
-				for (int k = t; k < j; k++)
+				for (unsigned int k = t; k < j; k++)
 					if (tmp_value_class[k].data_class == 0)
 						num_0_incorrect--;
 					else
@@ -127,15 +128,15 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 		delete[] line_of_constants;
 }
 //---------------------------------------------------------------------------
-bool t_mep_chromosome::compute_binary_classification_error_on_double_data(double** data, int num_data,
-	int output_col, double& error)
+bool t_mep_chromosome::compute_binary_classification_error_on_double_data(double** data, unsigned int num_data,
+	unsigned int output_col, double& error)
 {
 	error = 0;
 	double actual_output_double[1];
 
 	//	int num_valid = 0;
-	int index_error_gene;
-	for (int k = 0; k < num_data; k++) {
+	unsigned int index_error_gene;
+	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], actual_output_double, index_error_gene)) {
 			if (actual_output_double[0] <= best_class_threshold)
 				error += data[k][output_col];
@@ -152,13 +153,13 @@ bool t_mep_chromosome::compute_binary_classification_error_on_double_data(double
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_binary_classification_error_on_double_data_return_error(
-	double** data, int num_data, int output_col, double& error, int& index_error_gene)
+	double** data, unsigned int num_data, unsigned int output_col, double& error, unsigned int& index_error_gene)
 {
 	error = 0;
 	double actual_output_double[1];
 
 	//	int num_valid = 0;
-	for (int k = 0; k < num_data; k++) {
+	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], actual_output_double, index_error_gene)) {
 			if (actual_output_double[0] <= best_class_threshold)
 				error += data[k][output_col];

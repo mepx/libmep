@@ -527,9 +527,10 @@ int t_mep_functions::from_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_functions::get_list_of_operators(int *actual_operators)
+unsigned int t_mep_functions::get_list_of_operators(int *actual_operators)
 {
-	int num_operators = 0;
+	unsigned int num_operators = 0;
+
 	if (use_addition) {
 		actual_operators[num_operators] = O_ADDITION;
 		num_operators++;
@@ -660,9 +661,9 @@ int t_mep_functions::get_list_of_operators(int *actual_operators)
 	return num_operators;
 }
 //---------------------------------------------------------------------------
-int t_mep_functions::count_operators(void)
+unsigned int t_mep_functions::count_operators(void)
 {
-	int num_operators = 0;
+	unsigned int num_operators = 0;
 	if (use_addition)
 		num_operators++;
 	

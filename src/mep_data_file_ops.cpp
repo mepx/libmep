@@ -21,7 +21,7 @@ bool my_fgets(char* buf, int buf_size, FILE* f)
 	int i = 0;
 	buf[0] = 0;
 	while (i + 1 < buf_size && !feof(f)) {
-		buf[i] = getc(f);
+		buf[i] = (char)getc(f);
 		if (buf[i] == '\n') {
 			buf[i] = 0;
 			break;
@@ -29,7 +29,7 @@ bool my_fgets(char* buf, int buf_size, FILE* f)
 		else
 			if (buf[i] == '\r') {
 				// check what is next
-				buf[i + 1] = getc(f);
+				buf[i + 1] = (char)getc(f);
 				if (buf[i + 1] != '\n')
 					ungetc(buf[i + 1], f); // put it back
 				buf[i] = 0;
@@ -43,7 +43,7 @@ bool my_fgets(char* buf, int buf_size, FILE* f)
 	return (i > 0);
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_one_of_m_format(const char* filename, int given_num_classes)
+bool t_mep_data::from_one_of_m_format(const char* filename, unsigned int given_num_classes)
 {
 	FILE* f = NULL;
 #ifdef _WIN32
@@ -77,7 +77,7 @@ bool t_mep_data::from_one_of_m_format(const char* filename, int given_num_classe
 			num_cols = 0;
 
 			char tmp_str[1000];
-			int size;
+			size_t size;
 			int skipped;
 			bool result = get_next_field(buf, ' ', tmp_str, size, skipped);
 			while (result) {
@@ -104,13 +104,13 @@ bool t_mep_data::from_one_of_m_format(const char* filename, int given_num_classe
 	_data_double = new double* [num_data];
 
 	int out_class;
-	for (int r = 0; r < num_data; r++) {
+	for (unsigned int r = 0; r < num_data; r++) {
 		_data_double[r] = new double[num_cols];
-		for (int c = 0; c < num_cols - 1; c++)
+		for (unsigned int c = 0; c < num_cols - 1; c++)
 			fscanf(f, "%lf", &_data_double[r][c]);
 		// now scan the outputs
 		if (given_num_classes) // classification problem
-			for (int c = 0; c < given_num_classes; c++) {
+			for (unsigned int c = 0; c < given_num_classes; c++) {
 				fscanf(f, "%d", &out_class);
 				if (out_class == 1)
 					_data_double[r][num_cols - 1] = c;
@@ -208,7 +208,7 @@ bool t_mep_data::from_csv_double(const char* filename)
 		if (num_data == 1) {
 			num_cols = 0;
 
-			int size;
+			size_t size;
 			int skipped;
 			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
 			while (result) {
@@ -232,9 +232,9 @@ bool t_mep_data::from_csv_double(const char* filename)
 	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
 		size_t len = strlen(buf);
 		if (len > 1) {
-			int col = 0;
+			unsigned int col = 0;
 
-			int size;
+			size_t size;
 			int skipped;
 			_data_double[count_mep_data] = new double[num_cols];
 			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
@@ -279,15 +279,15 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 		return false;
 
 	if (_data_double)
-		for (int d = 0; d < num_data; d++) {
-			for (int v = 0; v < num_cols; v++)
+		for (unsigned int d = 0; d < num_data; d++) {
+			for (unsigned int v = 0; v < num_cols; v++)
 				fprintf(f, "%lg%c", _data_double[d][v], _list_separator);
 			fprintf(f, "\n");
 		}
 	else
 		if (_data_string)
-			for (int d = 0; d < num_data; d++) {
-				for (int v = 0; v < num_cols; v++) {
+			for (unsigned int d = 0; d < num_data; d++) {
+				for (unsigned int v = 0; v < num_cols; v++) {
 					if (strchr(_data_string[d][v], '\n') ||
 						strchr(_data_string[d][v], '\r') ||
 						strchr(_data_string[d][v], list_separator) ||

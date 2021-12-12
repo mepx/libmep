@@ -5,14 +5,16 @@
 //---------------------------------------------------------------------------
 #include <math.h>
 #include <errno.h>
+#include <float.h>
 //---------------------------------------------------------------------------
 #include "mep_chromosome.h"
 #include "mep_functions.h"
 //---------------------------------------------------------------------------
-void t_mep_chromosome::fitness_regression(const t_mep_data& mep_dataset, int* random_subset_indexes,
-	int random_subset_selection_size, double** cached_variables_eval_matrix,
-	double* cached_sum_of_errors, int num_actual_variables,
-	int* actual_enabled_variables, double** eval_matrix,
+void t_mep_chromosome::fitness_regression(const t_mep_data& mep_dataset, 
+	unsigned int* random_subset_indexes,
+	unsigned int random_subset_selection_size, double** cached_variables_eval_matrix,
+	double* cached_sum_of_errors, unsigned int num_actual_variables,
+	unsigned int* actual_enabled_variables, double** eval_matrix,
 	t_mep_error_function mep_error_function, t_seed& seed)
 {
 	fitness_regression_double_cache_all_training_data(mep_dataset,
@@ -24,27 +26,27 @@ void t_mep_chromosome::fitness_regression(const t_mep_data& mep_dataset, int* ra
 //---------------------------------------------------------------------------
 void t_mep_chromosome::fitness_regression_double_cache_all_training_data(
 	const t_mep_data& mep_dataset,
-	int* random_subset_indexes, int random_subset_selection_size,
+	unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
 	double** cached_variables_eval_matrix, double* cached_sum_of_errors,
-	int num_actual_variables, int* actual_enabled_variables,
+	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
 	double** eval_matrix_double, t_mep_error_function mep_error_function,
 	t_seed& seed)
 {
 	double** data = mep_dataset.get_data_matrix_double();
-	int num_rows = mep_dataset.get_num_rows();
+	unsigned int num_rows = mep_dataset.get_num_rows();
 
 	// evaluate a_chromosome
 	// partial results are stored and used later in other sub-expressions
 
-	fitness = 1E+308;
-	index_best_genes[0] = -1;
+	fitness = DBL_MAX;
+	//index_best_genes[0] = -1;
 
 	int* line_of_constants = NULL;
 	double* cached_sum_of_errors_for_constants = NULL;
 	if (num_constants) {
 		line_of_constants = new int[num_constants];// line where a constant was firstly computed
 		cached_sum_of_errors_for_constants = new double[num_constants];
-		for (int i = 0; i < num_constants; i++) {
+		for (unsigned int i = 0; i < num_constants; i++) {
 			line_of_constants[i] = -1;
 			cached_sum_of_errors_for_constants[i] = -1;
 		}
@@ -57,19 +59,19 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(
 
 	//	int num_training_data = mep_dataset->get_num_rows();
 
-	for (int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
+	for (unsigned int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 
 
 		if (prg[i].op >= 0)// variable or constant
-			if (prg[i].op < num_total_variables) // a variable, which is cached already
+			if (prg[i].op < (int)num_total_variables) // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 			else {// a constant
 				sum_of_errors = 0;
-				int constant_index = prg[i].op - num_total_variables;
+				unsigned int constant_index = (unsigned int)prg[i].op - num_total_variables;
 				if (cached_sum_of_errors_for_constants[constant_index] < -0.5) {// this is not cached?
 					double* eval = eval_matrix_double[line_of_constants[constant_index]];
-					for (int k = 0; k < random_subset_selection_size; k++)
+					for (unsigned int k = 0; k < random_subset_selection_size; k++)
 						sum_of_errors += mep_error_function(eval[random_subset_indexes[k]], data[random_subset_indexes[k]][num_total_variables]);
 					sum_of_errors /= double(random_subset_selection_size);
 				}
@@ -79,7 +81,7 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(
 		else {// operator
 			double* eval = eval_matrix_double[i];
 			sum_of_errors = 0;
-			for (int k = 0; k < random_subset_selection_size; k++)
+			for (unsigned int k = 0; k < random_subset_selection_size; k++)
 				sum_of_errors += mep_error_function(eval[random_subset_indexes[k]], data[random_subset_indexes[k]][num_total_variables]);
 			sum_of_errors /= double(random_subset_selection_size);
 		}
@@ -99,19 +101,19 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(
 }
 //---------------------------------------------------------------------------
 void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_dataset,
-	int* /*random_subset_indexes*/, int /*random_subset_selection_size*/,
+	unsigned int* /*random_subset_indexes*/, unsigned int /*random_subset_selection_size*/,
 	double* eval_vect, double* sum_of_errors_array, t_mep_error_function mep_error_function)
 {
 	double** data = mep_dataset.get_data_matrix_double();
 
-	fitness = 1E+308;
-	index_best_genes[0] = -1;
+	fitness = DBL_MAX;
+	//index_best_genes[0] = -1;
 
-	for (int i = 0; i < code_length; i++)
+	for (unsigned int i = 0; i < code_length; i++)
 		sum_of_errors_array[i] = 0;
 
-	for (int k = 0; k < mep_dataset.get_num_rows(); k++) {   // read the t_mep_chromosome from top to down
-		for (int i = 0; i < code_length; i++) {    // read the t_mep_chromosome from top to down
+	for (unsigned int k = 0; k < mep_dataset.get_num_rows(); k++) {   // read the t_mep_chromosome from top to down
+		for (unsigned int i = 0; i < code_length; i++) {    // read the t_mep_chromosome from top to down
 
 			errno = 0;
 			bool is_error_case = false;
@@ -227,7 +229,7 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 				break;
 
 			default:  // a variable
-				if (prg[i].op < num_total_variables)
+				if (prg[i].op < (int)num_total_variables)
 					eval_vect[i] = data[k][prg[i].op];
 				else
 					eval_vect[i] = real_constants[prg[i].op - num_total_variables];
@@ -243,8 +245,8 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 		}
 	}
 
-	int num_data = mep_dataset.get_num_rows();
-	for (int i = 0; i < code_length; i++) {    // find the best gene
+	unsigned int num_data = mep_dataset.get_num_rows();
+	for (unsigned int i = 0; i < code_length; i++) {    // find the best gene
 		if (fitness > sum_of_errors_array[i] / num_data) {
 			fitness = sum_of_errors_array[i] / num_data;
 			index_best_genes[0] = i;
@@ -254,14 +256,14 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_regression_error_on_double_data_return_error(
-	double** data, int num_data, int output_col, double& error, int& index_error_gene,
+	double** data, unsigned int num_data, unsigned int output_col, double& error, unsigned int& index_error_gene,
 	t_mep_error_function mep_error_function)
 {
 	error = 0;
 	double actual_output_double[1];
 
 	int num_valid = 0;
-	for (int k = 0; k < num_data; k++) {
+	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], actual_output_double, index_error_gene)) {
 			error += mep_error_function(data[k][output_col], actual_output_double[0]);
 			num_valid++;
@@ -275,14 +277,14 @@ bool t_mep_chromosome::compute_regression_error_on_double_data_return_error(
 	return true;
 }
 //---------------------------------------------------------------------------
-bool t_mep_chromosome::compute_regression_error_on_double_data(double** data, int num_data,
-	int output_col, double& error, t_mep_error_function mep_error_function)
+bool t_mep_chromosome::compute_regression_error_on_double_data(double** data, unsigned int num_data,
+	unsigned int output_col, double& error, t_mep_error_function mep_error_function)
 {
 	error = 0;
 	double actual_output_double[1];
-	int num_valid = 0;
-	int index_error_gene;
-	for (int k = 0; k < num_data; k++) {
+	unsigned int num_valid = 0;
+	unsigned int index_error_gene;
+	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], actual_output_double, index_error_gene)) {
 			error += mep_error_function(data[k][output_col], actual_output_double[0]);
 			num_valid++;

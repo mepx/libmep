@@ -27,9 +27,9 @@ double RNG(t_seed &seed)
 	return (seed.z1 ^ seed.z2 ^ seed.z3 ^ seed.z4) * 2.3283064365386963e-10;
 }
 //---------------------------------------------------------------------------
-int mep_int_rand(t_seed &seed, int _min, int _max)
+unsigned int mep_unsigned_int_rand(t_seed &seed, unsigned int _min, unsigned int _max)
 {
-	return int(RNG(seed) * (_max - _min + 1) + _min);
+	return (unsigned int)(RNG(seed) * (_max - _min + 1) + _min);
 }
 //---------------------------------------------------------------------------
 double mep_real_rand(t_seed &seed, double _min, double _max)

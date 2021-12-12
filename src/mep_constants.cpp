@@ -51,12 +51,12 @@ int t_mep_constants::to_xml(pugi::xml_node parent)
 
 	pugi::xml_node node = parent.append_child("type");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", constants_type);
+	sprintf(tmp_str, "%u", constants_type);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_automatic_constants");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", num_automatic_constants);
+	sprintf(tmp_str, "%u", num_automatic_constants);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("min_interval");
@@ -81,7 +81,7 @@ int t_mep_constants::to_xml(pugi::xml_node parent)
 
 	node = parent.append_child("num_user_defined_constants");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%ld", num_user_defined_constants);
+	sprintf(tmp_str, "%u", num_user_defined_constants);
 	data.set_value(tmp_str);
 
 	if (constants_double) {
@@ -94,7 +94,7 @@ int t_mep_constants::to_xml(pugi::xml_node parent)
 			char tmp_s[30];
 			tmp_cst_str = new char[num_user_defined_constants * 30]; // 30 digits for each constant !!!
 			tmp_cst_str[0] = 0;
-			for (int c = 0; c < num_user_defined_constants; c++) {
+			for (unsigned int c = 0; c < num_user_defined_constants; c++) {
 				sprintf(tmp_s, "%lg", constants_double[c]);
 				strcat(tmp_cst_str, tmp_s);
 				strcat(tmp_cst_str, " ");
@@ -115,13 +115,13 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 	pugi::xml_node node = parent.child("type");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		constants_type = atoi(value_as_cstring);
+		constants_type = (unsigned int)atoi(value_as_cstring);
 	}
 
 	node = parent.child("num_automatic_constants");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_automatic_constants = atoi(value_as_cstring);
+		num_automatic_constants = (unsigned int) atoi(value_as_cstring);
 	}
 
 	node = parent.child("min_interval");
@@ -151,7 +151,7 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 	node = parent.child("num_user_defined_constants");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		num_user_defined_constants = atoi(value_as_cstring);
+		num_user_defined_constants = (unsigned int)atoi(value_as_cstring);
 	}
 
 	if (constants_double) {
@@ -166,7 +166,7 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 		size_t num_jumped_chars = 0;
 
 		constants_double = new double[num_user_defined_constants];
-		for (int c = 0; c < num_user_defined_constants; c++) {
+		for (unsigned int c = 0; c < num_user_defined_constants; c++) {
 			sscanf(value_as_cstring + num_jumped_chars, "%lf", &constants_double[c]);
 			size_t local_jump = strcspn(value_as_cstring + num_jumped_chars, " ");
 			num_jumped_chars += local_jump + 1;
@@ -177,12 +177,12 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-long t_mep_constants::get_num_automatic_constants(void)const
+unsigned int t_mep_constants::get_num_automatic_constants(void)const
 {
 	return num_automatic_constants;
 }
 //---------------------------------------------------------------------------
-long t_mep_constants::get_num_user_defined_constants(void)const
+unsigned int t_mep_constants::get_num_user_defined_constants(void)const
 {
 	return num_user_defined_constants;
 }
@@ -197,12 +197,12 @@ double t_mep_constants::get_max_constants_interval_double(void)const
 	return max_constants_interval_double;
 }
 //---------------------------------------------------------------------------
-double t_mep_constants::get_constants_double(long index) const
+double t_mep_constants::get_constants_double(unsigned int index) const
 {
 	return constants_double[index];
 }
 //---------------------------------------------------------------------------
-long t_mep_constants::get_constants_type(void)const
+unsigned int t_mep_constants::get_constants_type(void)const
 {
 	return constants_type;
 }
@@ -217,13 +217,13 @@ double t_mep_constants::get_constants_mutation_max_deviation(void)const
 	return constants_mutation_max_deviation;
 }
 //---------------------------------------------------------------------------
-void t_mep_constants::set_num_automatic_constants(long value)
+void t_mep_constants::set_num_automatic_constants(unsigned int value)
 {
 	num_automatic_constants = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_constants::set_num_user_defined_constants(long value)
+void t_mep_constants::set_num_user_defined_constants(unsigned int value)
 {
 	if (constants_double)
 		delete[] constants_double;
@@ -250,13 +250,13 @@ void t_mep_constants::set_max_constants_interval_double(double value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_constants::set_constants_double(long index, double value)
+void t_mep_constants::set_constants_double(unsigned int index, double value)
 {
 	constants_double[index] = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_constants::set_constants_type(long value)
+void t_mep_constants::set_constants_type(unsigned int value)
 {
 	constants_type = value;
 	modified = true;
@@ -289,7 +289,7 @@ bool t_mep_constants::operator==(const t_mep_constants &other)
     if (max_constants_interval_double != other.max_constants_interval_double)
         return false;
 
-    for (int i = 0; i < num_user_defined_constants; i++)
+    for (unsigned int i = 0; i < num_user_defined_constants; i++)
         if (constants_double[i] != other.constants_double[i])
             return false;
 

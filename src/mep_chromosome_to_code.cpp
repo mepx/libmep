@@ -12,95 +12,95 @@
 #include "mep_chromosome.h"
 #include "mep_functions.h"
 //---------------------------------------------------------------------------------
-void print_instruction_to_C(int op, int adr1, int adr2, int adr3, int adr4, char* tmp_s)
+void print_instruction_to_C(int op, unsigned int adr1, unsigned int adr2, unsigned int adr3, unsigned int adr4, char* tmp_s)
 {
 	switch (op) {
 	case O_ADDITION:
-		sprintf(tmp_s, "prg[%d] + prg[%d];", adr1, adr2);
+		sprintf(tmp_s, "prg[%u] + prg[%u];", adr1, adr2);
 		break;
 	case O_SUBTRACTION:
-		sprintf(tmp_s, "prg[%d] - prg[%d];", adr1, adr2);
+		sprintf(tmp_s, "prg[%u] - prg[%u];", adr1, adr2);
 		break;
 	case O_MULTIPLICATION:
-		sprintf(tmp_s, "prg[%d] * prg[%d];", adr1, adr2);
+		sprintf(tmp_s, "prg[%u] * prg[%u];", adr1, adr2);
 		break;
 	case O_DIVISION:
-		sprintf(tmp_s, "prg[%d] / prg[%d];", adr1, adr2);
+		sprintf(tmp_s, "prg[%u] / prg[%u];", adr1, adr2);
 		break;
 	case O_POWER:
-		sprintf(tmp_s, "pow(prg[%d], prg[%d]);", adr1, adr2);
+		sprintf(tmp_s, "pow(prg[%u], prg[%u]);", adr1, adr2);
 		break;
 	case O_SQRT:
-		sprintf(tmp_s, "sqrt(prg[%d]);", adr1);
+		sprintf(tmp_s, "sqrt(prg[%u]);", adr1);
 		break;
 	case O_EXP:
-		sprintf(tmp_s, "exp(prg[%d]);", adr1);
+		sprintf(tmp_s, "exp(prg[%u]);", adr1);
 		break;
 	case O_POW10:
-		sprintf(tmp_s, "pow(10, prg[%d]);", adr1);
+		sprintf(tmp_s, "pow(10, prg[%u]);", adr1);
 		break;
 	case O_LN:
-		sprintf(tmp_s, "log(prg[%d]);", adr1);
+		sprintf(tmp_s, "log(prg[%u]);", adr1);
 		break;
 	case O_LOG10:
-		sprintf(tmp_s, "log10(prg[%d]);", adr1);
+		sprintf(tmp_s, "log10(prg[%u]);", adr1);
 		break;
 	case O_lOG2:
-		sprintf(tmp_s, "log2(prg[%d]);", adr1);
+		sprintf(tmp_s, "log2(prg[%u]);", adr1);
 		break;
 	case O_FLOOR:
-		sprintf(tmp_s, "floor(prg[%d]);", adr1);
+		sprintf(tmp_s, "floor(prg[%u]);", adr1);
 		break;
 	case O_CEIL:
-		sprintf(tmp_s, "ceil(prg[%d]);", adr1);
+		sprintf(tmp_s, "ceil(prg[%u]);", adr1);
 		break;
 	case O_ABS:
-		sprintf(tmp_s, "fabs(prg[%d]);", adr1);
+		sprintf(tmp_s, "fabs(prg[%u]);", adr1);
 		break;
 	case O_INV:
-		sprintf(tmp_s, "1/prg[%d];", adr1);
+		sprintf(tmp_s, "1/prg[%u];", adr1);
 		break;
 	case O_NEG:
-		sprintf(tmp_s, "-prg[%d];", adr1);
+		sprintf(tmp_s, "-prg[%u];", adr1);
 		break;
 	case O_X2:
-		sprintf(tmp_s, "prg[%d] * prg[%d];", adr1, adr1);
+		sprintf(tmp_s, "prg[%u] * prg[%u];", adr1, adr1);
 		break;
 	case O_MIN:
-		sprintf(tmp_s, "prg[%d] < prg[%d]?prg[%d] : prg[%d]; // min", adr1, adr2, adr1, adr2);
+		sprintf(tmp_s, "prg[%u] < prg[%u]?prg[%u] : prg[%u]; // min", adr1, adr2, adr1, adr2);
 		break;
 	case O_MAX:
-		sprintf(tmp_s, "prg[%d] > prg[%d]?prg[%d] : prg[%d]; // max", adr1, adr2, adr1, adr2);
+		sprintf(tmp_s, "prg[%u] > prg[%u]?prg[%u] : prg[%u]; // max", adr1, adr2, adr1, adr2);
 		break;
 	case O_SIN:
-		sprintf(tmp_s, "sin(prg[%d]);", adr1);
+		sprintf(tmp_s, "sin(prg[%u]);", adr1);
 		break;
 	case O_COS:
-		sprintf(tmp_s, "cos(prg[%d]);", adr1);
+		sprintf(tmp_s, "cos(prg[%u]);", adr1);
 		break;
 	case O_TAN:
-		sprintf(tmp_s, "tan(prg[%d]);", adr1);
+		sprintf(tmp_s, "tan(prg[%u]);", adr1);
 		break;
 	case O_ASIN:
-		sprintf(tmp_s, "asin(prg[%d]);", adr1);
+		sprintf(tmp_s, "asin(prg[%u]);", adr1);
 		break;
 	case O_ACOS:
-		sprintf(tmp_s, "acos(prg[%d]);", adr1);
+		sprintf(tmp_s, "acos(prg[%u]);", adr1);
 		break;
 	case O_ATAN:
-		sprintf(tmp_s, "atan(prg[%d]);", adr1);
+		sprintf(tmp_s, "atan(prg[%u]);", adr1);
 		break;
 	case O_IFLZ:
-		sprintf(tmp_s, "prg[%d] < 0?prg[%d] : prg[%d]; // ifalzbc", adr1, adr2, adr3);
+		sprintf(tmp_s, "prg[%u] < 0?prg[%u] : prg[%u]; // ifalzbc", adr1, adr2, adr3);
 		break;
 	case O_IFALBCD:
-		sprintf(tmp_s, "prg[%d] < prg[%d]?prg[%d] : prg[%d]; // ifalbcd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "prg[%u] < prg[%u]?prg[%u] : prg[%u]; // ifalbcd", adr1, adr2, adr3, adr4);
 		break;
 	case O_IF_A_OR_B_CD:
-		sprintf(tmp_s, "prg[%d] < 0 || prg[%d] < 0 ? prg[%d] : prg[%d]; // if_a_or_b_cd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "prg[%u] < 0 || prg[%u] < 0 ? prg[%u] : prg[%u]; // if_a_or_b_cd", adr1, adr2, adr3, adr4);
 		break;
 	case O_IF_A_XOR_B_CD:
-		sprintf(tmp_s, "prg[%d] < 0 != prg[%d] < 0 ? prg[%d] : prg[%d]; // if_a_xor_b_cd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "prg[%u] < 0 != prg[%u] < 0 ? prg[%u] : prg[%u]; // if_a_xor_b_cd", adr1, adr2, adr3, adr4);
 		break;
 
 	case O_NUM_INPUTS:
@@ -114,7 +114,7 @@ void print_instruction_to_C(int op, int adr1, int adr2, int adr3, int adr4, char
 }
 //---------------------------------------------------------------------------------
 char* t_mep_chromosome::to_C_double(bool simplified, double* data,
-	int problem_type, int error_measure, int num_classes)
+	unsigned int problem_type, unsigned int error_measure, unsigned int num_classes)
 {
 	setlocale(LC_NUMERIC, "C");
 
@@ -136,11 +136,11 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 
 		strcat(prog, "\n");
 
-		sprintf(tmp_s, "  double constants[%ld];", num_constants);
+		sprintf(tmp_s, "  double constants[%u];", num_constants);
 		strcat(prog, tmp_s);
 		strcat(prog, "\n");
-		for (int i = 0; i < num_constants; i++) {
-			sprintf(tmp_s, "  constants[%d] = %lf;", i, real_constants[i]);
+		for (unsigned int i = 0; i < num_constants; i++) {
+			sprintf(tmp_s, "  constants[%u] = %lf;", i, real_constants[i]);
 			strcat(prog, tmp_s);
 			strcat(prog, "\n");
 		}
@@ -149,13 +149,13 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 
 	if (simplified) {
 		strcat(prog, "  double prg[");
-		sprintf(tmp_s, "%d", num_utilized_genes);
+		sprintf(tmp_s, "%u", num_utilized_genes);
 		strcat(prog, tmp_s);
 		strcat(prog, "];");
 		strcat(prog, "\n");
 
-		for (int i = 0; i < num_utilized_genes; i++) {
-			sprintf(tmp_s, "  prg[%d] = ", i);
+		for (unsigned int i = 0; i < num_utilized_genes; i++) {
+			sprintf(tmp_s, "  prg[%u] = ", i);
 			strcat(prog, tmp_s);
 
 			if (simplified_prg[i].op < 0) {
@@ -164,13 +164,13 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 				strcat(prog, "\n");
 			}
 			else { // a variable
-				if (simplified_prg[i].op < num_total_variables) {
-					sprintf(tmp_s, "x[%d];", simplified_prg[i].op);
+				if (simplified_prg[i].op < (int)num_total_variables) {
+					sprintf(tmp_s, "x[%u];", (unsigned int)simplified_prg[i].op);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants[%d];", simplified_prg[i].op - num_total_variables);
+					sprintf(tmp_s, "constants[%u];", (unsigned int)simplified_prg[i].op - num_total_variables);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -180,10 +180,10 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 		strcat(prog, "\n");
 		if (problem_type == MEP_PROBLEM_REGRESSION || 
 			problem_type == MEP_PROBLEM_TIME_SERIE)
-			sprintf(tmp_s, "  outputs[0] = prg[%d];", num_utilized_genes - 1);
+			sprintf(tmp_s, "  outputs[0] = prg[%u];", num_utilized_genes - 1);
 		else
 			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION)
-				sprintf(tmp_s, "  if (prg[%d] <= %lf)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", num_utilized_genes - 1, best_class_threshold);
+				sprintf(tmp_s, "  if (prg[%u] <= %lf)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", num_utilized_genes - 1, best_class_threshold);
 			else {
 				// cannot be here
 			}
@@ -192,13 +192,13 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 	}
 	else {// not simplified
 		strcat(prog, "  double prg[");
-		sprintf(tmp_s, "%ld", code_length);
+		sprintf(tmp_s, "%u", code_length);
 		strcat(prog, tmp_s);
 		strcat(prog, "];");
 		strcat(prog, "\n");
 
-		for (int i = 0; i < code_length; i++) {
-			sprintf(tmp_s, "  prg[%d] = ", i);
+		for (unsigned int i = 0; i < code_length; i++) {
+			sprintf(tmp_s, "  prg[%u] = ", i);
 			strcat(prog, tmp_s);
 
 			if (prg[i].op < 0) {
@@ -207,13 +207,13 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 				strcat(prog, "\n");
 			}
 			else { // a variable
-				if (prg[i].op < num_total_variables) {
-					sprintf(tmp_s, "x[%d];", prg[i].op);
+				if (prg[i].op < (int)num_total_variables) {
+					sprintf(tmp_s, "x[%u];", (unsigned int)prg[i].op);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants[%d];", prg[i].op - num_total_variables);
+					sprintf(tmp_s, "constants[%u];", prg[i].op - num_total_variables);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -224,12 +224,12 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
 		case MEP_PROBLEM_TIME_SERIE:
-			sprintf(tmp_s, "  outputs[0] = prg[%d];", index_best_genes[0]);
+			sprintf(tmp_s, "  outputs[0] = prg[%u];", index_best_genes[0]);
 			strcat(prog, tmp_s);
 			break;
 
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			sprintf(tmp_s, "  if (prg[%d] <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", index_best_genes[0], best_class_threshold);
+			sprintf(tmp_s, "  if (prg[%u] <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", index_best_genes[0], best_class_threshold);
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
@@ -241,12 +241,12 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 
 				strcat(prog, "  double max_value = prg[0];\n");
 				strcat(prog, "  int index_max_value = 0;\n");
-				sprintf(tmp_s, "  for (int i = 1; i < %ld; i++)\n", code_length);
+				sprintf(tmp_s, "  for (unsigned int i = 1; i < %u; i++)\n", code_length);
 				strcat(prog, tmp_s);
 
 				strcat(prog, "    if (max_value < prg[i]){\n      max_value = prg[i];\n      index_max_value = i;\n    }\n");
 
-				sprintf(tmp_s, "  outputs[0] = index_max_value %% %d;\n", num_classes);
+				sprintf(tmp_s, "  outputs[0] = index_max_value %% %u;\n", num_classes);
 				strcat(prog, tmp_s);
 				break;
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
@@ -254,10 +254,10 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 				sprintf(tmp_s, "// index of genes holding the output for each class\n");
 				strcat(prog, tmp_s);
 
-				sprintf(tmp_s, "  int index_best_genes[%d];\n", num_classes);
+				sprintf(tmp_s, "  int index_best_genes[%u];\n", num_classes);
 				strcat(prog, tmp_s);
-				for (int c = 0; c < num_classes; c++) {
-					sprintf(tmp_s, "  index_best_genes[%d] = %d;\n", c, index_best_genes[c]);
+				for (unsigned int c = 0; c < num_classes; c++) {
+					sprintf(tmp_s, "  index_best_genes[%u] = %u;\n", c, index_best_genes[c]);
 					strcat(prog, tmp_s);
 				}
 
@@ -266,13 +266,13 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 
 				strcat(prog, "  double max_value = prg[0];\n");
 				strcat(prog, "  int index_max_value = 0;\n");
-				sprintf(tmp_s, "  for (int i = 1; i < %ld; i++)\n", code_length);
+				sprintf(tmp_s, "  for (unsigned int i = 1; i < %u; i++)\n", code_length);
 				strcat(prog, tmp_s);
 
 				strcat(prog, "    if (max_value < prg[i]){\n      max_value = prg[i];\n      index_max_value = i;\n    }\n");
 				strcat(prog, "  // find the class\n");
 				strcat(prog, "  int class_index = -1;\n");
-				sprintf(tmp_s, "  for (int c = 0; c < %d; c++)\n", num_classes);
+				sprintf(tmp_s, "  for (unsigned int c = 0; c < %u; c++)\n", num_classes);
 				strcat(prog, tmp_s);
 
 				strcat(prog, "    if (index_best_genes[c] == index_max_value){\n      class_index = c;\n      break;\n    }\n");
@@ -295,10 +295,10 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 	strcat(prog, "\n");
 	strcat(prog, "//example of utilization ...\n");
 	strcat(prog, "\n");
-	sprintf(tmp_s, "  double x[%d];\n", num_total_variables);
+	sprintf(tmp_s, "  double x[%u];\n", num_total_variables);
 	strcat(prog, tmp_s);
-	for (int i = 0; i < num_total_variables; i++) {
-		sprintf(tmp_s, "  x[%d] = %lf;\n", i, data[i]);
+	for (unsigned int i = 0; i < num_total_variables; i++) {
+		sprintf(tmp_s, "  x[%u] = %lf;\n", i, data[i]);
 		strcat(prog, tmp_s);
 	}
 
@@ -316,95 +316,95 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 	return prog;
 }
 //---------------------------------------------------------------------------
-void print_instruction_to_Basic(int op, int adr1, int adr2, int adr3, int adr4, char* tmp_s)
+void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, unsigned int adr3, unsigned int adr4, char* tmp_s)
 {
 	switch (op) {
 	case O_ADDITION:
-		sprintf(tmp_s, "prg(%d) + prg(%d)", adr1, adr2);
+		sprintf(tmp_s, "prg(%u) + prg(%u)", adr1, adr2);
 		break;
 	case O_SUBTRACTION:
-		sprintf(tmp_s, "prg(%d) - prg(%d)", adr1, adr2);
+		sprintf(tmp_s, "prg(%u) - prg(%u)", adr1, adr2);
 		break;
 	case O_MULTIPLICATION:
-		sprintf(tmp_s, "prg(%d) * prg(%d)", adr1, adr2);
+		sprintf(tmp_s, "prg(%u) * prg(%u)", adr1, adr2);
 		break;
 	case O_DIVISION:
-		sprintf(tmp_s, "prg(%d) / prg(%d)", adr1, adr2);
+		sprintf(tmp_s, "prg(%u) / prg(%u)", adr1, adr2);
 		break;
 	case O_POWER:
-		sprintf(tmp_s, "pow(prg(%d), prg(%d))", adr1, adr2);
+		sprintf(tmp_s, "pow(prg(%u), prg(%u))", adr1, adr2);
 		break;
 	case O_SQRT:
-		sprintf(tmp_s, "sqrt(prg(%d))", adr1);
+		sprintf(tmp_s, "sqrt(prg(%u))", adr1);
 		break;
 	case O_EXP:
-		sprintf(tmp_s, "exp(prg(%d))", adr1);
+		sprintf(tmp_s, "exp(prg(%u))", adr1);
 		break;
 	case O_POW10:
-		sprintf(tmp_s, "pow(10, prg(%d))", adr1);
+		sprintf(tmp_s, "pow(10, prg(%u))", adr1);
 		break;
 	case O_LN:
-		sprintf(tmp_s, "log(prg(%d))", adr1);
+		sprintf(tmp_s, "log(prg(%u))", adr1);
 		break;
 	case O_LOG10:
-		sprintf(tmp_s, "log10(prg(%d))", adr1);
+		sprintf(tmp_s, "log10(prg(%u))", adr1);
 		break;
 	case O_lOG2:
-		sprintf(tmp_s, "log2(prg(%d))", adr1);
+		sprintf(tmp_s, "log2(prg(%u))", adr1);
 		break;
 	case O_FLOOR:
-		sprintf(tmp_s, "floor(prg(%d))", adr1);
+		sprintf(tmp_s, "floor(prg(%u))", adr1);
 		break;
 	case O_CEIL:
-		sprintf(tmp_s, "ceil(prg(%d))", adr1);
+		sprintf(tmp_s, "ceil(prg(%u))", adr1);
 		break;
 	case O_ABS:
-		sprintf(tmp_s, "fabs(prg(%d))", adr1);
+		sprintf(tmp_s, "fabs(prg(%u))", adr1);
 		break;
 	case O_INV:
-		sprintf(tmp_s, "1/prg(%d)", adr1);
+		sprintf(tmp_s, "1/prg(%u)", adr1);
 		break;
 	case O_NEG:
-		sprintf(tmp_s, "-prg(%d)", adr1);
+		sprintf(tmp_s, "-prg(%u)", adr1);
 		break;
 	case O_X2:
-		sprintf(tmp_s, "prg(%d) * prg(%d)", adr1, adr1);
+		sprintf(tmp_s, "prg(%u) * prg(%u)", adr1, adr1);
 		break;
 	case O_MIN:
-		sprintf(tmp_s, "IIf (prg(%d) < prg(%d), prg(%d), prg(%d)) ' min", adr1, adr2, adr1, adr2);
+		sprintf(tmp_s, "IIf (prg(%u) < prg(%u), prg(%u), prg(%u)) ' min", adr1, adr2, adr1, adr2);
 		break;
 	case O_MAX:
-		sprintf(tmp_s, "IIf (prg(%d) > prg(%d), prg(%d), prg(%d)) ' max", adr1, adr2, adr1, adr2);
+		sprintf(tmp_s, "IIf (prg(%u) > prg(%u), prg(%u), prg(%u)) ' max", adr1, adr2, adr1, adr2);
 		break;
 	case O_SIN:
-		sprintf(tmp_s, "sin(prg(%d))", adr1);
+		sprintf(tmp_s, "sin(prg(%u))", adr1);
 		break;
 	case O_COS:
-		sprintf(tmp_s, "cos(prg(%d))", adr1);
+		sprintf(tmp_s, "cos(prg(%u))", adr1);
 		break;
 	case O_TAN:
-		sprintf(tmp_s, "tan(prg(%d))", adr1);
+		sprintf(tmp_s, "tan(prg(%u))", adr1);
 		break;
 	case O_ASIN:
-		sprintf(tmp_s, "asin(prg(%d))", adr1);
+		sprintf(tmp_s, "asin(prg(%u))", adr1);
 		break;
 	case O_ACOS:
-		sprintf(tmp_s, "acos(prg(%d))", adr1);
+		sprintf(tmp_s, "acos(prg(%u))", adr1);
 		break;
 	case O_ATAN:
-		sprintf(tmp_s, "atan(prg(%d))", adr1);
+		sprintf(tmp_s, "atan(prg(%u))", adr1);
 		break;
 	case O_IFLZ:
-		sprintf(tmp_s, "IIf (prg(%d) < 0, prg(%d), prg(%d)) ' ifalzbc", adr1, adr2, adr3);
+		sprintf(tmp_s, "IIf (prg(%u) < 0, prg(%u), prg(%u)) ' ifalzbc", adr1, adr2, adr3);
 		break;
 	case O_IFALBCD:
-		sprintf(tmp_s, "IIf (prg(%d) < prg(%d), prg(%d), prg(%d)) ' ifalbcd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "IIf (prg(%u) < prg(%u), prg(%u), prg(%u)) ' ifalbcd", adr1, adr2, adr3, adr4);
 		break;
 	case O_IF_A_OR_B_CD:
-		sprintf(tmp_s, "IIf (prg(%d) < 0 Or prg(%d) < 0, prg(%d), prg(%d)) ' if_a_or_b_cd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "IIf (prg(%u) < 0 Or prg(%u) < 0, prg(%u), prg(%u)) ' if_a_or_b_cd", adr1, adr2, adr3, adr4);
 		break;
 	case O_IF_A_XOR_B_CD:
-		sprintf(tmp_s, "IIf (prg(%d) < 0 <> prg(%d) < 0, prg(%d), prg(%d)) ' if_a_xor_b_cd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "IIf (prg(%u) < 0 <> prg(%u) < 0, prg(%u), prg(%u)) ' if_a_xor_b_cd", adr1, adr2, adr3, adr4);
 		break;
 
 	case O_NUM_INPUTS:
@@ -418,7 +418,7 @@ void print_instruction_to_Basic(int op, int adr1, int adr2, int adr3, int adr4, 
 }
 //---------------------------------------------------------------------------
 char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
-	int problem_type, int error_measure, int num_classes)
+	unsigned int problem_type, unsigned int error_measure, unsigned int num_classes)
 {
 	setlocale(LC_NUMERIC, "C");
 
@@ -435,11 +435,11 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 		strcat(prog, "\n");
 
-		sprintf(tmp_s, "  Dim constants(%ld) As Double", num_constants - 1);// -1 because in VB the size is actual the last index
+		sprintf(tmp_s, "  Dim constants(%u) As Double", num_constants - 1);// -1 because in VB the size is actual the last index
 		strcat(prog, tmp_s);
 		strcat(prog, "\n");
-		for (int i = 0; i < num_constants; i++) {
-			sprintf(tmp_s, "  constants(%d) = %lf", i, real_constants[i]);
+		for (unsigned int i = 0; i < num_constants; i++) {
+			sprintf(tmp_s, "  constants(%u) = %lf", i, real_constants[i]);
 			strcat(prog, tmp_s);
 			strcat(prog, "\n");
 		}
@@ -448,13 +448,13 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 	if (simplified) {
 		strcat(prog, "  Dim prg(");
-		sprintf(tmp_s, "%d", num_utilized_genes - 1);
+		sprintf(tmp_s, "%u", num_utilized_genes - 1);
 		strcat(prog, tmp_s);
 		strcat(prog, ") as Double");
 		strcat(prog, "\n");
 
-		for (int i = 0; i < num_utilized_genes; i++) {
-			sprintf(tmp_s, "  prg(%d) = ", i);
+		for (unsigned int i = 0; i < num_utilized_genes; i++) {
+			sprintf(tmp_s, "  prg(%u) = ", i);
 			strcat(prog, tmp_s);
 
 			if (simplified_prg[i].op < 0) {
@@ -463,18 +463,17 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 				strcat(prog, "\n");
 			}
 			else { // a variable
-				if (simplified_prg[i].op < num_total_variables) {
-					if (problem_type == MEP_PROBLEM_REGRESSION)
-						sprintf(tmp_s, "x(1,%d).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
+				if (simplified_prg[i].op < (int)num_total_variables) {
+					if (problem_type == MEP_PROBLEM_TIME_SERIE)
+						sprintf(tmp_s, "x(%d,1).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
 					else
-						if (problem_type == MEP_PROBLEM_TIME_SERIE)
-							sprintf(tmp_s, "x(%d,1).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
+						sprintf(tmp_s, "x(1,%d).Value", simplified_prg[i].op + 1); // +1 because in VB all ranges are from 1
 
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants(%d)", simplified_prg[i].op - num_total_variables);
+					sprintf(tmp_s, "constants(%u)", (unsigned int)simplified_prg[i].op - num_total_variables);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -483,10 +482,10 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 		strcat(prog, "\n");
 		if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE)
-			sprintf(tmp_s, "  mepx = prg(%d)", num_utilized_genes - 1);
+			sprintf(tmp_s, "  mepx = prg(%u)", num_utilized_genes - 1);
 		else
 			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION)
-				sprintf(tmp_s, "  If (prg(%d) <= %lf) Then\n   mepx = 0\n  ElseIf\n    mepx = 1\n Endif\n", num_utilized_genes - 1, best_class_threshold);
+				sprintf(tmp_s, "  If (prg(%u) <= %lf) Then\n   mepx = 0\n  ElseIf\n    mepx = 1\n Endif\n", num_utilized_genes - 1, best_class_threshold);
 			else {
 				// cannot be here
 			}
@@ -495,13 +494,13 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 	}
 	else {// not simplified
 		strcat(prog, "  Dim prg(");
-		sprintf(tmp_s, "%ld", code_length - 1);
+		sprintf(tmp_s, "%u", code_length - 1);
 		strcat(prog, tmp_s);
 		strcat(prog, ") As Double");
 		strcat(prog, "\n");
 
-		for (int i = 0; i < code_length; i++) {
-			sprintf(tmp_s, "  prg(%d) = ", i);
+		for (unsigned int i = 0; i < code_length; i++) {
+			sprintf(tmp_s, "  prg(%u) = ", i);
 			strcat(prog, tmp_s);
 
 			if (prg[i].op < 0) {
@@ -510,17 +509,17 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 				strcat(prog, "\n");
 			}
 			else { // a variable
-				if (prg[i].op < num_total_variables) {
-					if (problem_type == MEP_PROBLEM_REGRESSION)
-						sprintf(tmp_s, "x(1,%d).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
+				if (prg[i].op < (int)num_total_variables) {
+					if (problem_type == MEP_PROBLEM_TIME_SERIE)
+						sprintf(tmp_s, "x(%d,1).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
 					else
-						if (problem_type == MEP_PROBLEM_TIME_SERIE)
-							sprintf(tmp_s, "x(%d,1).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
+						sprintf(tmp_s, "x(1,%d).Value", prg[i].op + 1); // +1 because all ranges in VB start from 1
+
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants(%d)", prg[i].op - num_total_variables);
+					sprintf(tmp_s, "constants(%u)", (unsigned int)prg[i].op - num_total_variables);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -531,12 +530,12 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 		switch (problem_type) {
 		case MEP_PROBLEM_REGRESSION:
 		case MEP_PROBLEM_TIME_SERIE:
-			sprintf(tmp_s, "  mepx = prg(%d)", index_best_genes[0]);
+			sprintf(tmp_s, "  mepx = prg(%u)", index_best_genes[0]);
 			strcat(prog, tmp_s);
 			break;
 
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			sprintf(tmp_s, "  If (prg(%d) <= %lg) Then\n    mepx = 0\n  Else\n    mepx = 1\n  End If\n", index_best_genes[0], best_class_threshold);
+			sprintf(tmp_s, "  If (prg(%u) <= %lg) Then\n    mepx = 0\n  Else\n    mepx = 1\n  End If\n", index_best_genes[0], best_class_threshold);
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
@@ -548,13 +547,13 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 				strcat(prog, "  max_value = prg(0)\n");
 				strcat(prog, "  index_max_value = 0\n");
-				sprintf(tmp_s, "  For i = 1 To %ld\n", code_length - 1);
+				sprintf(tmp_s, "  For i = 1 To %u\n", code_length - 1);
 				strcat(prog, tmp_s);
 
 				strcat(prog, "    If max_value < prg(i) Then\n      max_value = prg(i)\n      index_max_value = i\n    EndIf\n");
 				strcat(prog, "	Next\n");
 
-				sprintf(tmp_s, "  mepx = index_max_value Mod %d\n", num_classes);
+				sprintf(tmp_s, "  mepx = index_max_value Mod %u\n", num_classes);
 				strcat(prog, tmp_s);
 				break;
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
@@ -562,10 +561,10 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 				sprintf(tmp_s, "' index of genes holding the output for each class\n");
 				strcat(prog, tmp_s);
 
-				sprintf(tmp_s, "  Dim index_best_genes(%d) As Integer\n", num_classes - 1);
+				sprintf(tmp_s, "  Dim index_best_genes(%u) As Integer\n", num_classes - 1);
 				strcat(prog, tmp_s);
-				for (int c = 0; c < num_classes; c++) {
-					sprintf(tmp_s, "  index_best_genes(%d) = %d\n", c, index_best_genes[c]);
+				for (unsigned int c = 0; c < num_classes; c++) {
+					sprintf(tmp_s, "  index_best_genes(%u) = %u\n", c, index_best_genes[c]);
 					strcat(prog, tmp_s);
 				}
 
@@ -574,7 +573,7 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 				strcat(prog, "  max_value = prg(0)\n");
 				strcat(prog, "  index_max_value = 0\n");
-				sprintf(tmp_s, "  For i = 1 To %ld\n", code_length - 1);
+				sprintf(tmp_s, "  For i = 1 To %u\n", code_length - 1);
 				strcat(prog, tmp_s);
 
 				strcat(prog, "    If max_value < prg(i) Then\n      max_value = prg(i)\n      index_max_value = i\n    EndIf\n");
@@ -582,7 +581,7 @@ char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
 
 				strcat(prog, "  ' find the class\n");
 				strcat(prog, "  class_index = -1\n");
-				sprintf(tmp_s, "  For c = 0 To %d\n", num_classes - 1);
+				sprintf(tmp_s, "  For c = 0 To %u\n", num_classes - 1);
 
 				strcat(prog, tmp_s);
 
