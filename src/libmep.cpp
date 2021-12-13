@@ -1748,10 +1748,13 @@ bool t_mep::change_window_size_time_serie(unsigned int new_window_size)
 	return result;
 }
 //---------------------------------------------------------------------------
-void t_mep::predict(int run_index, double* output, char* correct_output)
+bool t_mep::predict(int run_index, double* output, char* correct_output)
 {
+	if (run_index == -1)
+		return false;
+
 	if (mep_parameters.get_problem_type() != MEP_PROBLEM_TIME_SERIE)
-		return;
+		return false;
 
 	unsigned int num_cols = training_data.get_num_cols();
 	double* data_row = new double[num_cols - 1];
@@ -1789,5 +1792,6 @@ void t_mep::predict(int run_index, double* output, char* correct_output)
 	}
 
 	delete[] data_row;
+	return true;
 }
 //---------------------------------------------------------------------------

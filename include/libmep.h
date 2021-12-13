@@ -214,7 +214,7 @@ public:
 	bool change_window_size_time_serie(unsigned int new_window_size);
 
 	// predict new values for a time serie
-	void predict(int run_index, double* output, char* correct_output);
+	bool predict(int run_index, double* output, char* correct_output);
 };
 //-----------------------------------------------------------------
 #endif 
