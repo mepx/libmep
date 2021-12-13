@@ -54,6 +54,7 @@ private:
 	bool modified;
 
 	unsigned int error_measure;
+	unsigned int num_predictions;
 
 public:
 
@@ -196,6 +197,12 @@ public:
 
 	// set the number of generations for which the random subset of data is kept fixed
 	void set_num_generations_for_which_random_subset_is_kept_fixed(unsigned int);
+
+	// get the number of generations for which the random subset of data is kept fixed
+	unsigned int get_num_predictions(void) const;
+
+	// set the number of generations for which the random subset of data is kept fixed
+	void set_num_predictions(unsigned int);
 };
 //-----------------------------------------------------------------
 #endif // PARAMETERS_CLASS_H_INCLUDED

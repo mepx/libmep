@@ -36,6 +36,7 @@ void t_mep_parameters::init(void)
 	random_subset_selection_size = 1000;
 	error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 	num_generations_for_which_random_subset_is_kept_fixed = 1;
+	num_predictions = 10;
 
 	modified = false;
 }
@@ -141,6 +142,11 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	node = parent.append_child("num_generations_for_which_random_subset_is_kept_fixed");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%u", num_generations_for_which_random_subset_is_kept_fixed);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("num_predictions");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%u", num_predictions);
 	data.set_value(tmp_str);
 
 	modified = false;
@@ -277,6 +283,14 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	}
 	else
 		num_generations_for_which_random_subset_is_kept_fixed = 1;
+
+	node = parent.child("num_predictions");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		num_predictions = (unsigned int)atoi(value_as_cstring);
+	}
+	else
+		num_predictions = 10;
 
 	node = parent.child("error_measure");
 	if (node) {
@@ -576,6 +590,16 @@ void t_mep_parameters::set_num_generations_for_which_random_subset_is_kept_fixed
 	num_generations_for_which_random_subset_is_kept_fixed = new_value;
 }
 //---------------------------------------------------------------------------
+unsigned int t_mep_parameters::get_num_predictions(void) const
+{
+	return num_predictions;
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_num_predictions(unsigned int new_value)
+{
+	num_predictions = new_value;
+}
+//---------------------------------------------------------------------------
 bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 {
 	if (mutation_probability != other.mutation_probability)
@@ -630,6 +654,9 @@ bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 		return false;
 
 	if (error_measure != other.error_measure)
+		return false;
+
+	if (num_predictions != other.num_predictions)
 		return false;
 
 	return true;

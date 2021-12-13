@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.12.12.0-beta");
+	strcpy(version, "2021.12.13.0-beta");
 
 	num_selected_operators = 0;
 
@@ -1746,5 +1746,48 @@ bool t_mep::change_window_size_time_serie(unsigned int new_window_size)
 	bool result = training_data.to_time_serie(new_window_size);
 
 	return result;
+}
+//---------------------------------------------------------------------------
+void t_mep::predict(int run_index, double* output, char* correct_output)
+{
+	if (mep_parameters.get_problem_type() != MEP_PROBLEM_TIME_SERIE)
+		return;
+
+	unsigned int num_cols = training_data.get_num_cols();
+	double* data_row = new double[num_cols - 1];
+
+	if (test_data.get_num_rows()) {
+		for (unsigned int i = 0; i < num_cols - 1; i++)
+			data_row[i] = test_data.get_data_matrix_double()[test_data.get_num_rows() - 1][i + 1];
+	}
+	else
+		if (validation_data.get_num_rows()) {
+			for (unsigned int i = 0; i < num_cols - 1; i++)
+				data_row[i] = validation_data.get_data_matrix_double()[validation_data.get_num_rows() - 1][i + 1];
+		}
+		else
+			if (training_data.get_num_rows()) {
+				for (unsigned int i = 0; i < num_cols - 1; i++)
+					data_row[i] = training_data.get_data_matrix_double()[training_data.get_num_rows() - 1][i + 1];
+			}
+
+	double out[1];
+	for (unsigned int p = 0; p < mep_parameters.get_num_predictions(); p++) {	
+		if (get_output(run_index, data_row, out)) {
+			output[p] = out[0];
+			correct_output[p] = true;
+			for (unsigned int i = 0; i < num_cols - 2; i++)
+				data_row[i] = data_row[i + 1];
+			data_row[num_cols - 2] = out[0];
+		}
+		else {
+			// fill the remaining with false
+			for (unsigned int q = p; q < mep_parameters.get_num_predictions(); q++)
+				correct_output[q] = false;
+			break;
+		}
+	}
+
+	delete[] data_row;
 }
 //---------------------------------------------------------------------------

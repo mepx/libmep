@@ -204,9 +204,17 @@ public:
 
 	void clear(void);
 
+	// is this a time serie? we do not take window size now into account
 	bool could_be_time_serie(void);
+
+	// transform 1 column of training data to a time serie
 	bool to_time_serie(unsigned int window_size);
+
+	// change window size of an existing time serie
 	bool change_window_size_time_serie(unsigned int new_window_size);
+
+	// predict new values for a time serie
+	void predict(int run_index, double* output, char* correct_output);
 };
 //-----------------------------------------------------------------
 #endif 
