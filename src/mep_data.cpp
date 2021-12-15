@@ -1072,7 +1072,7 @@ bool t_mep_data::to_time_serie(unsigned int window_size)
 		for (unsigned int r = 0; r < num_data; r++) {
 			if (_data_string[r][0])
 				delete[] _data_string[r][0];
-			delete[] _data_double[r];
+			delete[] _data_string[r];
 		}
 		delete[] _data_double;
 		

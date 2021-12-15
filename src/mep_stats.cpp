@@ -661,7 +661,7 @@ int t_mep_statistics::to_csv(const char *filename, unsigned int problem_type)con
 	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
 		fprintf(f, "Run #;training error; validation error; test error; running time (s)\n");
 		for (unsigned int r = 0; r < num_runs; r++) {
-			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_error[stats[r].last_generation]);
+			fprintf(f, "%u;%lf;", r + 1, stats[r].best_training_error[stats[r].last_generation]);
 			if (stats[r].best_validation_error > -1E-6)
 				fprintf(f, "%lf;", stats[r].best_validation_error);
 			else
@@ -710,7 +710,7 @@ int t_mep_statistics::to_csv(const char *filename, unsigned int problem_type)con
 	else {// MEP CLASSIFICATION
 		fprintf(f, "#;training num incorrect (%%); validation num incorrect (%%); test num incorrect (%%); running time (s)\n");
 		for (unsigned int r = 0; r < num_runs; r++) {
-			fprintf(f, "%d;%lf;", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
+			fprintf(f, "%u;%lf;", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
 			if (stats[r].best_validation_num_incorrect > -1E-6)
 				fprintf(f, "%lf;", stats[r].best_validation_num_incorrect);
 			else
@@ -785,7 +785,7 @@ int t_mep_statistics::to_tex(const char *filename, unsigned int problem_type) co
 	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
 		fprintf(f, "Run \\# & training error & validation error & test error & running time(s)\\\\ \n");
 		for (unsigned int r = 0; r < num_runs; r++) {
-			fprintf(f, "%d & %lf & ", r + 1, stats[r].best_training_error[stats[r].last_generation]);
+			fprintf(f, "%u & %lf & ", r + 1, stats[r].best_training_error[stats[r].last_generation]);
 
 			if (stats[r].best_validation_error > -1E-6)
 				fprintf(f, "%lf & ", stats[r].best_validation_error);
@@ -838,7 +838,7 @@ int t_mep_statistics::to_tex(const char *filename, unsigned int problem_type) co
 	else {// MEP CLASSIFICATION
 		fprintf(f, "Run \\# & training num incorrect (\\%%) & validation num incorrect (\\%%) & test num incorrect (\\%%) & running time(s)\\\\ \n");
 		for (unsigned int r = 0; r < num_runs; r++) {
-			fprintf(f, "%d & %lf &", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
+			fprintf(f, "%u & %lf &", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
 			if (stats[r].best_validation_num_incorrect > -1E-6)
 				fprintf(f, "%lf & ", stats[r].best_validation_num_incorrect);
 			else
