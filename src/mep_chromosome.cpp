@@ -57,7 +57,7 @@ void t_mep_chromosome::allocate_memory(unsigned int _code_length, unsigned int n
 	this->num_outputs = _num_outputs;
 
 	if (use_constants) {
-		if (constants->get_constants_type() == USER_DEFINED_CONSTANTS) {
+		if (constants->get_constants_type() == MEP_USER_DEFINED_CONSTANTS) {
 			num_constants = constants->get_num_user_defined_constants();
 			real_constants = new double[num_constants];
 		}
@@ -514,7 +514,7 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 {
 	// I have to generate the constants for this individuals
 	if (parameters.get_constants_probability() > 1E-6) {
-		if (mep_constants.get_constants_type() == USER_DEFINED_CONSTANTS) {
+		if (mep_constants.get_constants_type() == MEP_USER_DEFINED_CONSTANTS) {
 			for (unsigned int c = 0; c < num_constants; c++)
 				real_constants[c] = mep_constants.get_constants_double(c);
 		}
@@ -600,7 +600,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_
 	}
 	// lets see if I can evolve constants
 
-	if (mep_constants.get_constants_can_evolve() && mep_constants.get_constants_type() == AUTOMATIC_CONSTANTS)
+	if (mep_constants.get_constants_can_evolve() && mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS)
 		for (unsigned int c = 0; c < num_constants; c++) {
 			p = mep_real_rand(seed, 0, 1);      // mutate the operator
 			double tmp_cst_d = mep_real_rand(seed, 0, mep_constants.get_constants_mutation_max_deviation());
@@ -640,7 +640,7 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2,
 	}
 
 	if (num_constants && mep_constants.get_constants_can_evolve() &&
-			mep_constants.get_constants_type() == AUTOMATIC_CONSTANTS) {
+			mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS) {
 		pct = 1 + mep_unsigned_int_rand(seed, 0, num_constants - 3);
 		for (unsigned int c = 0; c < pct; c++) {
 			offspring1.real_constants[c] = real_constants[c];
@@ -675,7 +675,7 @@ void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2,
 		}
 
     if (mep_constants.get_constants_can_evolve() &&
-        mep_constants.get_constants_type() == AUTOMATIC_CONSTANTS)
+        mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS)
         for (unsigned int c = 0; c < num_constants; c++) {
             offspring1.real_constants[c] = real_constants[c];
             offspring2.real_constants[c] = parent2.real_constants[c];

@@ -4,7 +4,7 @@
 // License: MIT
 //-----------------------------------------------------------------
 #include "libmep.h"
-
+//-----------------------------------------------------------------
 static unsigned int generation_index;
 t_mep mep;
 //-----------------------------------------------------------------
@@ -63,7 +63,7 @@ int main(void)
 	
 	printf("\nFinal Error = %lf\n", error);
 
-	printf("\nFinal Num incorreclty classified = %lf\n", num_incorrectly_classified_percent);
+	printf("\nFinal Num incorrectly classified = %lf\n", num_incorrectly_classified_percent);
 
 	printf("Program = \n%s\n", mep.program_as_C(0, 0, training_data->get_row(0)));
 	
