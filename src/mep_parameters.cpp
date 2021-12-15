@@ -588,6 +588,7 @@ unsigned int t_mep_parameters::get_num_generations_for_which_random_subset_is_ke
 void t_mep_parameters::set_num_generations_for_which_random_subset_is_kept_fixed(unsigned int new_value)
 {
 	num_generations_for_which_random_subset_is_kept_fixed = new_value;
+	modified = true;
 }
 //---------------------------------------------------------------------------
 unsigned int t_mep_parameters::get_num_predictions(void) const
@@ -598,6 +599,7 @@ unsigned int t_mep_parameters::get_num_predictions(void) const
 void t_mep_parameters::set_num_predictions(unsigned int new_value)
 {
 	num_predictions = new_value;
+	modified = true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_parameters::operator ==(const t_mep_parameters& other)
