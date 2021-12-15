@@ -36,7 +36,7 @@ void t_mep_parameters::init(void)
 	random_subset_selection_size = 1000;
 	error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 	num_generations_for_which_random_subset_is_kept_fixed = 1;
-	time_series_mode = TIME_SERIES_TEST;
+	time_series_mode = MEP_TIME_SERIES_TEST;
 	num_predictions = 10;
 	
 	modified = false;
@@ -320,7 +320,7 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 		time_series_mode = (unsigned int)atoi(value_as_cstring);
 	}
 	else
-		time_series_mode = TIME_SERIES_TEST;
+		time_series_mode = MEP_TIME_SERIES_TEST;
 
 	node = parent.child("error_measure");
 	if (node) {

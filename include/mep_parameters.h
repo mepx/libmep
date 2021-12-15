@@ -26,8 +26,8 @@
 #define MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR 4
 #define MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR 5
 //-----------------------------------------------------------------
-#define TIME_SERIES_TEST 0
-#define TIME_SERIES_PREDICTION 1
+#define MEP_TIME_SERIES_TEST 0
+#define MEP_TIME_SERIES_PREDICTION 1
 //-----------------------------------------------------------------
 class t_mep_parameters{
 private:
