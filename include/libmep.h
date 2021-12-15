@@ -42,7 +42,7 @@ private:
 
 	unsigned int num_selected_operators;
 
-	int actual_operators[MAX_OPERATORS];
+	int actual_operators[MEP_MAX_OPERATORS];
 
 	bool _stopped;
 	bool _stopped_signal_sent;

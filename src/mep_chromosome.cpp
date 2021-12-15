@@ -756,7 +756,7 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, unsigned
 			eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr2];
 			break;
 		case  O_DIVISION:  //  /
-			if (fabs(eval_vect[prg[i].addr2]) < DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
 				eval_vect[i] = eval_vect[prg[i].addr1] / eval_vect[prg[i].addr2];
@@ -805,7 +805,7 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, unsigned
 			eval_vect[i] = fabs(eval_vect[prg[i].addr1]);
 			break;
 		case O_INV:
-			if (fabs(eval_vect[prg[i].addr1]) < DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr1]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
 				eval_vect[i] = 1 / eval_vect[prg[i].addr1];
@@ -904,7 +904,7 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, unsigned int &max_ind
 			eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr2];
 			break;
 		case  O_DIVISION:  //  /
-			if (fabs(eval_vect[prg[i].addr2]) < DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
 				eval_vect[i] = eval_vect[prg[i].addr1] / eval_vect[prg[i].addr2];
@@ -953,7 +953,7 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, unsigned int &max_ind
 			eval_vect[i] = fabs(eval_vect[prg[i].addr1]);
 			break;
 		case O_INV:
-			if (fabs(eval_vect[prg[i].addr1]) < DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr1]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
 				eval_vect[i] = 1.0 / eval_vect[prg[i].addr1];
@@ -1097,7 +1097,7 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 			break;
 		case  O_DIVISION:  //  /
 			for (unsigned int k = 0; k < num_training_data; k++)
-				if (fabs(arg2[k]) < DIVISION_PROTECT) {
+				if (fabs(arg2[k]) < MEP_DIVISION_PROTECT) {
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
@@ -1185,7 +1185,7 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 			break;
 		case O_INV:
 			for (unsigned int k = 0; k < num_training_data; k++)
-				if (fabs(arg1[k]) < DIVISION_PROTECT) {
+				if (fabs(arg1[k]) < MEP_DIVISION_PROTECT) {
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}

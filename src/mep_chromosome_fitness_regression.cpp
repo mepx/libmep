@@ -128,7 +128,7 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 				eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr2];
 				break;
 			case  O_DIVISION:  //  /
-				if (fabs(eval_vect[prg[i].addr2]) < DIVISION_PROTECT)
+				if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
 					is_error_case = true;
 				else
 					eval_vect[i] = eval_vect[prg[i].addr1] / eval_vect[prg[i].addr2];
@@ -177,7 +177,7 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 				eval_vect[i] = fabs(eval_vect[prg[i].addr1]);
 				break;
 			case O_INV:
-				if (fabs(eval_vect[prg[i].addr1]) < DIVISION_PROTECT)
+				if (fabs(eval_vect[prg[i].addr1]) < MEP_DIVISION_PROTECT)
 					is_error_case = true;
 				else
 					eval_vect[i] = 1.0 / eval_vect[prg[i].addr1];

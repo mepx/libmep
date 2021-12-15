@@ -56,8 +56,8 @@
 #define O_NOR -27
 */
 
-#define MAX_OPERATORS 31
-#define DIVISION_PROTECT 1E-10
+#define MEP_MAX_OPERATORS 31
+#define MEP_DIVISION_PROTECT 1E-10
 
 
 
