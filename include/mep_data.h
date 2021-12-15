@@ -16,10 +16,10 @@
 #define MEP_DATA_STRING 1
 //-----------------------------------------------------------------
 
-#define E_OK 0
-#define E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
-#define E_NOT_ENOUGH_DATA_TO_MOVE 2
-#define E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
+#define MEP_E_OK 0
+#define MEP_E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
+#define MEP_E_NOT_ENOUGH_DATA_TO_MOVE 2
+#define MEP_E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
 
 //-----------------------------------------------------------------
 class t_mep_data: public t_setter_data_base {

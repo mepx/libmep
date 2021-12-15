@@ -459,10 +459,10 @@ int t_mep_data::to_interval_all_variables(double min, double max, t_mep_data *ot
 int t_mep_data::move_to(t_mep_data *dest, unsigned int count)
 {
 	if (!(data_type == dest->data_type || !dest->num_data))
-		return E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES; // can move only of the same type
+		return MEP_E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES; // can move only of the same type
 
 	if (num_data && dest->num_data && num_cols != dest->num_cols)
-		return E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS; // 
+		return MEP_E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS; // 
 
 	if (num_data >= count) {
 
@@ -535,8 +535,8 @@ int t_mep_data::move_to(t_mep_data *dest, unsigned int count)
 
 	}
 	else
-		return E_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
-	return E_OK;
+		return MEP_E_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
+	return MEP_E_OK;
 }
 //-----------------------------------------------------------------
 bool re_match(char *str, const char *pattern, bool use_regular)

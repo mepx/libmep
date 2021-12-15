@@ -38,7 +38,7 @@ void t_mep_constants::init(void)
 	}
 	constants_double = NULL;
 
-	constants_type = 1; // automatically generated
+	constants_type = MEP_AUTOMATIC_CONSTANTS; // automatically generated
 	constants_can_evolve = true;
 	constants_mutation_max_deviation = 1;
 
@@ -114,9 +114,11 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 {
 	pugi::xml_node node = parent.child("type");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		constants_type = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		constants_type = MEP_AUTOMATIC_CONSTANTS;
 
 	node = parent.child("num_automatic_constants");
 	if (node) {
@@ -282,7 +284,6 @@ bool t_mep_constants::operator==(const t_mep_constants &other)
     if (num_user_defined_constants != other.num_user_defined_constants)
         return false;
 
-
 	if (min_constants_interval_double != other.min_constants_interval_double)
 		return false;
 
@@ -312,7 +313,6 @@ t_mep_constants& t_mep_constants::operator=(const t_mep_constants &source)
 			delete[] constants_double;
 			constants_double = NULL;
 		}
-
 	}
 	return *this;
 }
