@@ -185,10 +185,20 @@ public:
 
 	bool compute_regression_error_on_double_data_return_error(double **inputs, 
 			unsigned int num_data, unsigned int output_col, 
-			double &error, unsigned int &index_error_gene, t_mep_error_function mep_error_function);
+			double &error, unsigned int &index_error_gene, const t_mep_error_function mep_error_function);
 
 	bool compute_regression_error_on_double_data(double **data, unsigned int num_data, unsigned int output_col, 
-			double &error, t_mep_error_function mep_error_function);
+			double &error, const t_mep_error_function mep_error_function);
+
+	bool compute_time_series_error_on_double_data_return_error(double* previous_data, unsigned int window_size,
+		double** inputs,
+		unsigned int num_data,
+		double& error, unsigned int& index_error_gene, const t_mep_error_function mep_error_function);
+
+	bool compute_time_series_error_on_double_data(double* previous_data, unsigned int window_size,
+		double** data,
+		unsigned int num_data,
+		double& error, const t_mep_error_function mep_error_function);
 
 	bool evaluate_double(double *inputs, double *outputs, unsigned int &index_error_gene);
 	bool get_first_max_index(double *inputs, unsigned int &max_index, unsigned int &index_error_gene);
