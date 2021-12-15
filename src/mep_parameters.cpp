@@ -30,14 +30,15 @@ void t_mep_parameters::init(void)
 	variables_probability = 0.5;
 	constants_probability = 0;
 	use_validation_data = false;
-	crossover_type = 0;
+	crossover_type = MEP_UNIFORM_CROSSOVER;
 	simplified_programs = 0;
 	num_threads = 1;
 	random_subset_selection_size = 1000;
 	error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 	num_generations_for_which_random_subset_is_kept_fixed = 1;
+	time_series_mode = TIME_SERIES_TEST;
 	num_predictions = 10;
-
+	
 	modified = false;
 }
 //---------------------------------------------------------------------------
@@ -144,6 +145,11 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	sprintf(tmp_str, "%u", num_generations_for_which_random_subset_is_kept_fixed);
 	data.set_value(tmp_str);
 
+	node = parent.append_child("time_series_mode");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%u", time_series_mode);
+	data.set_value(tmp_str);
+
 	node = parent.append_child("num_predictions");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%u", num_predictions);
@@ -164,33 +170,43 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 
 	node = parent.child("crossover_probability");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		crossover_probability = atof(value_as_cstring);
 	}
+	else
+		crossover_probability = 0.9;
 
 	node = parent.child("chromosome_length");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		code_length = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		code_length = 30;
 
 	node = parent.child("crossover_type");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		crossover_type = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		crossover_type = MEP_UNIFORM_CROSSOVER;
 
 	node = parent.child("subpopulation_size");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		subpopulation_size = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		subpopulation_size = 50;
 
 	node = parent.child("num_subpopulations");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		num_subpopulations = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		num_subpopulations = 1;
 
 	node = parent.child("operators_probability");
 	if (node) {
@@ -212,21 +228,27 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 
 	node = parent.child("number_of_generations");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		num_generations = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		num_generations = 100;
 
 	node = parent.child("tournament_size");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		tournament_size = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		tournament_size = 2;
 
 	node = parent.child("problem_type");
 	if (node) {
-		const char *value_as_cstring = node.child_value();
+		const char* value_as_cstring = node.child_value();
 		problem_type = (unsigned int)atoi(value_as_cstring);
 	}
+	else
+		problem_type = MEP_PROBLEM_REGRESSION;
 
 	node = parent.child("random_seed");
 	if (node) {
@@ -291,6 +313,14 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	}
 	else
 		num_predictions = 10;
+
+	node = parent.child("time_series_mode");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		time_series_mode = (unsigned int)atoi(value_as_cstring);
+	}
+	else
+		time_series_mode = TIME_SERIES_TEST;
 
 	node = parent.child("error_measure");
 	if (node) {
@@ -602,6 +632,17 @@ void t_mep_parameters::set_num_predictions(unsigned int new_value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
+unsigned int t_mep_parameters::get_time_series_mode(void) const
+{
+	return time_series_mode;
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_time_series_mode(unsigned int new_value)
+{
+	time_series_mode = new_value;
+	modified = true;
+}
+//---------------------------------------------------------------------------
 bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 {
 	if (mutation_probability != other.mutation_probability)
@@ -659,6 +700,9 @@ bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 		return false;
 
 	if (num_predictions != other.num_predictions)
+		return false;
+
+	if (time_series_mode != other.time_series_mode)
 		return false;
 
 	return true;

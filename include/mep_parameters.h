@@ -6,6 +6,7 @@
 #ifndef mep_parameters_H
 #define mep_parameters_H
 
+//-----------------------------------------------------------------
 #include "pugixml.hpp"
 #include "mep_constants.h"
 
@@ -14,17 +15,19 @@
 #define MEP_PROBLEM_BINARY_CLASSIFICATION 1
 #define MEP_PROBLEM_MULTICLASS_CLASSIFICATION 2
 #define MEP_PROBLEM_TIME_SERIE 3
-
+//-----------------------------------------------------------------
 #define MEP_UNIFORM_CROSSOVER 0
 #define MEP_ONE_CUTTING_POINT_CROSSOVER 1
-
+//-----------------------------------------------------------------
 #define MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 0
 #define MEP_REGRESSION_MEAN_SQUARED_ERROR 1
 #define MEP_BINARY_CLASSIFICATION_BEST_THRESHOLD 2
 #define MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR 3
 #define MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR 4
 #define MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR 5
-
+//-----------------------------------------------------------------
+#define TIME_SERIES_TEST 0
+#define TIME_SERIES_PREDICTION 1
 //-----------------------------------------------------------------
 class t_mep_parameters{
 private:
@@ -55,6 +58,8 @@ private:
 
 	unsigned int error_measure;
 	unsigned int num_predictions;
+
+	unsigned int time_series_mode;
 
 public:
 
@@ -203,6 +208,12 @@ public:
 
 	// set the number of generations for which the random subset of data is kept fixed
 	void set_num_predictions(unsigned int);
+
+	// get time series mode
+	unsigned int get_time_series_mode(void) const;
+
+	// set time series mode
+	void set_time_series_mode(unsigned int new_value);
 };
 //-----------------------------------------------------------------
 #endif // PARAMETERS_CLASS_H_INCLUDED
