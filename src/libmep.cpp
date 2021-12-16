@@ -1591,7 +1591,7 @@ char* t_mep::program_as_C(unsigned int run_index, bool simplified, double* input
 //---------------------------------------------------------------------------
 char* t_mep::program_as_Excel_function(unsigned int run_index, bool simplified, double* inputs)const
 {
-	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Excel_function_double(
+	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Excel_VBA_function_double(
 		simplified, inputs, mep_parameters.get_problem_type(),
 		mep_parameters.get_error_measure(), training_data.get_num_classes()
 	);

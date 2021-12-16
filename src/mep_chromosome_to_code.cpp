@@ -417,7 +417,7 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 	}
 }
 //---------------------------------------------------------------------------
-char* t_mep_chromosome::to_Excel_function_double(bool simplified, double* ,
+char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double* ,
 	unsigned int problem_type, unsigned int error_measure, unsigned int num_classes)
 {
 	setlocale(LC_NUMERIC, "C");

@@ -106,7 +106,7 @@ public:
 	// a row of data is also required because the main C program will also contain an example on how to run the obtained program
 	char * to_C_double(bool simplified, double *data, 
 				unsigned int problem_type, unsigned int error_measure, unsigned int num_classes);
-	char* to_Excel_function_double(bool simplified, double* data, 
+	char* to_Excel_VBA_function_double(bool simplified, double* data, 
 				unsigned int problem_type, unsigned int error_measure, unsigned int num_classes);
 
 	double get_fitness(void);
