@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2021.12.16.0-beta");
+	strcpy(version, "2021.12.17.0-beta");
 
 	num_selected_operators = 0;
 
@@ -130,6 +130,9 @@ bool t_mep::get_output(unsigned int run_index, double* inputs, double* outputs) 
 //	if (run_index > -1) {
 		switch (mep_parameters.get_problem_type()) {
 		case MEP_PROBLEM_REGRESSION:
+			if (!statistics.get_stat_ptr(run_index)->best_program.evaluate_double(inputs, outputs, index_error_gene))
+				return false;
+			break;
 		case MEP_PROBLEM_TIME_SERIE:
 			if (!statistics.get_stat_ptr(run_index)->best_program.evaluate_double(inputs, outputs, index_error_gene))
 				return false;
@@ -1138,18 +1141,39 @@ bool t_mep::start_steady_state(unsigned int run, t_seed * seeds, double*** eval_
 		case MEP_PROBLEM_TIME_SERIE: {
 			unsigned int window_size = training_data.get_num_cols() - 1;
 			double* previous_data = new double[window_size];
-			int num_previous_data;
-			double** previous_matrix;
-			if (validation_data.get_num_rows() && mep_parameters.get_use_validation_data()) {
-				previous_matrix = validation_data.get_data_matrix_double();
-				num_previous_data = validation_data.get_num_rows();
+			//int num_previous_data;
+			//double** previous_matrix;
+			if (validation_data.get_num_rows()) {
+				double **validation_matrix = validation_data.get_data_matrix_double();
+				unsigned int num_validation_data = validation_data.get_num_rows();
+				double** training_matrix = training_data.get_data_matrix_double();
+				unsigned int num_training_data = training_data.get_num_rows();
+				unsigned int num_training_cols = training_data.get_num_cols();
+
+				unsigned int window_size_from_validation = window_size;
+				unsigned int window_size_from_training = 0;
+				if (window_size > num_validation_data) {
+					window_size_from_validation = num_validation_data;
+					window_size_from_training = window_size - num_validation_data;
+				}
+
+				int index_in_previous_data = window_size - 1;
+				for (unsigned int i = 0; i < window_size_from_validation; i++) {
+					previous_data[index_in_previous_data] = validation_matrix[num_validation_data - i - 1][0];
+					index_in_previous_data--;
+				}
+
+				for (unsigned int i = 0; i < window_size_from_training; i++) {
+					previous_data[index_in_previous_data] = training_matrix[num_training_data - i - 1][num_training_cols - 1];
+					index_in_previous_data--;
+				}
 			}
 			else {// take data from training
-				previous_matrix = training_data.get_data_matrix_double();
-				num_previous_data = training_data.get_num_rows();
+				double **training_matrix = training_data.get_data_matrix_double();
+				unsigned int num_training_data = training_data.get_num_rows();
+				for (unsigned int i = 0; i < window_size; i++)
+					previous_data[i] = training_matrix[num_training_data - 1][i];
 			}
-			for (unsigned int i = 0; i < window_size; i++)
-				previous_data[i] = previous_matrix[num_previous_data - 1][i];
 
 			if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR) {
 				if (statistics.get_stat_ptr(run)->best_program.compute_time_series_error_on_double_data(
@@ -1867,6 +1891,75 @@ bool t_mep::change_window_size_time_serie(unsigned int new_window_size)
 	return result;
 }
 //---------------------------------------------------------------------------
+bool t_mep::predict_on_test(int run_index, double* output, char* correct_output)
+{
+	if (run_index == -1)
+		return false;
+
+	if (mep_parameters.get_problem_type() != MEP_PROBLEM_TIME_SERIE)
+		return false;
+
+	unsigned int num_cols = training_data.get_num_cols();
+	//double* data_row = new double[num_cols - 1];
+
+	unsigned int window_size = training_data.get_num_cols() - 1;
+	double* previous_data = new double[window_size];
+	//int num_previous_data;
+	//double** previous_matrix;
+	if (validation_data.get_num_rows()) {
+		double** validation_matrix = validation_data.get_data_matrix_double();
+		unsigned int num_validation_data = validation_data.get_num_rows();
+		double** training_matrix = training_data.get_data_matrix_double();
+		unsigned int num_training_data = training_data.get_num_rows();
+		unsigned int num_training_cols = training_data.get_num_cols();
+
+		unsigned int window_size_from_validation = window_size;
+		unsigned int window_size_from_training = 0;
+		if (window_size > num_validation_data) {
+			window_size_from_validation = num_validation_data;
+			window_size_from_training = window_size - num_validation_data;
+		}
+
+		int index_in_previous_data = window_size - 1;
+		for (unsigned int i = 0; i < window_size_from_validation; i++) {
+			previous_data[index_in_previous_data] = validation_matrix[num_validation_data - i - 1][0];
+			index_in_previous_data--;
+		}
+
+		for (unsigned int i = 0; i < window_size_from_training; i++) {
+			previous_data[index_in_previous_data] = training_matrix[num_training_data - i - 1][num_training_cols - 1];
+			index_in_previous_data--;
+		}
+	}
+	else {// take data from training
+		double** training_matrix = training_data.get_data_matrix_double();
+		unsigned int num_training_data = training_data.get_num_rows();
+		for (unsigned int i = 0; i < window_size; i++)
+			previous_data[i] = training_matrix[num_training_data - 1][i];
+	}
+
+	double out[1];
+	unsigned int num_test_data = test_data.get_num_rows();
+	for (unsigned int p = 0; p < num_test_data; p++) {
+		if (get_output(run_index, previous_data, out)) {
+			output[p] = out[0];
+			correct_output[p] = true;
+			for (unsigned int i = 0; i < num_cols - 2; i++)
+				previous_data[i] = previous_data[i + 1];
+			previous_data[num_cols - 2] = out[0];
+		}
+		else {
+			// fill the remaining with false
+			for (unsigned int q = p; q < num_test_data; q++)
+				correct_output[q] = false;
+			break;
+		}
+	}
+
+	delete[] previous_data;
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep::predict(int run_index, double* output, char* correct_output)
 {
 	if (run_index == -1)
@@ -1876,31 +1969,92 @@ bool t_mep::predict(int run_index, double* output, char* correct_output)
 		return false;
 
 	unsigned int num_cols = training_data.get_num_cols();
-	double* data_row = new double[num_cols - 1];
+	//double* data_row = new double[num_cols - 1];
 
+	unsigned int window_size = training_data.get_num_cols() - 1;
+	double* previous_data = new double[window_size];
+	//int num_previous_data;
+	//double** previous_matrix;
 	if (test_data.get_num_rows()) {
-		for (unsigned int i = 0; i < num_cols - 1; i++)
-			data_row[i] = test_data.get_data_matrix_double()[test_data.get_num_rows() - 1][i + 1];
+		double** test_matrix = test_data.get_data_matrix_double();
+		unsigned int num_test_data = test_data.get_num_rows();
+
+		double** validation_matrix = validation_data.get_data_matrix_double();
+		unsigned int num_validation_data = validation_data.get_num_rows();
+
+		double** training_matrix = training_data.get_data_matrix_double();
+		unsigned int num_training_data = training_data.get_num_rows();
+		unsigned int num_training_cols = training_data.get_num_cols();
+
+		unsigned int window_size_from_test = window_size;
+		unsigned int window_size_from_validation = 0;
+		unsigned int window_size_from_training = 0;
+		if (window_size > num_test_data) {
+			window_size_from_test = num_test_data;
+			window_size_from_validation = window_size - num_test_data;
+			if (window_size_from_validation > num_validation_data) {
+				window_size_from_validation = num_validation_data;
+				window_size_from_training = window_size - num_test_data - num_validation_data;
+			}
+		}
+
+		int index_in_previous_data = window_size - 1;
+		for (unsigned int i = 0; i < window_size_from_test; i++) {
+			previous_data[index_in_previous_data] = test_matrix[num_test_data - i - 1][0];
+			index_in_previous_data--;
+		}
+
+		for (unsigned int i = 0; i < window_size_from_validation; i++) {
+			previous_data[index_in_previous_data] = validation_matrix[num_validation_data - i - 1][0];
+			index_in_previous_data--;
+		}
+
+		for (unsigned int i = 0; i < window_size_from_training; i++) {
+			previous_data[index_in_previous_data] = training_matrix[num_training_data - i - 1][num_training_cols - 1];
+			index_in_previous_data--;
+		}
 	}
 	else
 		if (validation_data.get_num_rows()) {
-			for (unsigned int i = 0; i < num_cols - 1; i++)
-				data_row[i] = validation_data.get_data_matrix_double()[validation_data.get_num_rows() - 1][i + 1];
-		}
-		else
-			if (training_data.get_num_rows()) {
-				for (unsigned int i = 0; i < num_cols - 1; i++)
-					data_row[i] = training_data.get_data_matrix_double()[training_data.get_num_rows() - 1][i + 1];
+			double** validation_matrix = validation_data.get_data_matrix_double();
+			unsigned int num_validation_data = validation_data.get_num_rows();
+			double** training_matrix = training_data.get_data_matrix_double();
+			unsigned int num_training_data = training_data.get_num_rows();
+			unsigned int num_training_cols = training_data.get_num_cols();
+
+			unsigned int window_size_from_validation = window_size;
+			unsigned int window_size_from_training = 0;
+			if (window_size > num_validation_data) {
+				window_size_from_validation = num_validation_data;
+				window_size_from_training = window_size - num_validation_data;
 			}
 
+			int index_in_previous_data = window_size - 1;
+			for (unsigned int i = 0; i < window_size_from_validation; i++) {
+				previous_data[index_in_previous_data] = validation_matrix[num_validation_data - i - 1][0];
+				index_in_previous_data--;
+			}
+
+			for (unsigned int i = 0; i < window_size_from_training; i++) {
+				previous_data[index_in_previous_data] = training_matrix[num_training_data - i - 1][num_training_cols - 1];
+				index_in_previous_data--;
+			}
+		}
+		else {// take data from training
+			double** training_matrix = training_data.get_data_matrix_double();
+			unsigned int num_training_data = training_data.get_num_rows();
+			for (unsigned int i = 0; i < window_size; i++)
+				previous_data[i] = training_matrix[num_training_data - 1][i];
+		}
+
 	double out[1];
-	for (unsigned int p = 0; p < mep_parameters.get_num_predictions(); p++) {	
-		if (get_output(run_index, data_row, out)) {
+	for (unsigned int p = 0; p < mep_parameters.get_num_predictions(); p++) {
+		if (get_output(run_index, previous_data, out)) {
 			output[p] = out[0];
 			correct_output[p] = true;
 			for (unsigned int i = 0; i < num_cols - 2; i++)
-				data_row[i] = data_row[i + 1];
-			data_row[num_cols - 2] = out[0];
+				previous_data[i] = previous_data[i + 1];
+			previous_data[num_cols - 2] = out[0];
 		}
 		else {
 			// fill the remaining with false
@@ -1910,7 +2064,7 @@ bool t_mep::predict(int run_index, double* output, char* correct_output)
 		}
 	}
 
-	delete[] data_row;
+	delete[] previous_data;
 	return true;
 }
 //---------------------------------------------------------------------------

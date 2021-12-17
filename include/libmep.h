@@ -215,6 +215,8 @@ public:
 
 	// predict new values for a time serie
 	bool predict(int run_index, double* output, char* correct_output);
+
+	bool predict_on_test(int run_index, double* output, char* correct_output);
 };
 //-----------------------------------------------------------------
 #endif 
