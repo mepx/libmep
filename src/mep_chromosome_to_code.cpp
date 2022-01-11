@@ -332,34 +332,34 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 		sprintf(tmp_s, "prg(%u) / prg(%u)", adr1, adr2);
 		break;
 	case O_POWER:
-		sprintf(tmp_s, "pow(prg(%u), prg(%u))", adr1, adr2);
+		sprintf(tmp_s, "prg(%u) ^ prg(%u)", adr1, adr2);
 		break;
 	case O_SQRT:
-		sprintf(tmp_s, "sqrt(prg(%u))", adr1);
+		sprintf(tmp_s, "Sqr(prg(%u))", adr1);
 		break;
 	case O_EXP:
-		sprintf(tmp_s, "exp(prg(%u))", adr1);
+		sprintf(tmp_s, "Exp(prg(%u))", adr1);
 		break;
 	case O_POW10:
-		sprintf(tmp_s, "pow(10, prg(%u))", adr1);
+		sprintf(tmp_s, "10 ^prg(%u)", adr1);
 		break;
 	case O_LN:
-		sprintf(tmp_s, "log(prg(%u))", adr1);
+		sprintf(tmp_s, "Log(prg(%u))", adr1);
 		break;
 	case O_LOG10:
-		sprintf(tmp_s, "log10(prg(%u))", adr1);
+		sprintf(tmp_s, "Log(prg(%u)) / Log(10#)", adr1);
 		break;
 	case O_lOG2:
-		sprintf(tmp_s, "log2(prg(%u))", adr1);
+		sprintf(tmp_s, "Log(prg(%u)) / Log(2#)", adr1);
 		break;
 	case O_FLOOR:
-		sprintf(tmp_s, "floor(prg(%u))", adr1);
+		sprintf(tmp_s, "Floor_Precise(prg(%u))", adr1);
 		break;
 	case O_CEIL:
-		sprintf(tmp_s, "ceil(prg(%u))", adr1);
+		sprintf(tmp_s, "Ceil_Precise(prg(%u))", adr1);
 		break;
 	case O_ABS:
-		sprintf(tmp_s, "fabs(prg(%u))", adr1);
+		sprintf(tmp_s, "Abs(prg(%u))", adr1);
 		break;
 	case O_INV:
 		sprintf(tmp_s, "1/prg(%u)", adr1);
@@ -377,22 +377,22 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 		sprintf(tmp_s, "IIf (prg(%u) > prg(%u), prg(%u), prg(%u)) ' max", adr1, adr2, adr1, adr2);
 		break;
 	case O_SIN:
-		sprintf(tmp_s, "sin(prg(%u))", adr1);
+		sprintf(tmp_s, "Sin(prg(%u))", adr1);
 		break;
 	case O_COS:
-		sprintf(tmp_s, "cos(prg(%u))", adr1);
+		sprintf(tmp_s, "Cos(prg(%u))", adr1);
 		break;
 	case O_TAN:
-		sprintf(tmp_s, "tan(prg(%u))", adr1);
+		sprintf(tmp_s, "Tan(prg(%u))", adr1);
 		break;
 	case O_ASIN:
-		sprintf(tmp_s, "asin(prg(%u))", adr1);
+		sprintf(tmp_s, "Asin(prg(%u))", adr1);
 		break;
 	case O_ACOS:
-		sprintf(tmp_s, "acos(prg(%u))", adr1);
+		sprintf(tmp_s, "Acos(prg(%u))", adr1);
 		break;
 	case O_ATAN:
-		sprintf(tmp_s, "atan(prg(%u))", adr1);
+		sprintf(tmp_s, "Atan(prg(%u))", adr1);
 		break;
 	case O_IFLZ:
 		sprintf(tmp_s, "IIf (prg(%u) < 0, prg(%u), prg(%u)) ' ifalzbc", adr1, adr2, adr3);
@@ -485,7 +485,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double* ,
 			sprintf(tmp_s, "  mepx = prg(%u)", num_utilized_genes - 1);
 		else
 			if (problem_type == MEP_PROBLEM_BINARY_CLASSIFICATION)
-				sprintf(tmp_s, "  If (prg(%u) <= %lf) Then\n   mepx = 0\n  ElseIf\n    mepx = 1\n Endif\n", num_utilized_genes - 1, best_class_threshold);
+				sprintf(tmp_s, "  If (prg(%u) <= %lf) Then\n   mepx = 0\n  Else\n    mepx = 1\n Endif\n", num_utilized_genes - 1, best_class_threshold);
 			else {
 				// cannot be here
 			}

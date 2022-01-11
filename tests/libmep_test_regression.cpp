@@ -4,7 +4,7 @@
 // License: MIT
 
 #include "libmep.h"
-
+#include <locale.h>
 //-----------------------------------------------------------------
 static int generation_index;
 t_mep mep;
@@ -25,27 +25,30 @@ int main(void)
 	t_mep_parameters* mep_parameters = mep.get_parameters_ptr();
 	//t_mep_constants* mep_constants = mep.get_constants_ptr();
 
+	setlocale(LC_NUMERIC, ""); // do this because after from_csv_file call, the LC_NUMERIC is set to ""
+
 // take the input data from the https://github.com/mepx/libmep/tree/master/data folder
-	if (!training_data->from_csv("../data/building1.csv")) {
+	if (!training_data->from_csv_file("c:/Mihai/Dropbox/mep/src/libmep/data/building1.csv", ' ', '.')) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
 		printf("Press Enter...");
 		getchar();
 		return 1;
 	}
 
-
 	mep.init_enabled_variables();
 
 	mep_functions->set_addition(true);
 	mep_functions->set_subtraction(true);
 	mep_functions->set_multiplication(true);
+	mep_functions->set_division(true);
 
-	mep_parameters->set_num_subpopulations(1);
-	mep_parameters->set_num_generations(50);
-	mep_parameters->set_code_length(20);
+	mep_parameters->set_num_subpopulations(2);
+	mep_parameters->set_subpopulation_size(200);
+	mep_parameters->set_num_generations(100);
+	mep_parameters->set_code_length(50);
 	mep_parameters->set_problem_type(MEP_PROBLEM_REGRESSION);
-	mep_parameters->set_random_subset_selection_size(training_data->get_num_rows());
-	mep_parameters->set_num_threads(1);
+	mep_parameters->set_random_subset_selection_size_percent(100);
+	mep_parameters->set_num_threads(2);
 	mep_parameters->set_error_measure(MEP_REGRESSION_MEAN_ABSOLUTE_ERROR);
 	mep_parameters->set_num_runs(1);
 	

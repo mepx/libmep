@@ -25,19 +25,20 @@ void t_mep_parameters::init(void)
 	random_seed = 0;
 	num_runs = 10;
 	tournament_size = 2;
-	num_subpopulations = 1;
+	num_subpopulations = 2;
 	operators_probability = 0.5;
 	variables_probability = 0.5;
 	constants_probability = 0;
-	use_validation_data = false;
+	use_validation_data = true;
 	crossover_type = MEP_UNIFORM_CROSSOVER;
 	simplified_programs = 0;
-	num_threads = 1;
-	random_subset_selection_size = 1000;
+	num_threads = 2;
+	random_subset_selection_size_percent = 100;
 	error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
 	num_generations_for_which_random_subset_is_kept_fixed = 1;
 	time_series_mode = MEP_TIME_SERIES_TEST;
 	num_predictions = 10;
+	window_size = 2;
 	
 	modified = false;
 }
@@ -130,9 +131,9 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	sprintf(tmp_str, "%u", num_threads);
 	data.set_value(tmp_str);
 
-	node = parent.append_child("random_subset_selection_size");
+	node = parent.append_child("random_subset_selection_size_percent");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", random_subset_selection_size);
+	sprintf(tmp_str, "%d", random_subset_selection_size_percent);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("error_measure");
@@ -153,6 +154,11 @@ int t_mep_parameters::to_xml(pugi::xml_node parent)
 	node = parent.append_child("num_predictions");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%u", num_predictions);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("window_size");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%u", window_size);
 	data.set_value(tmp_str);
 
 	modified = false;
@@ -290,13 +296,15 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	else
 		num_threads = 1;
 
-	node = parent.child("random_subset_selection_size");
+	node = parent.child("random_subset_selection_size_percent");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
-		random_subset_selection_size = (unsigned int)atoi(value_as_cstring);
+		random_subset_selection_size_percent = (unsigned int)atoi(value_as_cstring);
+		if (random_subset_selection_size_percent > 100)
+			random_subset_selection_size_percent = 100;
 	}
 	else
-		random_subset_selection_size = 0;
+		random_subset_selection_size_percent = 100;
 
 	node = parent.child("num_generations_for_which_random_subset_is_kept_fixed");
 	if (node) {
@@ -313,6 +321,14 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 	}
 	else
 		num_predictions = 10;
+
+	node = parent.child("window_size");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		window_size = (unsigned int)atoi(value_as_cstring);
+	}
+	else
+		window_size = 2;
 
 	node = parent.child("time_series_mode");
 	if (node) {
@@ -567,15 +583,15 @@ void t_mep_parameters::set_simplified_programs(bool value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::set_random_subset_selection_size(unsigned int value)
+void t_mep_parameters::set_random_subset_selection_size_percent(unsigned int value)
 {
-	random_subset_selection_size = value;
+	random_subset_selection_size_percent = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
-unsigned int t_mep_parameters::get_random_subset_selection_size(void)  const
+unsigned int t_mep_parameters::get_random_subset_selection_size_percent(void)  const
 {
-	return random_subset_selection_size;
+	return random_subset_selection_size_percent;
 }
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_error_measure(unsigned int value)
@@ -687,7 +703,7 @@ bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 	if (crossover_type != other.crossover_type)
 		return false;
 
-	if (random_subset_selection_size != other.random_subset_selection_size)
+	if (random_subset_selection_size_percent != other.random_subset_selection_size_percent)
 		return false;
 
 	if (num_generations_for_which_random_subset_is_kept_fixed != other.num_generations_for_which_random_subset_is_kept_fixed)
@@ -706,5 +722,18 @@ bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 		return false;
 
 	return true;
+}
+//---------------------------------------------------------------------------
+unsigned int t_mep_parameters::get_window_size(void)const
+{
+	return window_size;
+}
+//---------------------------------------------------------------------------
+void t_mep_parameters::set_window_size(unsigned int new_window_size)
+{
+	if (new_window_size) {
+		window_size = new_window_size;
+		modified = true;
+	}
 }
 //---------------------------------------------------------------------------

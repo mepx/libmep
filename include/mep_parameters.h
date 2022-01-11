@@ -46,7 +46,7 @@ private:
 	bool use_validation_data;
 	unsigned int crossover_type;
 
-	unsigned int random_subset_selection_size;
+	unsigned int random_subset_selection_size_percent;
 	unsigned int num_generations_for_which_random_subset_is_kept_fixed;
 
 	unsigned int random_seed;
@@ -60,6 +60,7 @@ private:
 	unsigned int num_predictions;
 
 	unsigned int time_series_mode;
+	unsigned int window_size;
 
 public:
 
@@ -182,10 +183,10 @@ public:
 
 	// set the size of the random subset on which the training is performed.
 	// this must be called after calling set_training_data from the t_mep class because set_training_data sets this value to the size of the training data
-	void set_random_subset_selection_size(unsigned int value);
+	void set_random_subset_selection_size_percent(unsigned int value);
 
 	// returns the size of the random subset on which the training is performed
-	unsigned int get_random_subset_selection_size(void) const;
+	unsigned int get_random_subset_selection_size_percent(void) const;
 
 	// sets the error measure type
 	// for regression and time series it can be: MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 0 or MEP_REGRESSION_MEAN_SQUARED_ERROR 1
@@ -203,10 +204,10 @@ public:
 	// set the number of generations for which the random subset of data is kept fixed
 	void set_num_generations_for_which_random_subset_is_kept_fixed(unsigned int);
 
-	// get the number of generations for which the random subset of data is kept fixed
+	// get the number of predictions for time series
 	unsigned int get_num_predictions(void) const;
 
-	// set the number of generations for which the random subset of data is kept fixed
+	// set the number of predictions for time series
 	void set_num_predictions(unsigned int);
 
 	// get time series mode
@@ -214,6 +215,10 @@ public:
 
 	// set time series mode
 	void set_time_series_mode(unsigned int new_value);
+
+	unsigned int get_window_size(void) const;
+
+	void set_window_size(unsigned int window_size);
 };
 //-----------------------------------------------------------------
 #endif // PARAMETERS_CLASS_H_INCLUDED

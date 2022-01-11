@@ -23,6 +23,7 @@ private:
 
 	unsigned int constants_type;
 	bool constants_can_evolve;
+	bool constants_can_evolve_outside_initial_interval;
 	double constants_mutation_max_deviation;
 
 	bool modified;
@@ -61,6 +62,9 @@ public:
 	// returns true if the constants can evolve
 	bool get_constants_can_evolve(void)const;
 
+	// returns true if the constants can evolve outside interval
+	bool get_constants_can_evolve_outside_initial_interval(void)const;
+
 	// returns the max deviation within which the constants can evolve
 	double get_constants_mutation_max_deviation(void)const;
 
@@ -86,6 +90,9 @@ public:
 
 	// sets if the constants can evolve
 	void  set_constants_can_evolve(bool value);
+
+	// sets if the constants can evolve outside initial interval
+	void  set_constants_can_evolve_outside_initial_interval(bool value);
 
 	// sets the max deviation when constants can evolve
 	void set_constants_mutation_max_deviation(double value);

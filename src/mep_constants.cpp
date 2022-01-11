@@ -41,6 +41,7 @@ void t_mep_constants::init(void)
 	constants_type = MEP_AUTOMATIC_CONSTANTS; // automatically generated
 	constants_can_evolve = true;
 	constants_mutation_max_deviation = 1;
+	constants_can_evolve_outside_initial_interval = false;
 
 	modified = false;
 }
@@ -72,6 +73,11 @@ int t_mep_constants::to_xml(pugi::xml_node parent)
 	node = parent.append_child("evolve");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", constants_can_evolve);
+	data.set_value(tmp_str);
+
+	node = parent.append_child("can_evolve_outside_initial_interval");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%d", constants_can_evolve_outside_initial_interval);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("stddev");
@@ -149,6 +155,18 @@ int t_mep_constants::from_xml(pugi::xml_node parent)
 		const char *value_as_cstring = node.child_value();
 		constants_can_evolve = (bool)atoi(value_as_cstring);
 	}
+
+	if (constants_can_evolve) {
+		node = parent.child("can_evolve_outside_initial_interval");
+		if (node) {
+			const char* value_as_cstring = node.child_value();
+			constants_can_evolve_outside_initial_interval = (bool)atoi(value_as_cstring);
+		}
+		else
+			constants_can_evolve_outside_initial_interval = false;
+	}
+	else
+		constants_can_evolve_outside_initial_interval = false;
 
 	node = parent.child("num_user_defined_constants");
 	if (node) {
@@ -300,7 +318,10 @@ bool t_mep_constants::operator==(const t_mep_constants &other)
     if (constants_can_evolve != other.constants_can_evolve)
         return false;
 
-    if (constants_mutation_max_deviation != other.constants_mutation_max_deviation)
+	if (constants_can_evolve_outside_initial_interval != other.constants_can_evolve_outside_initial_interval)
+		return false;
+	
+	if (constants_mutation_max_deviation != other.constants_mutation_max_deviation)
         return false;
 
 	return true;
@@ -315,5 +336,16 @@ t_mep_constants& t_mep_constants::operator=(const t_mep_constants &source)
 		}
 	}
 	return *this;
+}
+//---------------------------------------------------------------------------
+void t_mep_constants::set_constants_can_evolve_outside_initial_interval(bool value)
+{
+	constants_can_evolve_outside_initial_interval = value;
+	modified = true;
+}
+//---------------------------------------------------------------------------
+bool t_mep_constants::get_constants_can_evolve_outside_initial_interval(void) const
+{
+	return constants_can_evolve_outside_initial_interval;
 }
 //---------------------------------------------------------------------------

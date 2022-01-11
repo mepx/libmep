@@ -3,8 +3,8 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#ifndef CHROMOSOME_CLASS_H
-#define CHROMOSOME_CLASS_H
+#ifndef MEP_CHROMOSOME_CLASS_H
+#define MEP_CHROMOSOME_CLASS_H
 
 #include "pugixml.hpp"
 #include "mep_constants.h"
@@ -133,6 +133,14 @@ public:
 	void uniform_crossover(const t_mep_chromosome &parent2, 
 					t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, const t_mep_constants & mep_constants, t_seed& seed);
 
+	void compute_fitness(const t_mep_data& mep_dataset, const t_mep_data& mep_dataset_ts,
+		unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
+		double** cached_eval_matrix, double* cached_sum_of_errors, 
+		double* cached_threashold, s_value_class* tmp_value_class,
+		unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
+		double**, unsigned int problem_type, unsigned int error_measure, 
+		t_seed& seed);
+
 	void fitness_regression(const t_mep_data &mep_dataset, 
 			unsigned int *random_subset_indexes, unsigned int random_subset_selection_size,
 			double** cached_eval_matrix, double * cached_sum_of_errors, 
@@ -199,6 +207,17 @@ public:
 		double** data,
 		unsigned int num_data,
 		double& error, const t_mep_error_function mep_error_function);
+
+	bool compute_time_series_output_on_given_double_data(
+		double* previous_data, unsigned int window_size,
+		double** data, unsigned int num_data, 
+		double* output, char* valid_data);
+
+	bool compute_time_series_output_on_predicted_double_data(
+		double* previous_data, unsigned int window_size,
+		unsigned int num_data, unsigned int& index_error_gene,
+		double* output, char* valid_data);
+
 
 	bool evaluate_double(double *inputs, double *outputs, unsigned int &index_error_gene);
 	bool get_first_max_index(double *inputs, unsigned int &max_index, unsigned int &index_error_gene);

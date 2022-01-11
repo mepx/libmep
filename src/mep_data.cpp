@@ -81,7 +81,7 @@ void t_mep_data::init(void)
 
 	_data_string = NULL;
 
-	list_separator = ' ';
+	list_separator = ';';
 
 	data_type = MEP_DATA_DOUBLE;// double
 	num_outputs = 1;
@@ -134,15 +134,26 @@ void t_mep_data::set_to_minus_one(void)
 			_data_double[r][c] = -1;
 }
 //-----------------------------------------------------------------
-int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
+int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2, char _decimal_separator)
 {
+	if (_decimal_separator == '.') {
+		setlocale(LC_NUMERIC, "C");
+	}
+	else {
+		setlocale(LC_NUMERIC, "ro_RO");
+	}
+
+
 	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data2->num_data) {
 
 		//		int count_new_strings = 0;
-		if (data_type != MEP_DATA_STRING && 
-				(!other_data1 || other_data1 && other_data1->data_type != MEP_DATA_STRING) && 
-				(other_data2 || other_data2 && other_data2->data_type != MEP_DATA_STRING))
+		if (data_type != MEP_DATA_STRING &&
+			(!other_data1 || other_data1 && other_data1->data_type != MEP_DATA_STRING) &&
+			(other_data2 || other_data2 && other_data2->data_type != MEP_DATA_STRING)) {
+
+			setlocale(LC_NUMERIC, "");
 			return E_DATA_MUST_HAVE_STRING_TYPE;
+		}
 
 		if (_data_string) {
 			delete_double_data();
@@ -332,11 +343,13 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2)
 			}
 			other_data2->data_type = MEP_DATA_DOUBLE;
 		}
-
+		setlocale(LC_NUMERIC, "");
 		return MEP_OK;
 	}
-	else
+	else {
+		setlocale(LC_NUMERIC, "");
 		return E_NO_DATA;
+	}
 }
 //-----------------------------------------------------------------
 int t_mep_data::to_interval_selected_col(double min, double max, unsigned int col, t_mep_data *other_data1, t_mep_data* other_data2)
@@ -946,63 +959,48 @@ void t_mep_data::add_string_data_to_row(unsigned int row, unsigned int col, cons
 	}
 }
 //-----------------------------------------------------------------
-void t_mep_data::from_tab_separated_string(const char* s)
+void t_mep_data::from_tab_separated_string(const char* s, char _list_separator, char _decimal_separator)
 {
 	clear_data();
+
+	list_separator = _list_separator;
+	//decimal_separator = _decimal_separator;
+
+	clear_data();
+	lconv* lc;
+	lc = localeconv();
+	//char saved_decimal_separator = lc->decimal_point[0];
+
+	if (_decimal_separator == '.') {
+		setlocale(LC_NUMERIC, "C");
+	}
+	else {
+		setlocale(LC_NUMERIC, "ro_RO");
+	}
 	
 	data_type = MEP_DATA_STRING;
-	get_csv_info_from_string(s, '\t', this);
+	get_csv_info_from_string(s, list_separator, this);
 
 	remove_empty_rows();
 
 	// try to convert to double
-	if (to_double()) {
-		data_type = MEP_DATA_DOUBLE;
-	}
+	to_double();
 
-	/*
-	int col = 0;
-	int row = 0;
-	if (strchr(s, '\n') != NULL) {
-		while (!s) {
-			s_current_row = wx_copied_data.BeforeFirst('\n');
-			bool was_empty = s_current_row.IsEmpty();
-			if (!s_current_row.IsEmpty() && can_add_rows && row == g->GetNumberRows()) {
-				g->AppendRows(1);
-			}
-			while (!s_current_row.IsEmpty()) {
-				s_current_field = s_current_row.BeforeFirst('\t');
-				g->SetCellValue(row, col, s_current_field);
-				col++;
-				s_current_row = s_current_row.AfterFirst('\t');
-			}
-			if (!was_empty)
-				row++;
-			col = start_col;
-			wx_copied_data = wx_copied_data.AfterFirst('\n');
-		}
-	}
-	else // search for \r
-		while (!s) {
-			s_current_row = wx_copied_data.BeforeFirst('\r');
-			bool was_empty = s_current_row.IsEmpty();
+	setlocale(LC_NUMERIC, "");
+}
+//-----------------------------------------------------------------
+void t_mep_data::from_tab_separated_string_no_conversion_to_double (const char* s, char _list_separator)
+{
+	clear_data();
 
-			if (!s_current_row.IsEmpty() && can_add_rows && row == g->GetNumberRows()) {
-				g->AppendRows(1);
-			}
+	list_separator = _list_separator;
 
-			while (!s_current_row.IsEmpty()) {
-				s_current_field = s_current_row.BeforeFirst('\t');
-				g->SetCellValue(row, col, s_current_field);
-				col++;
-				s_current_row = s_current_row.AfterFirst('\t');
-			}
-			if (!was_empty)
-				row++;
-			col = start_col;
-			wx_copied_data = wx_copied_data.AfterFirst('\r');
-		}
-		*/
+	data_type = MEP_DATA_STRING;
+	get_csv_info_from_string(s, list_separator, this);
+
+	remove_empty_rows();
+
+	setlocale(LC_NUMERIC, "");
 }
 //-----------------------------------------------------------------
 void t_mep_data::remove_empty_rows(void)
@@ -1048,130 +1046,81 @@ bool t_mep_data::could_be_time_serie(void) const
 	return (num_cols == 1 && num_data >= 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_time_serie(unsigned int window_size)
+bool t_mep_data::to_time_serie_from_single_col(const t_mep_data& source, unsigned int window_size)
 {
-	if (!(num_cols == 1 && num_data >= window_size + 1)) 
+	if (!(source.num_cols == 1 && source.num_data >= window_size + 1))
 		return false;
-	
-	if (data_type == MEP_DATA_STRING) {
-		char* ** _tmp_data;
 
+	if (data_type == MEP_DATA_DOUBLE) {
+		// double
 		// 1 col only
-		_tmp_data = new char** [num_data - window_size];
-		for (unsigned int r = 0; r < num_data - window_size; r++) {
-			_tmp_data[r] = new char*[window_size + 1];
-			for (unsigned int c = 0; c < window_size + 1; c++) {
-				_tmp_data[r][c] = NULL;
-				if (_data_string[r + c][0]) {
-					size_t len = strlen(_data_string[r + c][0]);
-					_tmp_data[r][c] = new char[len + 1];
-					strcpy(_tmp_data[r][c], _data_string[r + c][0]);
-				}
-			}
-		}
-		for (unsigned int r = 0; r < num_data; r++) {
-			if (_data_string[r][0])
-				delete[] _data_string[r][0];
-			delete[] _data_string[r];
-		}
-		delete[] _data_double;
-		
-		_data_string = _tmp_data;
-	}
-	else {// double
-		double** _tmp_data;
-		// 1 col only
-		_tmp_data = new double* [num_data - window_size];
-		for (unsigned int r = 0; r < num_data - window_size; r++) {
-			_tmp_data[r] = new double[window_size + 1];
+		_data_double = new double* [source.num_data - window_size];
+		for (unsigned int r = 0; r < source.num_data - window_size; r++) {
+			_data_double[r] = new double[window_size + 1];
 			for (unsigned int c = 0; c < window_size + 1; c++)
-				_tmp_data[r][c] = _data_double[r + c][0];
+				_data_double[r][c] = source._data_double[r + c][0];
 		}
-		for (unsigned int r = 0; r < num_data; r++)
-			delete[] _data_double[r];
-		delete[] _data_double;
-		
-		_data_double = _tmp_data;
-		num_data = num_data - window_size;
-		num_cols = window_size + 1;
 	}
-	
+	else
+		return false;
+
+	num_data = source.num_data - window_size;
+	num_cols = window_size + 1;
+
 	return true;
 }
 //-----------------------------------------------------------------
-void t_mep_data::append_and_steal(t_mep_data& other)
+/*
+bool t_mep_data::to_time_serie_from_single_col(const t_mep_data& source, const t_mep_data* prev_data1, const t_mep_data* prev_data2, unsigned int window_size)
 {
-	if (other.num_data <= 0 || other.num_cols <= 0)
-		return;
+	if (source.num_cols != 1)
+		return false;
 
-	if (data_type == MEP_DATA_DOUBLE){
-		double** new_data_double = new double* [num_data + other.num_data];
-		for (unsigned int r = 0; r < num_data; r++)
-			new_data_double[r] = _data_double[r];
-		for (unsigned int r = 0; r < other.num_data; r++)
-			new_data_double[r + num_data] = other._data_double[r];
+	if (data_type != MEP_DATA_DOUBLE)
+		return false;
 
-		if (_data_double)
-			delete[] _data_double;
-		delete[] other._data_double;
-		other._data_double = NULL;
-		_data_double = new_data_double;
-	}
-	else
-		if (data_type == MEP_DATA_STRING) {
-			char*** new_data_string = new char** [num_data + other.num_data];
-			for (unsigned int r = 0; r < num_data; r++)
-				new_data_string[r] = _data_string[r];
-			for (unsigned int r = 0; r < other.num_data; r++)
-				new_data_string[r + num_data] = other._data_string[r];
-
-			if (_data_string)
-				delete[] _data_string;
-			delete[] other._data_string;
-			other._data_string = NULL;
-			_data_string = new_data_string;
+	if (!prev_data1) {// no previous data; it means that is the training set
+		_data_double = new double* [source.num_data - window_size];
+		for (unsigned int r = 0; r < source.num_data - window_size; r++) {
+			_data_double[r] = new double[window_size + 1];
+			for (unsigned int c = 0; c < window_size + 1; c++)
+				_data_double[r][c] = source._data_double[r + c][0];
 		}
+		num_data = source.num_data - window_size;
+		num_cols = window_size + 1;
+	}
+	else {
+		// prev_data1 is available; so we have validation or test
+		_data_double = new double* [source.num_data];
+		for (unsigned int r = 0; r < source.num_data - window_size; r++) {
+			_data_double[r] = new double[window_size + 1];
+			for (unsigned int c = 0; c < window_size + 1; c++)
+				_data_double[r][c] = source._data_double[r + c][0];
+		}
+		num_data = source.num_data;
+		num_cols = window_size + 1;
+	}
 
-	num_data += other.num_data;
-	other.num_data = 0;
-	other.num_cols = 0;
+
+	return true;
 }
+*/
 //-----------------------------------------------------------------
-void t_mep_data::reverse_time_serie(void)
+bool t_mep_data::compute_min_max_of_target(double& min_target, double& max_target)
 {
-	if (data_type == MEP_DATA_DOUBLE) {
-		double** new_data_double = new double* [num_data + num_cols - 1];
-		for (unsigned int r = 0; r < num_data + num_cols - 1; r++)
-			new_data_double[r] = new double[1];
-		for (unsigned int c = 0; c < num_cols - 1; c++)
-			new_data_double[c][0] = _data_double[0][c];
-		for (unsigned int r = 0; r < num_data; r++) {
-			new_data_double[r + num_cols - 1][0] = _data_double[r][num_cols - 1];
-			delete[] _data_double[r];
-		}
+	if (data_type != MEP_DATA_DOUBLE)
+		return false;
+	if (!num_outputs)
+		return false;
 
-		delete[] _data_double;
-		_data_double = new_data_double;
+	min_target = _data_double[0][num_cols - 1];
+	max_target = _data_double[0][num_cols - 1];
+	for (unsigned int i = 1; i < num_data; i++) {
+		if (min_target > _data_double[0][num_cols - 1])
+			min_target = _data_double[0][num_cols - 1];
+		if (max_target < _data_double[0][num_cols - 1])
+			max_target = _data_double[0][num_cols - 1];
 	}
-	else
-		if (data_type == MEP_DATA_STRING) {
-			char*** new_data_string = new char** [num_data + num_cols - 1];
-			for (unsigned int r = 0; r < num_data + num_cols - 1; r++)
-				new_data_string[r] = new char*[1];
-			for (unsigned int c = 0; c < num_cols - 1; c++)
-				new_data_string[c][0] = _data_string[0][c];
-			for (unsigned int r = 0; r < num_data; r++) {
-				new_data_string[r + num_cols - 1][0] = _data_string[r][num_cols - 1];
-				for (unsigned int c = 0; c < num_cols; c++)
-					if (_data_string[r])
-						delete[] _data_string[r][c];
-				delete[] _data_string[r];
-			}
-
-			delete[] _data_string;
-			_data_string = new_data_string;
-		}
-	num_data += num_cols - 1;
-	num_cols = 1;
+	return true;
 }
 //-----------------------------------------------------------------

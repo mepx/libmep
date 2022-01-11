@@ -62,8 +62,7 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(
 	for (unsigned int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
 
-
-		if (prg[i].op >= 0)// variable or constant
+		if (prg[i].op >= 0) {// variable or constant
 			if (prg[i].op < (int)num_total_variables) // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 			else {// a constant
@@ -78,6 +77,7 @@ void t_mep_chromosome::fitness_regression_double_cache_all_training_data(
 				else
 					sum_of_errors = cached_sum_of_errors_for_constants[constant_index];
 			}
+		}
 		else {// operator
 			double* eval = eval_matrix_double[i];
 			sum_of_errors = 0;

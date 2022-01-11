@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,7 +44,8 @@ bool my_fgets(char* buf, int buf_size, FILE* f)
 	return (i > 0);
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_one_of_m_format(const char* filename, unsigned int given_num_classes)
+/*
+bool t_mep_data::from_one_of_m_format(const char* filename, unsigned int given_num_classes, char list_separator, char decimal_separator)
 {
 	FILE* f = NULL;
 #ifdef _WIN32
@@ -123,27 +125,9 @@ bool t_mep_data::from_one_of_m_format(const char* filename, unsigned int given_n
 	delete[] buf;
 	return true;
 }
+*/
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv(const char* filename)
-{
-	if (!detect_list_separator(filename))
-		return false;
-
-	_modified = true;
-
-	clear_data();
-
-	from_csv_string(filename);
-
-	// try to convert to double
-	if (to_double()) {
-		data_type = MEP_DATA_DOUBLE;
-	}
-
-	return true;
-}
-//-----------------------------------------------------------------
-bool t_mep_data::from_csv_string(const char* filename)
+bool t_mep_data::from_csv_file(const char* filename, char _list_separator, char _decimal_separator)
 {
 	FILE* f = NULL;
 #ifdef _WIN32
@@ -160,21 +144,40 @@ bool t_mep_data::from_csv_string(const char* filename)
 
 	if (!f)
 		return false;
-	delete_data();
+
+	this->list_separator = _list_separator;
+	//this->decimal_separator = _decimal_separator;
+
+	_modified = true;
+
+	clear_data();
+	lconv* lc;
+	lc = localeconv();
+
+	if (_decimal_separator == '.') {
+		setlocale(LC_NUMERIC, "C");
+}
+	else {
+		setlocale(LC_NUMERIC, "ro_RO");
+	}
 
 	data_type = MEP_DATA_STRING;
-	num_data = 0;
-	num_cols = 0;
 
 	get_csv_info_from_file(f, list_separator, this);
 
 	fclose(f);
 
 	remove_empty_rows();
+
+	// try to convert to double
+	to_double();
+
+	setlocale(LC_NUMERIC, "");
+
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv_double(const char* filename)
+bool t_mep_data::from_csv_file_no_conversion_to_double(const char* filename, char _list_separator)
 {
 	FILE* f = NULL;
 #ifdef _WIN32
@@ -192,69 +195,22 @@ bool t_mep_data::from_csv_double(const char* filename)
 	if (!f)
 		return false;
 
-	delete_data();
+	this->list_separator = _list_separator;
 
-	char* buf = new char[MAX_ROW_CHARS];
-	char* start_buf = buf;
+	_modified = true;
 
-	num_data = 0;
-	data_type = MEP_DATA_DOUBLE;
-	char tmp_str[1000];
+	clear_data();
 
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		size_t len = strlen(buf);
-		if (len > 1)
-			num_data++;
-		if (num_data == 1) {
-			num_cols = 0;
+	data_type = MEP_DATA_STRING;
 
-			size_t size;
-			int skipped;
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				num_cols++;
-				if (!buf[size])
-					break;
-				buf = buf + size + skipped;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
+	get_csv_info_from_file(f, list_separator, this);
 
-			}
-			buf = start_buf;
-		}
-	}
-	//	num_cols--;
-	rewind(f);
-
-	_data_double = new double* [num_data];
-	int count_mep_data = 0;
-	//char tmp_str[1000];
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		size_t len = strlen(buf);
-		if (len > 1) {
-			unsigned int col = 0;
-
-			size_t size;
-			int skipped;
-			_data_double[count_mep_data] = new double[num_cols];
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				if (col < num_cols)
-					_data_double[count_mep_data][col] = atof(tmp_str);
-				else {
-					break;
-				}
-				buf = buf + size + skipped;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-
-				col++;
-			}
-			count_mep_data++;
-		}
-		buf = start_buf;
-	}
 	fclose(f);
-	delete[] buf;
+
+	remove_empty_rows();
+
+	setlocale(LC_NUMERIC, "");
+
 	return true;
 }
 //-----------------------------------------------------------------
@@ -280,8 +236,9 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 
 	if (_data_double)
 		for (unsigned int d = 0; d < num_data; d++) {
-			for (unsigned int v = 0; v < num_cols; v++)
+			for (unsigned int v = 0; v < num_cols - 1; v++)
 				fprintf(f, "%lg%c", _data_double[d][v], _list_separator);
+			fprintf(f, "%lg", _data_double[d][num_cols - 1]);
 			fprintf(f, "\n");
 		}
 	else
@@ -307,12 +264,17 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 						tmp_str[tmp_pos++] = '"';
 						tmp_str[tmp_pos] = '\0';
 
-						fprintf(f, "%s%c", tmp_str, _list_separator);
+						fprintf(f, "%s", tmp_str);
+						if (v < num_cols - 1)
+							fprintf(f, "%c", _list_separator);
 
 						delete[] tmp_str;
 					}
-					else
-						fprintf(f, "%s%c", _data_string[d][v], _list_separator);
+					else {
+						fprintf(f, "%s", _data_string[d][v]);
+						if (v < num_cols - 1)
+							fprintf(f, "%c", _list_separator);
+					}
 				}
 				fprintf(f, "\n");
 			}
@@ -323,6 +285,7 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 	return true;
 }
 //-----------------------------------------------------------------
+/*
 bool t_mep_data::detect_list_separator(const char* file_name)
 {
 	FILE* f = NULL;
@@ -380,18 +343,11 @@ bool t_mep_data::detect_list_separator(const char* file_name)
 	}
 
 	// most likely there is only variable and no output
-	/*
-	double x;
-	if (sscanf(buf, "%lf", &x) == 1) {
-		list_separator = ';';
-		delete[] buf;
-		return true;
-	}
-	*/
 
 	delete[] buf;
 	return true;
 }
+*/
 //-----------------------------------------------------------------
 /*
 bool t_mep_data::from_csv_string_old(const char* filename)

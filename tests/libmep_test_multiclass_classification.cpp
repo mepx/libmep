@@ -4,6 +4,7 @@
 // License: MIT
 //-----------------------------------------------------------------
 #include "libmep.h"
+#include <locale.h>
 //-----------------------------------------------------------------
 static unsigned int generation_index;
 t_mep mep;
@@ -17,15 +18,17 @@ void on_generation(void)
 int main(void)
 {
 	printf("libmep version = %s\n", mep.get_version());
+
 	t_mep_data* training_data = mep.get_training_data_ptr(); // store objects in some local variables for easier access
 	t_mep_functions* mep_functions = mep.get_functions_ptr();
 	t_mep_parameters* mep_parameters = mep.get_parameters_ptr();
-	//t_mep_constants* mep_constants = mep.get_constants_ptr();
+	t_mep_constants* mep_constants = mep.get_constants_ptr();
 
+	setlocale(LC_NUMERIC, ""); // do this because after from_csv_file call, the LC_NUMERIC is set to ""
 	printf("Loading data ...\n");
 	// sample input file taken from the https://github.com/mepx/libmep/tree/master/data folder
-	if (!training_data->from_csv("../data/cancer1.csv")) {
-		printf("Cannot load training data! Please make sure that the path to file is correct!");
+	if (!training_data->from_csv_file("c:/Mihai/Dropbox/mep/src/libmep/data/iris.txt", ' ', '.')) {
+		printf("Cannot load training data! Please make sure that the path to file is correct!\n");
 		printf("Press Enter...");
 		getchar();
 		return 1;
@@ -39,19 +42,30 @@ int main(void)
 	mep_functions->set_addition(true);
 	mep_functions->set_subtraction(true);
 	mep_functions->set_multiplication(true);
+	mep_functions->set_division(true);
+	mep_functions->set_sin(true);
 	mep_functions->set_iflz(true);
 
 	mep_parameters->set_num_subpopulations(4);// should be multiple of num_threads
-	mep_parameters->set_num_generations(50);
-	mep_parameters->set_subpopulation_size(100);
+	mep_parameters->set_num_generations(200);
+	mep_parameters->set_subpopulation_size(200);
 	mep_parameters->set_code_length(100);
 	mep_parameters->set_problem_type(MEP_PROBLEM_MULTICLASS_CLASSIFICATION);
 	mep_parameters->set_error_measure(MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR);
-	mep_parameters->set_random_subset_selection_size(training_data->get_num_rows()); // all data are used for training
+	mep_parameters->set_random_subset_selection_size_percent(100); // all data are used for training
 	mep_parameters->set_num_threads(4);
 	mep_parameters->set_mutation_probability(0.01);
+	mep_parameters->set_operators_probability(0.5);
+	mep_parameters->set_variables_probability(0.3);
+	mep_parameters->set_constants_probability(0.2); // do this is you want constants in your solution
 	mep_parameters->set_num_runs(1);
 
+
+	mep_constants->set_constants_type(MEP_AUTOMATIC_CONSTANTS);
+	mep_constants->set_num_automatic_constants(5); // 5 constants
+	mep_constants->set_min_constants_interval_double(0);
+	mep_constants->set_max_constants_interval_double(1);
+	mep_constants->set_constants_can_evolve(1);
 
 	printf("Evolving ... \n");
 	generation_index = 0;

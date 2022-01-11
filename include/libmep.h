@@ -52,6 +52,9 @@ private:
 	t_mep_data validation_data;
 	t_mep_data test_data;
 
+	// data transformed for time series
+	t_mep_data training_data_ts;
+
 	t_mep_statistics statistics;
 
 	unsigned int num_total_variables;
@@ -97,6 +100,14 @@ private:
 			double ** eval_double, s_value_class *tmp_value_class, t_seed* seeds);
 	void get_random_subset(unsigned int count, unsigned int *indecses, t_seed& seed);
 
+	// transform from single column arrays to matrices
+	//bool create_time_series_data(void);
+
+	unsigned int random_subset_selection_size;
+	void compute_previous_data_for_training(double* previous_data);
+	void compute_previous_data_for_validation(double* previous_data);
+	void compute_previous_data_for_test(double* previous_data);
+	void compute_previous_data_for_prediction(double* previous_data);
 public:
 
 	t_mep();
@@ -208,15 +219,17 @@ public:
 	bool could_be_time_serie(void);
 
 	// transform 1 column of training data to a time serie
-	bool to_time_serie(unsigned int window_size);
-
-	// change window size of an existing time serie
-	bool change_window_size_time_serie(unsigned int new_window_size);
+//	bool to_time_serie(unsigned int window_size);
 
 	// predict new values for a time serie
-	bool predict(int run_index, double* output, char* correct_output);
+	bool predict(int run_index, double* output, char* valid_output);
 
-	bool predict_on_test(int run_index, double* output, char* correct_output);
+	bool predict_on_test(int run_index, double* output, char* valid_output);
+
+	void compute_output_on_training(int run_index, double* output, char* valid_output);
+	void compute_output_on_validation(int run_index, double* output, char* valid_output);
+	void compute_output_on_test(int run_index, double* output, char* valid_output);
+
 };
 //-----------------------------------------------------------------
 #endif 

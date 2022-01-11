@@ -40,11 +40,11 @@ private:
 	unsigned char data_type; // 0-double, 1- string
 
 	char list_separator;
+	//char decimal_separator;
 
 	bool _modified;
 
-	bool from_csv_double(const char *file_name);
-	bool from_csv_string(const char *file_name);
+	//bool from_csv_double(const char *file_name);
 	bool from_csv_string_old(const char* file_name);
 
 	void delete_double_data(void);
@@ -63,8 +63,9 @@ public:
 	~t_mep_data();
 
 	// fills the internal matrix wiht data from string s which must contain tab separated data
-	void from_tab_separated_string(const char* s);
-	
+	void from_tab_separated_string(const char* s, char list_separator, char decimal_separator);
+	void from_tab_separated_string_no_conversion_to_double(const char* s, char _list_separator);
+
 	// returns the number of rows training data
 	unsigned int get_num_rows(void)const;
 
@@ -108,15 +109,17 @@ public:
 	bool to_csv(const char *file_name, char ListSeparator) const;
 	
 	// loads the data from a csv file
-	bool from_csv(const char *filename);
+//	bool from_csv(const char *filename, char list_separator, char decimal_separator);
+	bool from_csv_file(const char* file_name, char _list_separator, char _decimal_separator);
+	bool from_csv_file_no_conversion_to_double(const char* filename, char _list_separator);
 
 	// loads from PROBEN1 format
 	// num_classes must be known in advanced because it is an "1 of m" format
 	// if num_classes is 0, it means that is a regression problem
-	bool from_one_of_m_format(const char *filename, unsigned int num_classes);
+	//bool from_one_of_m_format(const char *filename, unsigned int num_classes, char list_separator, char decimal_separator);
 
 	// transform string values to real values
-	int to_numeric(t_mep_data *other_data1, t_mep_data* other_data2);
+	int to_numeric(t_mep_data *other_data1, t_mep_data* other_data2, char decimal_separator);
 
 	// scale to interval in the entire matrix
 	int to_interval_everywhere(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2);
@@ -138,7 +141,7 @@ public:
 	// randomly changes the rows of the data
 	void shuffle(t_seed &seed);
 
-	bool detect_list_separator(const char *file_name);
+	//bool detect_list_separator(const char *file_name);
 
 	// moves last count rows to another t_mep_data object
 	int move_to(t_mep_data *, unsigned int count);
@@ -174,12 +177,16 @@ public:
 	// do not call it from here
 	// use the method from the t_mep class because validation and test must be empty
 	// also the method from t_mep sets the problem_type to MEP_PROBLEM_TIME_SERIE
-	bool to_time_serie(unsigned int window_size);
+	//bool to_time_serie(unsigned int window_size);
 
 	// append another data and steal all rows from it
-	void append_and_steal(t_mep_data& other);
+	//void append_and_steal(t_mep_data& other);
 
-	void reverse_time_serie(void);
+	bool to_time_serie_from_single_col(const t_mep_data&, unsigned int window_size);
+
+	//bool to_time_serie_from_single_col(const t_mep_data& source, const t_mep_data* prev_data1, const t_mep_data* prev_data2, unsigned int window_size);
+
+	bool compute_min_max_of_target(double& min_target, double& max_target);
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

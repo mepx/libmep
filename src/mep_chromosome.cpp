@@ -559,6 +559,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_
 {
 
 	// mutate each symbol with the same pm probability
+	// mutate the first instruction
 	double p = mep_real_rand(seed, 0, 1);
 	if (p < parameters.get_mutation_probability()) {
 		double sum = parameters.get_variables_probability() + parameters.get_constants_probability();
@@ -569,7 +570,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_
 		else
 			prg[0].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants - 1);
 	}
-
+	// mutate the other instructions
 	for (unsigned int i = 1; i < code_length; i++) {
 		p = mep_real_rand(seed, 0, 1);      // mutate the operator
 		if (p < parameters.get_mutation_probability()) {
@@ -604,17 +605,25 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_
 		for (unsigned int c = 0; c < num_constants; c++) {
 			p = mep_real_rand(seed, 0, 1);      // mutate the operator
 			double tmp_cst_d = mep_real_rand(seed, 0, mep_constants.get_constants_mutation_max_deviation());
-
+			
 			if (p < parameters.get_mutation_probability()) {
 				if (rand_int_01(seed)) {// coin
-					if (real_constants[c] + tmp_cst_d <= mep_constants.get_max_constants_interval_double())
+					if (mep_constants.get_constants_can_evolve_outside_initial_interval())
 						real_constants[c] += tmp_cst_d;
+					else
+						if (real_constants[c] + tmp_cst_d <= mep_constants.get_max_constants_interval_double())
+							real_constants[c] += tmp_cst_d;
 				}
-				else
-					if (real_constants[c] - tmp_cst_d >= mep_constants.get_min_constants_interval_double())
+				else {
+					if (mep_constants.get_constants_can_evolve_outside_initial_interval())
 						real_constants[c] -= tmp_cst_d;
-				break;
+					else
+						if (real_constants[c] - tmp_cst_d >= mep_constants.get_min_constants_interval_double())
+							real_constants[c] -= tmp_cst_d;
+				}
+				break;// 1 mutation for constants only??
 			}
+			
 		}
 }
 //---------------------------------------------------------------------------
@@ -1081,18 +1090,39 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 
 		switch (prg[i].op) {
 		case  O_ADDITION: {  // +
-			for (unsigned int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = arg1[k] + arg2[k];
+				/*
+				if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					break;
+				}
+				*/
+			}
 		}
 			break;
 		case  O_SUBTRACTION: {  // -
-			for (unsigned int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = arg1[k] - arg2[k];
+				/*
+				if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					break;
+				}
+				*/
+			}
 		}
 			break;
 		case  O_MULTIPLICATION: {  // *
-			for (unsigned int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = arg1[k] * arg2[k];
+				/*
+				if (isinf(fabs(eval[k]))) {
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					break;
+				}
+				*/
+			}
 		}
 			break;
 		case  O_DIVISION:  //  /
@@ -1101,8 +1131,15 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
-				else
+				else {
 					eval[k] = arg1[k] / arg2[k];
+					/*
+					if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+						prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+						break;
+					}
+					*/
+				}
 			break;
 		case O_POWER:
 			for (unsigned int k = 0; k < num_training_data; k++) {
@@ -1119,8 +1156,15 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
-				else
+				else {
 					eval[k] = sqrt(arg1[k]);
+					/*
+					if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+						prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+						break;
+					}
+					*/
+				}
 			}
 			break;
 		case O_EXP:
@@ -1148,8 +1192,9 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
-				else
+				else {
 					eval[k] = log(arg1[k]);
+				}
 
 			break;
 		case O_LOG10:
@@ -1158,8 +1203,9 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
-				else
+				else {
 					eval[k] = log10(arg1[k]);
+				}
 
 			break;
 		case O_lOG2:
@@ -1168,8 +1214,9 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
 					break;
 				}
-				else
+				else {
 					eval[k] = log2(arg1[k]);
+				}
 			break;
 		case O_FLOOR:
 			for (unsigned int k = 0; k < num_training_data; k++)
@@ -1189,16 +1236,30 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
 					break;
 				}
-				else
+				else {
 					eval[k] = 1.0 / arg1[k];
+					/*
+					if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+						prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+						break;
+					}
+					*/
+				}
 			break;
 		case O_NEG:
 			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = -arg1[k];
 			break;
 		case O_X2:
-			for (unsigned int k = 0; k < num_training_data; k++)
+			for (unsigned int k = 0; k < num_training_data; k++) {
 				eval[k] = arg1[k] * arg1[k];
+				/*
+				if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+					break;
+				}
+				*/
+			}
 			break;
 		case O_MIN:
 			for (unsigned int k = 0; k < num_training_data; k++)
@@ -1318,5 +1379,76 @@ void t_mep_chromosome::set_gene_operation(unsigned int gene_index, int new_opera
 double t_mep_chromosome::get_num_incorrectly_classified(void)
 {
 	return num_incorrectly_classified;
+}
+//---------------------------------------------------------------------------
+void t_mep_chromosome::compute_fitness(const t_mep_data& mep_dataset, const t_mep_data& mep_dataset_ts,
+	unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
+	double** cached_eval_matrix, double* cached_sum_of_errors, double* cached_threashold, 
+	s_value_class* tmp_value_class,
+	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
+	double** eval_double, unsigned int problem_type, unsigned int error_measure, 
+	t_seed& seed)
+{
+	switch (problem_type) {
+	case MEP_PROBLEM_REGRESSION:
+		if (error_measure == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+			fitness_regression(mep_dataset,
+				random_subset_indexes, random_subset_selection_size,
+				cached_eval_matrix, cached_sum_of_errors,
+				num_actual_variables, actual_enabled_variables,
+				eval_double, mep_absolute_error, seed);
+		else
+			fitness_regression(mep_dataset,
+				random_subset_indexes, random_subset_selection_size,
+				cached_eval_matrix, cached_sum_of_errors,
+				num_actual_variables, actual_enabled_variables,
+				eval_double, mep_squared_error, seed);
+		break;
+	case MEP_PROBLEM_TIME_SERIE:
+		if (error_measure == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
+			fitness_regression(mep_dataset_ts,
+				random_subset_indexes, random_subset_selection_size,
+				cached_eval_matrix, cached_sum_of_errors,
+				num_actual_variables, actual_enabled_variables,
+				eval_double, mep_absolute_error, seed);
+		else
+			fitness_regression(mep_dataset_ts,
+				random_subset_indexes, random_subset_selection_size,
+				cached_eval_matrix, cached_sum_of_errors,
+				num_actual_variables, actual_enabled_variables,
+				eval_double, mep_squared_error, seed);
+		break;
+	case MEP_PROBLEM_BINARY_CLASSIFICATION:
+		fitness_binary_classification(mep_dataset,
+			random_subset_indexes, random_subset_selection_size,
+			cached_eval_matrix, cached_sum_of_errors, cached_threashold,
+			num_actual_variables, actual_enabled_variables,
+			eval_double, tmp_value_class, seed);
+		break;
+	case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
+		switch (error_measure) {
+		case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR:
+			fitness_multi_class_classification_winner_takes_all_fixed(
+				mep_dataset, random_subset_indexes,
+				random_subset_selection_size,
+				cached_eval_matrix, num_actual_variables,
+				actual_enabled_variables, eval_double, seed);
+			break;
+		case MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR:
+			fitness_multi_class_classification_smooth(
+				mep_dataset, random_subset_indexes,
+				random_subset_selection_size,
+				cached_eval_matrix, num_actual_variables,
+				actual_enabled_variables, eval_double, seed);
+			break;
+		case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
+			fitness_multi_class_classification_winner_takes_all_dynamic(
+				mep_dataset, random_subset_indexes,
+				random_subset_selection_size,
+				cached_eval_matrix, num_actual_variables,
+				actual_enabled_variables, eval_double, seed);
+			break;
+		}
+	}
 }
 //---------------------------------------------------------------------------
