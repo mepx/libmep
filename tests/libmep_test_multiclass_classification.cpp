@@ -54,11 +54,13 @@ int main(void)
 	mep_parameters->set_error_measure(MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR);
 	mep_parameters->set_random_subset_selection_size_percent(100); // all data are used for training
 	mep_parameters->set_num_threads(4);
+	mep_parameters->set_num_runs(1);
 	mep_parameters->set_mutation_probability(0.01);
+
+	// the sum of these 3 probabilities must be 1
 	mep_parameters->set_operators_probability(0.5);
 	mep_parameters->set_variables_probability(0.3);
-	mep_parameters->set_constants_probability(0.2); // do this is you want constants in your solution
-	mep_parameters->set_num_runs(1);
+	mep_parameters->set_constants_probability(0.2); // do this is you want constants to be used in evolution
 
 
 	mep_constants->set_constants_type(MEP_AUTOMATIC_CONSTANTS);
