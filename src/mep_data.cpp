@@ -801,6 +801,73 @@ bool t_mep_data::is_multi_class_classification_problem(void)const
 	return true;
 }
 //-----------------------------------------------------------------
+int t_mep_data::is_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes)const
+{
+	// test if last presumed_num_classes cols are 0 and 1 only
+	if (presumed_num_classes < 2)
+		return MEP_DATA_NUM_CLASSES_TOO_FEW;
+
+	if (presumed_num_classes >= num_cols)
+		return MEP_DATA_NUM_CLASSES_TOO_MANY;
+
+	for (unsigned int r = 0; r < num_data; r++) {
+		unsigned int count_0 = 0;
+		unsigned int count_1 = 0;
+		for (unsigned int c = num_cols - presumed_num_classes; c < num_cols; c++) {
+			double value;
+			if (!is_valid_double(_data_string[r][c], &value))
+				return MEP_DATA_NOT_NUMERICAL_VALUE;
+			if (fabs(value) < 1E-6)
+				count_0++;
+			else
+				if (fabs(value - 1.0) < 1E-6)
+					count_1++;
+		}
+		if (count_1 + count_0 != presumed_num_classes)
+			return MEP_DATA_NOT_ONE_OF_M;
+		if (count_1 != 1)
+			return MEP_DATA_MORE_THAN_ONE_1;
+	}
+	return MEP_E_OK;
+}
+//-----------------------------------------------------------------
+void t_mep_data::to_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes)
+{
+	if (_data_string) {
+		for (unsigned int r = 0; r < num_data; r++) {
+			unsigned int class_index = 0;
+			for (unsigned int c = num_cols - presumed_num_classes; c < num_cols; c++) {
+				double value;
+				is_valid_double(_data_string[r][c], &value); // it should always be valid since I have tested it earlier
+				if (fabs(value - 1.0) < 1E-6)
+					class_index = c - (num_cols - presumed_num_classes);
+			}
+			// delete all memory after the last new Target col
+			for (unsigned int c = num_cols - presumed_num_classes; c < num_cols; c++) {
+				if (_data_string[r][c])
+					delete[] _data_string[r][c];
+			}
+			char buf[12];
+			sprintf(buf, "%u", class_index);
+			_data_string[r][num_cols - presumed_num_classes] = new char[strlen(buf) + 1];
+			strcpy(_data_string[r][num_cols - presumed_num_classes], buf);
+		}
+	}
+	else {// data double
+		for (unsigned int r = 0; r < num_data; r++) {
+			unsigned int class_index = 0;
+			for (unsigned int c = num_cols - presumed_num_classes; c < num_cols; c++) {
+				if (fabs(_data_double[r][c] - 1.0) < 1E-6)
+					class_index = c - (num_cols - presumed_num_classes);
+			}
+			_data_double[r][num_cols - presumed_num_classes] = class_index;
+		}
+	}
+	num_cols -= presumed_num_classes - 1;
+	num_classes = presumed_num_classes;
+	num_outputs = 1;
+}
+//-----------------------------------------------------------------
 unsigned int t_mep_data::get_num_rows(void)const
 {
 	return num_data;

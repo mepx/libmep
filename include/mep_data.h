@@ -20,7 +20,13 @@
 #define MEP_E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
 #define MEP_E_NOT_ENOUGH_DATA_TO_MOVE 2
 #define MEP_E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
+//-----------------------------------------------------------------
 
+#define MEP_DATA_NUM_CLASSES_TOO_FEW 1
+#define MEP_DATA_NUM_CLASSES_TOO_MANY 2
+#define MEP_DATA_NOT_NUMERICAL_VALUE 3
+#define MEP_DATA_NOT_ONE_OF_M 4
+#define MEP_DATA_MORE_THAN_ONE_1 5
 //-----------------------------------------------------------------
 class t_mep_data: public t_setter_data_base {
 private:
@@ -187,6 +193,10 @@ public:
 	//bool to_time_serie_from_single_col(const t_mep_data& source, const t_mep_data* prev_data1, const t_mep_data* prev_data2, unsigned int window_size);
 
 	bool compute_min_max_of_target(double& min_target, double& max_target);
+
+	int is_one_of_m_multi_class_classification_problem(unsigned int num_classes)const;
+	void to_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes);
+
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED
