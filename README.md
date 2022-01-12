@@ -1,4 +1,4 @@
-# libmep 2021.11.03.0-beta
+# libmep 2022.01.10.0-beta
 
 # Multi Expression Programming library
 
