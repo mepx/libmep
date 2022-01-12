@@ -51,8 +51,13 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 
 	unsigned int R = 0;
 	unsigned int C = 0;
+
 	int Ch = getc(f);
+	while (Ch != EOF && Ch == list_separator)// skip consecutive separators
+		Ch = getc(f);
+
 	size_t L = 0;
+
 	while (Ch != EOF){
 
 		if (Ch == '"') {
@@ -112,7 +117,7 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 						C = 0;
 						L = 0;
 					}
-					else {
+					else {// quoted
 						append_to_string(Field, 0xD, L, CAPACITY_L);
 						append_to_string(Field, 0xA, L, CAPACITY_L);
 						L += 2;
@@ -132,7 +137,18 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 					}
 				}
 			}
-		Ch = getc(f);
+		if (Ch == list_separator) { 
+			while (Ch != EOF && Ch == list_separator)// skip consecutive separators
+				Ch = getc(f);
+		}
+		else
+			if (Ch == 10 || Ch == 13) {
+				Ch = getc(f);
+				while (Ch != EOF && Ch == list_separator)// skip consecutive separators
+					Ch = getc(f);
+			}
+			else
+				Ch = getc(f);
 	}
 
 	if (Field && Field[0]) {
@@ -165,6 +181,9 @@ bool get_csv_info_from_string_to_row(const char* input_string, const char list_s
 
 	unsigned int C = 0;
 	char Ch = input_string[index++];
+	while (Ch && Ch == list_separator)// skip consecutive separators
+		Ch = input_string[index++];
+
 	size_t L = 0;
 	while (Ch) {
 
@@ -247,7 +266,18 @@ bool get_csv_info_from_string_to_row(const char* input_string, const char list_s
 				}
 			}
 		//Ch = getc(f);
-		Ch = input_string[index++];
+		if (Ch == list_separator) { 
+			while (Ch && Ch == list_separator)// skip consecutive separators
+				Ch = input_string[index++];
+		}
+		else
+			if (Ch == 10 || Ch == 13) {
+				Ch = input_string[index++];
+				while (Ch && Ch == list_separator)// skip consecutive separators
+					Ch = input_string[index++];
+			}
+			else
+				Ch = input_string[index++];
 	}
 
 	if (Field && Field[0]) {
@@ -281,6 +311,9 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 	unsigned int C = 0;
 	unsigned int R = 0;
 	char Ch = input_string[index++];
+	while (Ch && Ch == list_separator)// skip consecutive separators
+		Ch = input_string[index++];
+
 	size_t L = 0;
 	while (Ch) {
 
@@ -342,7 +375,7 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 						C = 0;
 						L = 0;
 					}
-					else {
+					else {// quoted
 						append_to_string(Field, 0xD, L, CAPACITY_L);
 						append_to_string(Field, 0xA, L, CAPACITY_L);
 						L += 2;
@@ -363,7 +396,18 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 				}
 			}
 		//Ch = getc(f);
-		Ch = input_string[index++];
+		if (Ch == list_separator) { // skip consecutive separators
+			while (Ch && Ch == list_separator)
+				Ch = input_string[index++];
+		}
+		else
+			if (Ch == 10 || Ch == 13) {
+				Ch = input_string[index++];
+				while (Ch && Ch == list_separator)// skip consecutive separators
+					Ch = input_string[index++];
+			}
+			else
+				Ch = input_string[index++];
 	}
 
 	if (Field && Field[0]) {
