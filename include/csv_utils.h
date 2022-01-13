@@ -16,8 +16,6 @@ bool get_csv_info_from_string_to_row(const char* input_string, const char list_s
 bool get_csv_info_from_string(const char* input_string, const char list_separator, t_setter_data_base* obj);
 
 //-----------------------------------------------------------------
-bool get_next_field(char* start_sir, char list_separator, char* dest, size_t& size, int& skipped);
-//-----------------------------------------------------------------
 char* trim_and_strcpy(char* destination, const char* source);
 //-----------------------------------------------------------------
 

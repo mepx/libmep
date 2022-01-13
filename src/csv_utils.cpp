@@ -2,7 +2,6 @@
 #include <ctype.h>
 
 #include "csv_utils.h"
-
 //--------------------------------------------------------------------------
 void append_to_string(char* &Field, char Ch, size_t L, size_t &CAPACITY_L)
 {
@@ -18,20 +17,6 @@ void append_to_string(char* &Field, char Ch, size_t L, size_t &CAPACITY_L)
 	Field[L] = Ch;
 }
 //--------------------------------------------------------------------------
-/*
-void AddData(const char* Field, int R, int C)
-{
-	printf("R = %d C = %d D = %s\n", R, C, Field);
-}
-//--------------------------------------------------------------------------
-
-void AddData(t_setter_data_base *obj, const char* Field, int R, int C)
-{
-	obj->add_string_data(R, C, Field);
-	//printf("R = %d C = %d D = %s\n", R, C, Field);
-}
-//--------------------------------------------------------------------------
-*/
 bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_base* obj)
 {
 	unsigned int max_R = 0;
@@ -144,11 +129,29 @@ bool get_csv_info_from_file(FILE* f, const char list_separator, t_setter_data_ba
 		else
 			if (Ch == 10 || Ch == 13) {
 				Ch = getc(f);
-				while (Ch != EOF && Ch == list_separator)// skip consecutive separators
+				while (Ch != EOF && Ch == list_separator)// skip consecutive separators from begining of the line
 					Ch = getc(f);
 			}
-			else
+			else {
 				Ch = getc(f);
+				// if is list separator, then try to find if the next symbol is new line
+				// if is new line, then use that one as current character
+				// if not, continue as normal
+				int count_skipped = 0;
+				while (Ch != EOF && Ch == list_separator) {// skip consecutive separators from begining of the line
+					Ch = getc(f);
+					count_skipped++;
+				}
+				if (count_skipped && Ch != 10 && Ch != 13) {
+					ungetc(Ch, f);
+					count_skipped--;
+					while (count_skipped) {
+						count_skipped--;
+						ungetc(list_separator, f);
+					}
+					Ch = list_separator;
+				}
+			}
 	}
 
 	if (Field && Field[0]) {
@@ -276,8 +279,26 @@ bool get_csv_info_from_string_to_row(const char* input_string, const char list_s
 				while (Ch && Ch == list_separator)// skip consecutive separators
 					Ch = input_string[index++];
 			}
-			else
+			else {
 				Ch = input_string[index++];
+				// if is list separator, then try to find if the next symbol is new line
+				// if is new line, then use that one as current character
+				// if not, continue as normal
+				int count_skipped = 0;
+				while (Ch != EOF && Ch == list_separator) {// skip consecutive separators from begining of the line
+					Ch = input_string[index++];
+					count_skipped++;
+				}
+				if (count_skipped && Ch != 10 && Ch != 13) {
+					index--;
+					count_skipped--;
+					while (count_skipped) {
+						count_skipped--;
+						index--;
+					}
+					Ch = input_string[index-1];
+				}
+			}
 	}
 
 	if (Field && Field[0]) {
@@ -406,8 +427,23 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 				while (Ch && Ch == list_separator)// skip consecutive separators
 					Ch = input_string[index++];
 			}
-			else
+			else {
 				Ch = input_string[index++];
+				int count_skipped = 0;
+				while (Ch != EOF && Ch == list_separator) {// skip consecutive separators from begining of the line
+					Ch = input_string[index++];
+					count_skipped++;
+				}
+				if (count_skipped && Ch != 10 && Ch != 13) {
+					index--;
+					count_skipped--;
+					while (count_skipped) {
+						count_skipped--;
+						index--;
+					}
+					Ch = input_string[index-1];
+				}
+			}
 	}
 
 	if (Field && Field[0]) {
@@ -426,29 +462,6 @@ bool get_csv_info_from_string(const char* input_string, const char list_separato
 	return true;
 }
 //--------------------------------------------------------------------------
-
-
-bool get_next_field(char* start_sir, char list_separator, char* dest, size_t& size, int& skipped)
-{
-	skipped = 0;
-	char* tmp_start = start_sir;
-	while (*tmp_start && (*tmp_start == ' ' || *tmp_start == '\t' || *tmp_start == list_separator)) {
-		tmp_start++;
-		skipped++;
-	}
-
-	size = 0;
-	while (tmp_start[size] && (tmp_start[size] != list_separator) && (tmp_start[size] != '\n')) {
-		size++;
-	}
-	if (!size && !tmp_start[size])
-		return false;
-	strncpy(dest, tmp_start, size);
-	dest[size] = '\0';
-	return true;
-}
-
-// ---------------------------------------------------------------------------
 char* trim_and_strcpy(char* destination, const char* source)
 {
 	// return if no memory is allocated to the destination
