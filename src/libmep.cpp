@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2022.01.13.1-beta");
+	strcpy(version, "2022.01.20.0-beta");
 
 	num_selected_operators = 0;
 
@@ -1378,45 +1378,6 @@ int t_mep::from_xml(const char* filename)
 	return true;
 }
 //-----------------------------------------------------------------
-void t_mep::compute_list_of_enabled_variables(void)
-{
-	if (actual_enabled_variables) {
-		delete[] actual_enabled_variables;
-		actual_enabled_variables = NULL;
-	}
-
-	num_actual_variables = 0;
-
-	if (training_data.get_num_cols()) {
-		if (mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE) {
-			num_total_variables = training_data_ts.get_num_cols() - 1;
-
-			if (variables_enabled) // from a previous run
-				delete[] variables_enabled;
-
-			variables_enabled = new bool[num_total_variables];
-			//num_actual_variables = num_total_variables;
-			for (unsigned int i = 0; i < num_total_variables; i++) {
-				variables_enabled[i] = 1;
-				//actual_enabled_variables[i] = i;
-			}
-		}
-		else
-			num_total_variables = training_data.get_num_cols() - 1;
-	}
-	else
-		num_total_variables = 0;
-
-	if (num_total_variables) {
-		actual_enabled_variables = new unsigned int[num_total_variables];
-		for (unsigned int i = 0; i < num_total_variables; i++)
-			if (variables_enabled[i]) {
-				actual_enabled_variables[num_actual_variables] = i;
-				num_actual_variables++;
-			}
-	}
-}
-//---------------------------------------------------------------------------
 bool t_mep::is_running(void) const
 {
 	return !_stopped;
@@ -1500,6 +1461,53 @@ void t_mep::init(void)
 		strcpy(problem_description, "Problem description here ...");
 
 		modified_project = false;
+	}
+}
+//---------------------------------------------------------------------------
+void t_mep::compute_list_of_enabled_variables(void)
+{
+	if (actual_enabled_variables) {
+		delete[] actual_enabled_variables;
+		actual_enabled_variables = NULL;
+	}
+
+	num_actual_variables = 0;
+
+	if (training_data.get_num_cols()) {
+		if (mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE) {
+			if (training_data_ts.get_num_cols() < 1)
+				num_total_variables = 0;
+			else
+				num_total_variables = training_data_ts.get_num_cols() - 1;
+
+			if (variables_enabled) { // from a previous run
+				delete[] variables_enabled;
+				variables_enabled = NULL;
+			}
+
+			if (num_total_variables == 0)
+				return;
+
+			variables_enabled = new bool[num_total_variables];
+			//num_actual_variables = num_total_variables;
+			for (unsigned int i = 0; i < num_total_variables; i++) {
+				variables_enabled[i] = 1;
+				//actual_enabled_variables[i] = i;
+			}
+		}
+		else
+			num_total_variables = training_data.get_num_cols() - 1;
+	}
+	else
+		num_total_variables = 0;
+
+	if (num_total_variables) {
+		actual_enabled_variables = new unsigned int[num_total_variables];
+		for (unsigned int i = 0; i < num_total_variables; i++)
+			if (variables_enabled[i]) {
+				actual_enabled_variables[num_actual_variables] = i;
+				num_actual_variables++;
+			}
 	}
 }
 //---------------------------------------------------------------------------
