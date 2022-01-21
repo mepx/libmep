@@ -1689,9 +1689,9 @@ bool t_mep::could_be_time_serie(void)
 {
 	return training_data.could_be_time_serie() &&
 		(!validation_data.get_num_rows() ||
-		validation_data.get_num_rows() && validation_data.get_num_cols () == 1)	&&
+		(validation_data.get_num_rows() && validation_data.get_num_cols () == 1))	&&
 		(!test_data.get_num_rows() ||
-		test_data.get_num_rows() && test_data.get_num_cols() == 1);
+		(test_data.get_num_rows() && test_data.get_num_cols() == 1));
 }
 //---------------------------------------------------------------------------
 bool t_mep::predict_on_test(int run_index, double* output, char* valid_output)
