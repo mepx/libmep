@@ -102,6 +102,9 @@ void print_instruction_to_C(int op, unsigned int adr1, unsigned int adr2, unsign
 	case O_IF_A_XOR_B_CD:
 		sprintf(tmp_s, "prg[%u] < 0 != prg[%u] < 0 ? prg[%u] : prg[%u]; // if_a_xor_b_cd", adr1, adr2, adr3, adr4);
 		break;
+	case O_FMOD:
+		sprintf(tmp_s, "fmod(prg[%u], prg[%u]); // fmod", adr1, adr2);
+		break;
 
 	case O_NUM_INPUTS:
 		sprintf(tmp_s, "%d; // num inputs", 0);
@@ -413,6 +416,9 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 
 	case O_INPUTS_AVERAGE:
 		sprintf(tmp_s, "%lf ' inputs average", 0.0);
+		break;
+	case O_FMOD:
+		sprintf(tmp_s, "prg(%u) Mod prg(%u)", adr1, adr2);
 		break;
 	}
 }

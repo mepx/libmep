@@ -41,6 +41,7 @@
 
 #define O_IF_A_OR_B_CD -30
 #define O_IF_A_XOR_B_CD -31
+#define O_FMOD -32
 
 
 /*
@@ -56,7 +57,7 @@
 #define O_NOR -27
 */
 
-#define MEP_MAX_OPERATORS 31
+#define MEP_MAX_OPERATORS 32
 #define MEP_DIVISION_PROTECT 1E-10
 //#define MEP_MIN_PROTECT 1E-10
 //#define MEP_MAX_PROTECT 1E10
@@ -81,6 +82,7 @@ class t_mep_functions
 	bool use_ifalbcd;
 	bool use_if_a_or_b_cd;
 	bool use_if_a_xor_b_cd;
+	bool use_fmod;
 
 	bool modified;
 
@@ -182,6 +184,9 @@ class t_mep_functions
 	// returns true if the "if a < 0 xor b < 0 returns c else returns d" operator is enabled
 	bool get_if_a_xor_b_cd(void)const;
 
+	// returns true if the "fmod(x, y)" operator is enabled
+	bool get_fmod(void)const;
+
 	//bool get_inputs_average(void);
 	//bool get_num_inputs(void);
 
@@ -273,6 +278,9 @@ class t_mep_functions
 
 	// sets if the "if a < 0 xor b < 0 returns c else returns d" operator is enabled or not
 	void set_if_a_xor_b_cd(bool value);
+
+	// sets if the "fmod(x, y)" operator is enabled or not
+	void set_fmod(bool value);
 
 	//void set_inputs_average(bool value);
 	//void set_num_inputs(bool value);

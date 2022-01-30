@@ -228,6 +228,13 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 				eval_vect[i] = (eval_vect[prg[i].addr1] < 0) != (eval_vect[prg[i].addr2] < 0) ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 				break;
 
+			case O_FMOD:
+				if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+					is_error_case = true;
+				else
+					eval_vect[i] = fmod(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+				break;
+
 			default:  // a variable
 				if (prg[i].op < (int)num_total_variables)
 					eval_vect[i] = data[k][prg[i].op];

@@ -438,6 +438,9 @@ void t_mep_chromosome::mark(unsigned int position, bool* marked)
 		case O_MAX:
 			mark(prg[position].addr2, marked);
 			break;
+		case O_FMOD:
+			mark(prg[position].addr2, marked);
+			break;
 		case O_IFLZ:
 			mark(prg[position].addr2, marked);
 			mark(prg[position].addr3, marked);
@@ -863,6 +866,12 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, unsigned
 		case O_IF_A_XOR_B_CD:
 			eval_vect[i] = (eval_vect[prg[i].addr1] < 0) != (eval_vect[prg[i].addr2] < 0) ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 			break;
+		case O_FMOD:
+			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+				is_error_case = true;
+			else
+				eval_vect[i] = fmod(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+			break;
 		case O_INPUTS_AVERAGE:
 			eval_vect[i] = 0;
 			break;
@@ -1011,7 +1020,12 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, unsigned int &max_ind
 		case O_IF_A_XOR_B_CD:
 			eval_vect[i] = (eval_vect[prg[i].addr1] < 0) != (eval_vect[prg[i].addr2] < 0) ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 			break;
-
+		case O_FMOD:
+			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+				is_error_case = true;
+			else
+				eval_vect[i] = fmod(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+			break;
 
 		default:  // a variable
 			if (prg[i].op < (int)num_total_variables)
@@ -1322,6 +1336,23 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 		case O_IF_A_XOR_B_CD:
 			for (unsigned int k = 0; k < num_training_data; k++)
 				eval[k] = (arg1[k] < 0) != (arg2[k] < 0) ? arg3[k] : arg4[k];
+			break;
+		case O_FMOD:
+			for (unsigned int k = 0; k < num_training_data; k++)
+				if (fabs(arg2[k]) < MEP_DIVISION_PROTECT) {
+					prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal, I can also put a constant here!!!!!!!!!!!!!!!
+					break;
+				}
+				else {
+					eval[k] = fmod(arg1[k], arg2[k]);
+					/*
+					if (fabs(eval[k]) > MEP_MAX_PROTECT) {
+						prg[i].op = (int)actual_enabled_variables[mep_unsigned_int_rand(seed, 0, num_actual_variables - 1)];   // the gene is mutated into a terminal
+						break;
+					}
+					*/
+				}
+			
 			break;
 
 		default:  // a constant

@@ -25,6 +25,8 @@ void t_mep_functions::init(void)
 
 	use_iflz = use_ifalbcd = use_if_a_or_b_cd = use_if_a_xor_b_cd = false;
 
+	use_fmod = false;
+
 	use_inputs_average = false;
 	use_num_inputs = false;
 
@@ -209,6 +211,12 @@ int t_mep_functions::to_xml(pugi::xml_node parent)
 	sprintf(tmp_str, "%d", use_if_a_xor_b_cd);
 	data.set_value(tmp_str);
 
+	node = parent.append_child("use_fmod");
+	data = node.append_child(pugi::node_pcdata);
+	sprintf(tmp_str, "%d", use_fmod);
+	data.set_value(tmp_str);
+
+	/*
 	node = parent.append_child("use_num_inputs");
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", use_num_inputs);
@@ -218,6 +226,7 @@ int t_mep_functions::to_xml(pugi::xml_node parent)
 	data = node.append_child(pugi::node_pcdata);
 	sprintf(tmp_str, "%d", use_inputs_average);
 	data.set_value(tmp_str);
+	*/
 
 	modified = false;
 
@@ -506,6 +515,15 @@ int t_mep_functions::from_xml(pugi::xml_node parent)
 	else
 		use_if_a_xor_b_cd = false;
 
+	node = parent.child("use_fmod");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		use_fmod = atoi(value_as_cstring) > 0;
+	}
+	else
+		use_fmod = false;
+
+	/*
 	node = parent.child("use_num_inputs");
 	if (node) {
 		const char *value_as_cstring = node.child_value();
@@ -521,7 +539,7 @@ int t_mep_functions::from_xml(pugi::xml_node parent)
 	}
 	else
 		use_inputs_average = false;
-
+		*/
 	modified = false;
 
 	return true;
@@ -647,7 +665,7 @@ unsigned int t_mep_functions::get_list_of_operators(int *actual_operators)
 		actual_operators[num_operators] = O_IF_A_XOR_B_CD;
 		num_operators++;
 	}
-
+	
 	if (use_num_inputs) {
 		actual_operators[num_operators] = O_NUM_INPUTS;
 		num_operators++;
@@ -655,6 +673,11 @@ unsigned int t_mep_functions::get_list_of_operators(int *actual_operators)
 
 	if (use_inputs_average) {
 		actual_operators[num_operators] = O_INPUTS_AVERAGE;
+		num_operators++;
+	}
+	
+	if (use_fmod) {
+		actual_operators[num_operators] = O_FMOD;
 		num_operators++;
 	}
 
@@ -757,6 +780,9 @@ unsigned int t_mep_functions::count_operators(void)
 	if (use_inputs_average)
 		num_operators++;
 	
+	if (use_fmod)
+		num_operators++;
+
 	return num_operators;
 }
 //---------------------------------------------------------------------------
@@ -905,6 +931,11 @@ bool t_mep_functions::get_if_a_xor_b_cd(void)const
 	return use_if_a_xor_b_cd;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_fmod(void)const
+{
+	return use_fmod;
+}
+//---------------------------------------------------------------------------
 void t_mep_functions::set_addition(bool value)
 {
 	use_addition = value;
@@ -955,50 +986,38 @@ void t_mep_functions::set_pow10(bool value)
 //---------------------------------------------------------------------------
 void t_mep_functions::set_ln(bool value)
 {
-
 	use_ln = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_log10(bool value)
 {
-
 	use_log10 = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_log2(bool value)
 {
-
 	use_log2 = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_floor(bool value)
 {
-
 	use_floor = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_ceil(bool value)
 {
-
 	use_ceil = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_abs(bool value)
 {
-
 	use_abs = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_inv(bool value)
@@ -1015,82 +1034,62 @@ void t_mep_functions::set_neg(bool value)
 //---------------------------------------------------------------------------
 void t_mep_functions::set_x2(bool value)
 {
-
 	use_x2 = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_min(bool value)
 {
-
 	use_min = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_max(bool value)
 {
-
 	use_max = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_sin(bool value)
 {
-
 	use_sin = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_cos(bool value)
 {
-
 	use_cos = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_tan(bool value)
 {
-
 	use_tan = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_asin(bool value)
 {
-
 	use_asin = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_acos(bool value)
 {
-
 	use_acos = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_atan(bool value)
 {
-
 	use_atan = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_iflz(bool value)
 {
-
 	use_iflz = value;
 	modified = true;
-
 }
 //---------------------------------------------------------------------------
 void t_mep_functions::set_ifalbcd(bool value)
@@ -1108,6 +1107,12 @@ void t_mep_functions::set_if_a_or_b_cd(bool value)
 void t_mep_functions::set_if_a_xor_b_cd(bool value)
 {
 	use_if_a_xor_b_cd = value;
+	modified = true;
+}
+//---------------------------------------------------------------------------
+void t_mep_functions::set_fmod(bool value)
+{
+	use_fmod = value;
 	modified = true;
 }
 //---------------------------------------------------------------------------
@@ -1199,6 +1204,8 @@ bool t_mep_functions::operator==(const t_mep_functions &other)
 	if (use_if_a_or_b_cd != other.use_if_a_or_b_cd)
 		return false;
 	if (use_if_a_xor_b_cd != other.use_if_a_xor_b_cd)
+		return false;
+	if (use_fmod != other.use_fmod)
 		return false;
 
 	return true;
