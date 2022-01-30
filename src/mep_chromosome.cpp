@@ -610,7 +610,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters, const t_mep_
 			double tmp_cst_d = mep_real_rand(seed, 0, mep_constants.get_constants_mutation_max_deviation());
 			
 			if (p < parameters.get_mutation_probability()) {
-				if (rand_int_01(seed)) {// coin
+				if (mep_int_01_rand(seed)) {// coin
 					if (mep_constants.get_constants_can_evolve_outside_initial_interval())
 						real_constants[c] += tmp_cst_d;
 					else
@@ -677,7 +677,7 @@ void t_mep_chromosome::uniform_crossover(const t_mep_chromosome &parent2,
 	offspring2.num_total_variables = num_total_variables;
 
 	for (unsigned int i = 0; i < code_length; i++)
-		if (rand_int_01(seed)) {
+		if (mep_int_01_rand(seed)) {
 			offspring1.prg[i] = prg[i];
 			offspring2.prg[i] = parent2.prg[i];
 		}
