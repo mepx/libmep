@@ -731,7 +731,7 @@ unsigned int t_mep_parameters::get_window_size(void)const
 //---------------------------------------------------------------------------
 void t_mep_parameters::set_window_size(unsigned int new_window_size)
 {
-	if (new_window_size) {
+	if (new_window_size > 0) {
 		window_size = new_window_size;
 		modified = true;
 	}
