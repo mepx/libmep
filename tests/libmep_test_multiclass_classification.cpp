@@ -2,6 +2,7 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
+// last update on: 2022.02.09.0
 //-----------------------------------------------------------------
 #include "libmep.h"
 #include <locale.h>
@@ -52,6 +53,12 @@ int main(void)
 	mep_parameters->set_code_length(100);
 	mep_parameters->set_problem_type(MEP_PROBLEM_MULTICLASS_CLASSIFICATION);
 	mep_parameters->set_error_measure(MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR);
+	// choose between:
+//MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR
+//MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR
+//MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR
+//MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR
+
 	mep_parameters->set_random_subset_selection_size_percent(100); // all data are used for training
 	mep_parameters->set_num_threads(4);
 	mep_parameters->set_num_runs(1);

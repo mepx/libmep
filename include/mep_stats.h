@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 #ifndef MEP_STATS_H
 #define MEP_STATS_H
-
+//-----------------------------------------------------------------
 #include "mep_chromosome.h"
 //-----------------------------------------------------------------
 class t_mep_run_statistics{
@@ -38,7 +38,7 @@ public:
 	t_mep_run_statistics& operator=(const t_mep_run_statistics& source);
 
 	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent, unsigned int problem_type);
+	int from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure);
 
 };
 //-----------------------------------------------------------------
@@ -121,7 +121,7 @@ public:
 	void compute_mean_stddev(bool compute_on_validation, bool compute_on_test, unsigned int problem_type);
 
 	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent, unsigned int problem_type);
+	int from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure);
 };
 //-----------------------------------------------------------------
 #endif

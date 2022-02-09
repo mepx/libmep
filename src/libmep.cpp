@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2022.01.30.1-beta");
+	strcpy(version, "2022.02.07.0-beta");
 
 	num_selected_operators = 0;
 
@@ -101,29 +101,36 @@ void t_mep::allocate_values(double**** eval_double, s_value_class*** array_value
 //---------------------------------------------------------------------------
 void t_mep::allocate_sub_population(t_sub_population & a_pop)
 {
-	unsigned int num_outputs = 0;
+	unsigned int num_program_outputs = 1;// do not confuse it with the number of data outputs!!!!!!!!
+	
 	if (mep_parameters.get_problem_type() == MEP_PROBLEM_REGRESSION ||
 		mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE ||
 		mep_parameters.get_problem_type() == MEP_PROBLEM_BINARY_CLASSIFICATION)
-		num_outputs = 1;
-	else // MEP_PROBLEM_MULTICLASS
+		num_program_outputs = 1;
+	else { // MEP_PROBLEM_MULTICLASS
 		if (mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR ||
 			mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR)
-			num_outputs = 0;
-		else
-			num_outputs = training_data.get_num_classes();
-
+			num_program_outputs = 0;
+		else {
+			if (mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR)
+				num_program_outputs = training_data.get_num_classes();
+			else
+				if (mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR)
+					num_program_outputs = 1;
+		}
+	}
+	
 	a_pop.offspring1.allocate_memory(mep_parameters.get_code_length(),
 			num_total_variables, mep_parameters.get_constants_probability() > 1E-6,
-			&mep_constants, num_outputs);
+			&mep_constants, num_program_outputs, training_data.get_num_classes());
 	a_pop.offspring2.allocate_memory(mep_parameters.get_code_length(),
 			num_total_variables, mep_parameters.get_constants_probability() > 1E-6,
-			&mep_constants, num_outputs);
+			&mep_constants, num_program_outputs, training_data.get_num_classes());
 	a_pop.individuals = new t_mep_chromosome[mep_parameters.get_subpopulation_size()];
 	for (unsigned int j = 0; j < mep_parameters.get_subpopulation_size(); j++)
 		a_pop.individuals[j].allocate_memory(mep_parameters.get_code_length(),
 				num_total_variables, mep_parameters.get_constants_probability() > 1E-6,
-				&mep_constants, num_outputs);
+				&mep_constants, num_program_outputs, training_data.get_num_classes());
 }
 //---------------------------------------------------------------------------
 void t_mep::get_best(t_mep_chromosome & dest) const
@@ -135,21 +142,24 @@ bool t_mep::get_output(unsigned int run_index, double* inputs, double* outputs) 
 {
 	unsigned int index_error_gene;
 	unsigned int max_index;
+	double max_value;
+
+	t_mep_chromosome* best_program = &statistics.get_stat_ptr(run_index)->best_program;
 //	if (run_index > -1) {
 		switch (mep_parameters.get_problem_type()) {
 		case MEP_PROBLEM_REGRESSION:
-			if (!statistics.get_stat_ptr(run_index)->best_program.evaluate_double(inputs, outputs, index_error_gene))
+			if (!best_program->evaluate_double(inputs, outputs, index_error_gene))
 				return false;
 			break;
 		case MEP_PROBLEM_TIME_SERIE:
-			if (!statistics.get_stat_ptr(run_index)->best_program.evaluate_double(inputs, outputs, index_error_gene))
+			if (!best_program->evaluate_double(inputs, outputs, index_error_gene))
 				return false;
 			break;
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			if (!statistics.get_stat_ptr(run_index)->best_program.evaluate_double(inputs, outputs, index_error_gene))
+			if (!best_program->evaluate_double(inputs, outputs, index_error_gene))
 				return false;
 
-			if (outputs[0] <= statistics.get_stat_ptr(run_index)->best_program.get_best_class_threshold())
+			if (outputs[0] <= best_program->get_best_class_threshold())
 				outputs[0] = 0;
 			else
 				outputs[0] = 1;
@@ -160,21 +170,38 @@ bool t_mep::get_output(unsigned int run_index, double* inputs, double* outputs) 
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR:
 			case MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR:
 				//max_index = -1;
-				if (!statistics.get_stat_ptr(run_index)->best_program.get_first_max_index(inputs, max_index, index_error_gene))
+				if (!best_program->get_first_max_index(inputs, max_index, max_value, index_error_gene, NULL))
 					return false;
 				outputs[0] = max_index % training_data.get_num_classes();
 				break;
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
 				//max_index = -1;
+				unsigned int class_index;
+				if (!best_program->get_class_index_for_winner_takes_all_dynamic(inputs, class_index))
+					return false;
+				outputs[0] = class_index;
+
+				/*
 				outputs[0] = -1;
-				if (!statistics.get_stat_ptr(run_index)->best_program.get_first_max_index(inputs, max_index, index_error_gene))
+				unsigned int* output_genes_index = new unsigned int[training_data.get_num_classes()];
+				double* values_for_output_genes = new double[training_data.get_num_classes()];
+				if (!best_program->get_first_max_index(inputs, max_index, index_error_gene))
 					return false;
 				for (unsigned int c = 0; c < training_data.get_num_classes(); c++)
-					if (statistics.get_stat_ptr(run_index)->best_program.get_index_best_gene(c) == max_index) {
+					if (best_program->get_index_best_gene(c) == max_index) {
 						outputs[0] = c;
 						break;
 					}
+				delete[] output_genes_index;
+				delete[] values_for_output_genes;
+				*/
+				break;
+			case MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR:
+				
+				if (!best_program->evaluate_double(inputs, outputs, index_error_gene))
+					return false;
 
+				outputs[0] = best_program->get_closest_class_index(outputs[0]);
 				break;
 			}// end switch error measure
 			break;
@@ -533,7 +560,7 @@ double t_mep::compute_validation_error(unsigned int& best_subpopulation_index_fo
 
 			switch (mep_parameters.get_error_measure()) {
 				case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR:
-					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_data.get_num_classes(), validation_error, index_error_gene, num_incorrectly_classified)) {
+					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_error, index_error_gene, num_incorrectly_classified)) {
 						pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].set_gene_operation(index_error_gene,
 								actual_enabled_variables[mep_unsigned_int_rand(seeds[best_subpopulation_index], 0, num_actual_variables - 1)]);
 						// recompute its fitness on training;
@@ -559,7 +586,7 @@ double t_mep::compute_validation_error(unsigned int& best_subpopulation_index_fo
 
 					break;
 				case MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR:
-					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_data.get_num_classes(), validation_error, index_error_gene, num_incorrectly_classified)) {
+					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_error, index_error_gene, num_incorrectly_classified)) {
 						pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].set_gene_operation(index_error_gene,
 								actual_enabled_variables[mep_unsigned_int_rand(seeds[best_subpopulation_index], 0, num_actual_variables - 1)]);
 						// recompute its fitness on training;
@@ -585,7 +612,7 @@ double t_mep::compute_validation_error(unsigned int& best_subpopulation_index_fo
 
 					break;
 				case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
-					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_data.get_num_classes(), validation_error, index_error_gene, num_incorrectly_classified)) {
+					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_error, index_error_gene, num_incorrectly_classified)) {
 						pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].set_gene_operation(index_error_gene,
 								actual_enabled_variables[mep_unsigned_int_rand(seeds[best_subpopulation_index], 0, num_actual_variables - 1)]);
 						// recompute its fitness on training;
@@ -610,7 +637,33 @@ double t_mep::compute_validation_error(unsigned int& best_subpopulation_index_fo
 					}
 
 					break;
-				}// end switch (mep_parameters.get_error_measure()) {
+				case MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR:
+					while (!pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].compute_multi_class_classification_closest_center_error_on_double_data_return_error(validation_data.get_data_matrix_double(), validation_data.get_num_rows(), validation_data.get_num_cols() - 1, validation_error, index_error_gene, num_incorrectly_classified)) {
+						pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].set_gene_operation(index_error_gene,
+							actual_enabled_variables[mep_unsigned_int_rand(seeds[best_subpopulation_index], 0, num_actual_variables - 1)]);
+						// recompute its fitness on training;
+						pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].fitness_multi_class_classification_closest_center(
+							training_data, random_subset_indexes,
+							random_subset_selection_size,
+							cached_eval_variables_matrix_double, num_actual_variables,
+							actual_enabled_variables, eval_double, seeds[best_subpopulation_index]);
+						// resort the population
+						//sort_by_fitness(pop[best_subpopulation_index]);
+						pop[best_subpopulation_index].compute_best_index(mep_parameters.get_subpopulation_size());
+						if (pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].best_index].get_fitness() >
+							pop[best_subpopulation_index].individuals[pop[best_subpopulation_index].worst_index].get_fitness())
+							pop[best_subpopulation_index].compute_worst_index(mep_parameters.get_subpopulation_size());
+
+					}
+					if ((validation_error < best_validation_error) || (fabs(best_validation_error + 1) <= 1E-6)) {
+						best_validation_error = validation_error;
+						best_num_incorrectly_classified = num_incorrectly_classified;
+						best_subpopulation_index_for_validation = best_subpopulation_index;
+						best_individual_index_for_validation = pop[best_subpopulation_index].best_index;
+					}
+
+					break;
+			}// end switch (mep_parameters.get_error_measure()) {
 			break;
 	}
 	return best_validation_error;
@@ -936,7 +989,9 @@ bool t_mep::start_steady_state(unsigned int run, t_seed * seeds, double*** eval_
 	/**/
 	//if (!(mep_parameters.get_use_validation_data() && validation_data.get_num_rows() > 0)) // if no validation data, the test is the best from all
 	//	stats[run].prg = pop[best_subpopulation_index].individuals[best_individual_index];
-	if (mep_parameters.get_problem_type() != MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
+	if (mep_parameters.get_problem_type() != MEP_PROBLEM_MULTICLASS_CLASSIFICATION || 
+		mep_parameters.get_problem_type() == MEP_PROBLEM_MULTICLASS_CLASSIFICATION &&
+		mep_parameters.get_error_measure() == MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR)
 		statistics.get_stat_ptr(run)->best_program.simplify();
 
 	//double num_incorrectly_classified_test;
@@ -1001,7 +1056,7 @@ bool t_mep::start_steady_state(unsigned int run, t_seed * seeds, double*** eval_
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR:
 				if (statistics.get_stat_ptr(run)->best_program.compute_multi_class_classification_winner_takes_all_fixed_error_on_double_data(
 						test_data.get_data_matrix_double(),
-						test_data.get_num_rows(), test_data.get_num_cols() - 1, test_data.get_num_classes(),
+						test_data.get_num_rows(), test_data.get_num_cols() - 1, 
 						statistics.get_stat_ptr(run)->test_error)) {
 					statistics.get_stat_ptr(run)->test_num_incorrect = statistics.get_stat_ptr(run)->test_error;// num_incorrectly_classified_test;
 				}
@@ -1011,7 +1066,7 @@ bool t_mep::start_steady_state(unsigned int run, t_seed * seeds, double*** eval_
 				if (statistics.get_stat_ptr(run)->best_program.compute_multi_class_classification_smooth_error_on_double_data(
 						test_data.get_data_matrix_double(),
 						test_data.get_num_rows(), test_data.get_num_cols() - 1,
-						test_data.get_num_classes(), statistics.get_stat_ptr(run)->test_error)) {
+						statistics.get_stat_ptr(run)->test_error)) {
 					statistics.get_stat_ptr(run)->test_num_incorrect = statistics.get_stat_ptr(run)->test_error;
 				}
 				break;
@@ -1019,8 +1074,16 @@ bool t_mep::start_steady_state(unsigned int run, t_seed * seeds, double*** eval_
 				if (statistics.get_stat_ptr(run)->best_program.compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data(
 						test_data.get_data_matrix_double(),
 						test_data.get_num_rows(), test_data.get_num_cols() - 1,
-						test_data.get_num_classes(),
 						statistics.get_stat_ptr(run)->test_error)) {
+					statistics.get_stat_ptr(run)->test_num_incorrect = statistics.get_stat_ptr(run)->test_error;// num_incorrectly_classified_test;
+				}
+
+				break;
+			case MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR:
+				if (statistics.get_stat_ptr(run)->best_program.compute_multi_class_classification_closest_center_error_on_double_data(
+					test_data.get_data_matrix_double(),
+					test_data.get_num_rows(), test_data.get_num_cols() - 1,
+					statistics.get_stat_ptr(run)->test_error)) {
 					statistics.get_stat_ptr(run)->test_num_incorrect = statistics.get_stat_ptr(run)->test_error;// num_incorrectly_classified_test;
 				}
 
@@ -1262,7 +1325,12 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 			test_data.count_num_classes(target_col);
 	}
 
-	statistics.from_xml(parent, mep_parameters.get_problem_type());
+	statistics.from_xml(parent, mep_parameters.get_problem_type(), mep_parameters.get_error_measure());
+	/*
+	for (int s = 0; s < statistics.num_runs; s++) {
+		statistics.get_stat_ptr(s)->best_program.num
+	}
+	*/
 
 	last_run_index = (int)statistics.num_runs - 1;
 
@@ -1405,8 +1473,7 @@ char* t_mep::program_as_C(unsigned int run_index, bool simplified, double* input
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_double(
 			simplified, inputs,
 		mep_parameters.get_problem_type(),
-		mep_parameters.get_error_measure(),
-		training_data.get_num_classes()
+		mep_parameters.get_error_measure()
 		);
 }
 //---------------------------------------------------------------------------
@@ -1415,8 +1482,7 @@ char* t_mep::program_as_Excel_function(unsigned int run_index, bool simplified, 
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Excel_VBA_function_double(
 		simplified, inputs,
 		mep_parameters.get_problem_type(),
-		mep_parameters.get_error_measure(),
-		training_data.get_num_classes()
+		mep_parameters.get_error_measure()
 	);
 }
 //---------------------------------------------------------------------------

@@ -181,7 +181,7 @@ int t_mep_run_statistics::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_run_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type)
+int t_mep_run_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure)
 {
 	delete_memory();
 
@@ -353,7 +353,9 @@ int t_mep_run_statistics::from_xml(pugi::xml_node parent, unsigned int problem_t
 	{
 		best_program.from_xml(node);
 
-		if (problem_type != MEP_PROBLEM_MULTICLASS_CLASSIFICATION)
+		if (problem_type != MEP_PROBLEM_MULTICLASS_CLASSIFICATION ||
+			problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION &&
+			error_measure == MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR)
 			best_program.simplify();
 	}
 
@@ -1052,7 +1054,7 @@ int t_mep_statistics::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type)
+int t_mep_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure)
 {
 	num_runs = 0;
 	pugi::xml_node node_results = parent.child("results");
@@ -1063,7 +1065,7 @@ int t_mep_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type)
 		stats = new t_mep_run_statistics[num_runs];
 		num_runs = 0;
 		for (pugi::xml_node row = node_results.child("run"); row; row = row.next_sibling("run"), num_runs++)
-			stats[num_runs].from_xml(row, problem_type);
+			stats[num_runs].from_xml(row, problem_type, error_measure);
 	}
 	return true;
 }

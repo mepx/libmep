@@ -260,6 +260,7 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 		}
 	}
 	max_index_best_genes = index_best_genes[0];
+	errno = 0;
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_regression_error_on_double_data_return_error(

@@ -50,7 +50,7 @@ int main(void)
 	mep_parameters->set_subpopulation_size(200);
 	mep_parameters->set_code_length(100);
 	mep_parameters->set_problem_type(MEP_PROBLEM_BINARY_CLASSIFICATION);
-	mep_parameters->set_error_measure(MEP_BINARY_CLASSIFICATION_BEST_THRESHOLD);
+	mep_parameters->set_error_measure(MEP_BINARY_CLASSIFICATION_AUTOMATIC_THRESHOLD);
 	mep_parameters->set_random_subset_selection_size_percent(100); // all data are used for training
 	mep_parameters->set_num_threads(4);
 	mep_parameters->set_mutation_probability(0.005);
