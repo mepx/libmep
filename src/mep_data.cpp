@@ -765,7 +765,7 @@ bool t_mep_data::is_multi_class_classification_problem(void)const
 {
 	if (num_cols < 2)
 		return false;
-
+	// compute max value
 	unsigned int tmp_num_classes;
 	if (num_outputs && num_data) {
 		unsigned int max_value = (unsigned int)_data_double[0][num_cols - 1];
@@ -794,8 +794,10 @@ bool t_mep_data::is_multi_class_classification_problem(void)const
 	for (unsigned int i = 0; i < num_data; i++)
 		marked[(int)_data_double[i][num_cols - 1]] = true;
 	for (unsigned int c = 0; c < tmp_num_classes; c++)
-		if (!marked[c])
+		if (!marked[c]) {
+			delete[] marked;
 			return false;// a class does not appear
+		}
 
 	delete[] marked;
 	return true;
