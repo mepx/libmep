@@ -779,7 +779,7 @@ bool t_mep_data::is_multi_class_classification_problem(void)const
 
 	if (tmp_num_classes < 2)
 		return false;
-
+	// test if all possitive and integer
 	for (unsigned int i = 0; i < num_data; i++) {
 		if (_data_double[i][num_cols - 1] < 0) // all must be greater than 0
 			return false;
@@ -800,6 +800,38 @@ bool t_mep_data::is_multi_class_classification_problem(void)const
 		}
 
 	delete[] marked;
+	return true;
+}
+//-----------------------------------------------------------------
+bool t_mep_data::is_multi_class_classification_problem_within_range(unsigned int max_class_index)const
+{
+	if (num_cols < 2)
+		return false;
+	// compute max value
+	unsigned int tmp_num_classes;
+	if (num_outputs && num_data) {
+		unsigned int max_value = (unsigned int)_data_double[0][num_cols - 1];
+		for (unsigned int i = 1; i < num_data; i++)
+			if (max_value < _data_double[i][num_cols - 1])
+				max_value = (unsigned int)_data_double[i][num_cols - 1];
+		tmp_num_classes = max_value + 1;
+	}
+	else
+		tmp_num_classes = 0;
+
+	if (tmp_num_classes < 2)
+		return false;
+	// test if all possitive and integer
+	for (unsigned int i = 0; i < num_data; i++) {
+		if (_data_double[i][num_cols - 1] < 0) // all must be greater than 0
+			return false;
+		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)// all must be int
+			return false;
+	}
+
+	if (tmp_num_classes - 1 > max_class_index)
+		return false;
+
 	return true;
 }
 //-----------------------------------------------------------------

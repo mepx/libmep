@@ -196,7 +196,7 @@ public:
 
 	int is_one_of_m_multi_class_classification_problem(unsigned int num_classes)const;
 	void to_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes);
-
+	bool is_multi_class_classification_problem_within_range(unsigned int max_class)const;
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED
