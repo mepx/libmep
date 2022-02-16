@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2022.02.10.0-beta");
+	strcpy(version, "2022.02.16.0-beta");
 
 	num_selected_operators = 0;
 
@@ -1691,7 +1691,7 @@ bool t_mep::validate_project(char* error_message)
 	}
 	else
 	if (mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE) {
-		if (!could_be_time_serie()) {
+		if (!could_be_univariate_time_serie()) {
 			sprintf(error_message, "Data must have 1 column only for time series!");
 			return false;
 		}
@@ -1751,7 +1751,7 @@ const char* t_mep::get_version(void) const
 	return version;
 }
 //---------------------------------------------------------------------------
-bool t_mep::could_be_time_serie(void)
+bool t_mep::could_be_univariate_time_serie(void)
 {
 	return training_data.could_be_time_serie() &&
 		(!validation_data.get_num_rows() ||

@@ -215,8 +215,8 @@ public:
 
 	void clear(void);
 
-	// is this a time serie? we do not take window size now into account
-	bool could_be_time_serie(void);
+	// is this a univariate time serie? we do not take window size now into account
+	bool could_be_univariate_time_serie(void);
 
 	// transform 1 column of training data to a time serie
 //	bool to_time_serie(unsigned int window_size);
