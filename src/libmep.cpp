@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2022.02.16.0-beta");
+	strcpy(version, "2022.02.17.0-beta");
 
 	num_selected_operators = 0;
 
@@ -673,7 +673,7 @@ int t_mep::start(f_on_progress on_generation, f_on_progress on_new_evaluation, f
 {
 	if (mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE) {
 		training_data_ts.clear_data();
-		if (!training_data_ts.to_time_serie_from_single_col(training_data, mep_parameters.get_window_size())) { // I should do validation first before calling start
+		if (!training_data_ts.to_time_serie_from_univariate(training_data, mep_parameters.get_window_size())) { // I should do validation first before calling start
 			return false;
 		}
 	}
@@ -1473,8 +1473,8 @@ char* t_mep::program_as_C(unsigned int run_index, bool simplified, double* input
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_double(
 			simplified, inputs,
 		mep_parameters.get_problem_type(),
-		mep_parameters.get_error_measure()
-		);
+		mep_parameters.get_error_measure(),
+		version);
 }
 //---------------------------------------------------------------------------
 char* t_mep::program_as_Excel_function(unsigned int run_index, bool simplified, double* inputs)const
@@ -1482,7 +1482,16 @@ char* t_mep::program_as_Excel_function(unsigned int run_index, bool simplified, 
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Excel_VBA_function_double(
 		simplified, inputs,
 		mep_parameters.get_problem_type(),
-		mep_parameters.get_error_measure()
+		mep_parameters.get_error_measure(), version
+	);
+}
+//---------------------------------------------------------------------------
+char* t_mep::program_as_Python(unsigned int run_index, bool simplified, double* inputs)const
+{
+	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Python_double(
+		simplified, inputs,
+		mep_parameters.get_problem_type(),
+		mep_parameters.get_error_measure(), version
 	);
 }
 //---------------------------------------------------------------------------
@@ -1753,7 +1762,7 @@ const char* t_mep::get_version(void) const
 //---------------------------------------------------------------------------
 bool t_mep::could_be_univariate_time_serie(void)
 {
-	return training_data.could_be_time_serie() &&
+	return training_data.could_be_univariate_time_serie() &&
 		(!validation_data.get_num_rows() ||
 		(validation_data.get_num_rows() && validation_data.get_num_cols () == 1))	&&
 		(!test_data.get_num_rows() ||
@@ -1873,7 +1882,7 @@ void t_mep::compute_output_on_training(int run_index, double* output, char* vali
 			unsigned int num_data = training_data.get_num_rows();
 			double output_double[1];
 			for (unsigned int i = 0; i < num_data; i++) {
-				valid_output[i] = get_output(run_index, training_data.get_row(i), output_double);
+				valid_output[i] = get_output(run_index, training_data.get_row_as_double(i), output_double);
 				if (valid_output[i])
 					output[i] = output_double[0];
 			}
@@ -1919,7 +1928,7 @@ void t_mep::compute_output_on_validation(int run_index, double* output, char* va
 		unsigned int num_data = validation_data.get_num_rows();
 		double output_double[1];
 		for (unsigned int i = 0; i < num_data; i++) {
-			valid_output[i] = get_output(run_index, validation_data.get_row(i), output_double);
+			valid_output[i] = get_output(run_index, validation_data.get_row_as_double(i), output_double);
 			if (valid_output[i])
 				output[i] = output_double[0];
 		}
@@ -1956,7 +1965,7 @@ void t_mep::compute_output_on_test(int run_index, double* output, char* valid_ou
 		unsigned int num_data = test_data.get_num_rows();
 		double output_double[1];
 		for (unsigned int i = 0; i < num_data; i++) {
-			valid_output[i] = get_output(run_index, test_data.get_row(i), output_double);
+			valid_output[i] = get_output(run_index, test_data.get_row_as_double(i), output_double);
 			if (valid_output[i])
 				output[i] = output_double[0];
 		}

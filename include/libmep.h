@@ -169,6 +169,9 @@ public:
 	// returns the chromosome as an Excel function
 	char* program_as_Excel_function(unsigned int run_index, bool simplified, double* inputs) const;
 
+	// returns the chromosome as an Python function
+	char* program_as_Python(unsigned int run_index, bool simplified, double* inputs) const;
+
 	// returns the number of outputs of the program/
 	// currently only problems with 1 output are handled
 	unsigned int get_num_outputs(void) const;

@@ -120,6 +120,7 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynam
 			return false;
 		}
 	}
+	delete[] values_for_output_genes;
 
 	_num_incorrectly_classified = error;
 

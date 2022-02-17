@@ -167,7 +167,7 @@ bool t_mep_data::from_csv_file(const char* filename, char _list_separator, char 
 
 	fclose(f);
 
-	remove_empty_rows();
+	remove_empty_rows_string();
 
 	// try to convert to double
 	to_double();
@@ -207,7 +207,7 @@ bool t_mep_data::from_csv_file_no_conversion_to_double(const char* filename, cha
 
 	fclose(f);
 
-	remove_empty_rows();
+	remove_empty_rows_string();
 
 	setlocale(LC_NUMERIC, "");
 
@@ -234,15 +234,25 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 	if (!f)
 		return false;
 
-	if (_data_double)
+	if (_data_double) {
 		for (unsigned int d = 0; d < num_data; d++) {
 			for (unsigned int v = 0; v < num_cols - 1; v++)
 				fprintf(f, "%lg%c", _data_double[d][v], _list_separator);
 			fprintf(f, "%lg", _data_double[d][num_cols - 1]);
 			fprintf(f, "\n");
 		}
+	}
 	else
-		if (_data_string)
+		if (_data_long_long) {
+			for (unsigned int d = 0; d < num_data; d++) {
+				for (unsigned int v = 0; v < num_cols - 1; v++)
+					fprintf(f, "%lld%c", _data_long_long[d][v], _list_separator);
+				fprintf(f, "%lld", _data_long_long[d][num_cols - 1]);
+				fprintf(f, "\n");
+			}
+		}
+		else
+			if (_data_string) {
 			for (unsigned int d = 0; d < num_data; d++) {
 				for (unsigned int v = 0; v < num_cols; v++) {
 					if (strchr(_data_string[d][v], '\n') ||
@@ -278,6 +288,7 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 				}
 				fprintf(f, "\n");
 			}
+		}
 
 	fclose(f);
 
@@ -285,161 +296,3 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 	return true;
 }
 //-----------------------------------------------------------------
-/*
-bool t_mep_data::detect_list_separator(const char* file_name)
-{
-	FILE* f = NULL;
-#ifdef _WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, file_name, -1, NULL, 0);
-	wchar_t* w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, file_name, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"r");
-
-	delete[] w_filename;
-#else
-	f = fopen(file_name, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	char* buf = new char[MAX_ROW_CHARS];
-
-	my_fgets(buf, MAX_ROW_CHARS, f);
-
-	while (!feof(f)){
-		if (strlen(buf) > 0)// lines with at least one character
-			break;
-		my_fgets(buf, MAX_ROW_CHARS, f);
-	}
-
-	if (feof(f)){// nothing in the file
-		fclose(f);
-		delete[] buf;
-		return false;
-	}
-	fclose(f);
-// detect the ;
-	if (strchr(buf, ';')) {
-		list_separator = ';';
-		delete[] buf;
-		return true;
-	}
-	if (strchr(buf, ',')) {
-		list_separator = ',';
-		delete[] buf;
-		return true;
-	}
-	if (strchr(buf, ' ')) {
-		list_separator = ' ';
-		delete[] buf;
-		return true;
-	}
-	if (strchr(buf, '\t')) {
-		list_separator = '\t';
-		delete[] buf;
-		return true;
-	}
-
-	// most likely there is only variable and no output
-
-	delete[] buf;
-	return true;
-}
-*/
-//-----------------------------------------------------------------
-/*
-bool t_mep_data::from_csv_string_old(const char* filename)
-{
-	FILE* f = NULL;
-#ifdef _WIN32
-	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	wchar_t* w_filename = new wchar_t[count_chars];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
-
-	f = _wfopen(w_filename, L"r");
-
-	delete[] w_filename;
-#else
-	f = fopen(filename, "r");
-#endif
-
-	if (!f)
-		return false;
-
-	delete_data();
-
-	char* buf = new char[MAX_ROW_CHARS];
-	char* start_buf = buf;
-
-	data_type = MEP_DATA_STRING;
-	num_data = 0;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		size_t len = strlen(buf);
-		if (len > 1)
-			num_data++;
-		if (num_data == 1) {
-			num_cols = 0;
-			int skipped;
-
-			char tmp_str[1000];
-			int size;
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				num_cols++;
-				if (!buf[size + skipped])
-					break;
-				buf = buf + size + skipped;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			}
-			buf = start_buf;
-		}
-		}
-	//	num_cols--;
-	rewind(f);
-
-	_data_string = new char** [num_data];
-	int count_mep_data = 0;
-	//has_missing_values = 0;
-
-	while (my_fgets(buf, MAX_ROW_CHARS, f)) {
-		size_t len = strlen(buf);
-		if (len > 1) {
-			int col = 0;
-			char tmp_str[1000];
-			int size;
-			_data_string[count_mep_data] = new char* [num_cols];
-			for (int c = 0; c < num_cols; c++)
-				_data_string[count_mep_data][col] = NULL;
-
-			int skipped = 0;
-			bool result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-			while (result) {
-				if (col < num_cols) {
-					_data_string[count_mep_data][col] = new char[strlen(tmp_str) + 1];
-					strcpy(_data_string[count_mep_data][col], tmp_str);
-				}
-				else {
-					break;
-				}
-				buf = buf + size + skipped;
-				//if (buf - start_buf >= len)
-				//break;
-				result = get_next_field(buf, list_separator, tmp_str, size, skipped);
-
-				col++;
-			}
-			count_mep_data++;
-		}
-		buf = start_buf;
-	}
-	fclose(f);
-	//delete[] start_buf;
-	delete[] buf;
-
-	return true;
-}
-//-----------------------------------------------------------------
-*/

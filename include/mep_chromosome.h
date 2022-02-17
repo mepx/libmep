@@ -116,13 +116,13 @@ public:
 	// converts the MEP program into a C program
 	// a row of data is also required because the main C program will also contain an example on how to run the obtained program
 	char * to_C_double(bool simplified, double *data, 
-				unsigned int problem_type, unsigned int error_measure);
+				unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
 	char* to_Excel_VBA_function_double(bool simplified, double* data, 
-				unsigned int problem_type, unsigned int error_measure);
+				unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
+	char* to_Python_double(bool simplified, double* data,
+		unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
 
 	double get_fitness(void);
-
-
     
 	void generate_random(const t_mep_parameters &parameters, const t_mep_constants & mep_constants, 
 		const int *actual_operators, unsigned int num_actual_operators,

@@ -917,14 +917,24 @@ unsigned int t_mep_data::get_data_type(void)const
 	return data_type;
 }
 //-----------------------------------------------------------------
-double* t_mep_data::get_row(unsigned int row)const
+double* t_mep_data::get_row_as_double(unsigned int row)const
 {
 	return _data_double[row];
+}
+//-----------------------------------------------------------------
+long long* t_mep_data::get_row_as_long_long(unsigned int row)const
+{
+	return _data_long_long[row];
 }
 //-----------------------------------------------------------------
 double t_mep_data::get_value_double(unsigned int row, unsigned int col)const
 {
 	return _data_double[row][col];
+}
+//-----------------------------------------------------------------
+long long t_mep_data::get_value_long_long(unsigned int row, unsigned int col)const
+{
+	return _data_long_long[row][col];
 }
 //-----------------------------------------------------------------
 char* t_mep_data::get_value_string(unsigned int row, unsigned int col)const
@@ -945,6 +955,11 @@ unsigned int t_mep_data::get_num_outputs(void)const
 double** t_mep_data::get_data_matrix_double(void) const
 {
 	return _data_double;
+}
+//-----------------------------------------------------------------
+long long** t_mep_data::get_data_matrix_long_long(void) const
+{
+	return _data_long_long;
 }
 //-----------------------------------------------------------------
 unsigned int t_mep_data::get_num_items_class_0(void)const
@@ -1082,7 +1097,7 @@ void t_mep_data::from_tab_separated_string(const char* s, char _list_separator, 
 	data_type = MEP_DATA_STRING;
 	get_csv_info_from_string(s, list_separator, this);
 
-	remove_empty_rows();
+	remove_empty_rows_string();
 
 	// try to convert to double
 	to_double();
@@ -1099,12 +1114,12 @@ void t_mep_data::from_tab_separated_string_no_conversion_to_double (const char* 
 	data_type = MEP_DATA_STRING;
 	get_csv_info_from_string(s, list_separator, this);
 
-	remove_empty_rows();
+	remove_empty_rows_string();
 
 	setlocale(LC_NUMERIC, "");
 }
 //-----------------------------------------------------------------
-void t_mep_data::remove_empty_rows(void)
+void t_mep_data::remove_empty_rows_string(void)
 {
 	if (data_type == MEP_DATA_STRING) {
 		// try to remove the empty rows
@@ -1142,12 +1157,12 @@ void t_mep_data::remove_empty_rows(void)
 	}
 }
 //-----------------------------------------------------------------
-bool t_mep_data::could_be_time_serie(void) const
+bool t_mep_data::could_be_univariate_time_serie(void) const
 {
 	return (num_cols == 1 && num_data >= 2);// if num_data == 2 it makes no sense to make an extra step to time serie because is the same
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_time_serie_from_single_col(const t_mep_data& source, unsigned int window_size)
+bool t_mep_data::to_time_serie_from_univariate(const t_mep_data& source, unsigned int window_size)
 {
 	if (!(source.num_cols == 1 && source.num_data >= window_size + 1))
 		return false;

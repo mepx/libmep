@@ -3,8 +3,8 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#ifndef mep_DATA_CLASS_H
-#define mep_DATA_CLASS_H
+#ifndef MEP_DATA_CLASS_H
+#define MEP_DATA_CLASS_H
 
 //-----------------------------------------------------------------
 #include "pugixml.hpp"
@@ -14,6 +14,8 @@
 
 #define MEP_DATA_DOUBLE 0
 #define MEP_DATA_STRING 1
+// LONG LONG is currently under development! Do not use it yet!
+#define MEP_DATA_LONG_LONG 2
 //-----------------------------------------------------------------
 
 #define MEP_E_OK 0
@@ -37,13 +39,15 @@ private:
 
 	char* **_data_string;
 
+	long long** _data_long_long;
+
 	unsigned int num_outputs;
 
 	unsigned int num_class_0;
 
 	unsigned int num_classes;
 
-	unsigned char data_type; // 0-double, 1- string
+	unsigned char data_type; // 0-double, 1- string, 2-long long
 
 	char list_separator;
 	//char decimal_separator;
@@ -94,12 +98,18 @@ public:
 	// assumes that row and col are valid; no test for out of range are performed
 	char*** get_data_matrix_string(void) const;
 	
+	// returns a training data as double (if data type is 0)
+	// assumes that row and col are valid; no test for out of range are performed
+	long long** get_data_matrix_long_long(void) const;
+
 	// returns an entire row as a pointer to double
-	// data type must be 0,
-	double* get_row(unsigned int row)const;
+	double* get_row_as_double(unsigned int row)const;
+
+	long long* get_row_as_long_long(unsigned int row)const;
 
 	double get_value_double(unsigned int row, unsigned int col)const;
 	char* get_value_string(unsigned int row, unsigned int col)const;
+	long long get_value_long_long(unsigned int row, unsigned int col)const;
 
 	// clears the data internal structures and deletes memory
 	void clear_data(void);
@@ -161,8 +171,8 @@ public:
 	// returns true if the problem is a multi classs classification problem
 	bool is_multi_class_classification_problem(void)const;
 
-	// remove_empty_rows
-	void remove_empty_rows(void);
+	// removes empty rows for string encoding of data
+	void remove_empty_rows_string(void);
 
 	// returns true if data have been modified
 	bool is_modified(void)const;
@@ -177,7 +187,7 @@ public:
 	unsigned int get_num_classes(void)const;
 
 	// returns true is data could be a time serie
-	bool could_be_time_serie(void) const;
+	bool could_be_univariate_time_serie(void) const;
 
 	// transform the (1 row or 1 column) data into a matrix based on window size
 	// do not call it from here
@@ -188,7 +198,7 @@ public:
 	// append another data and steal all rows from it
 	//void append_and_steal(t_mep_data& other);
 
-	bool to_time_serie_from_single_col(const t_mep_data&, unsigned int window_size);
+	bool to_time_serie_from_univariate(const t_mep_data&, unsigned int window_size);
 
 	//bool to_time_serie_from_single_col(const t_mep_data& source, const t_mep_data* prev_data1, const t_mep_data* prev_data2, unsigned int window_size);
 
