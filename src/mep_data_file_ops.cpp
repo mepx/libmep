@@ -234,6 +234,20 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 	if (!f)
 		return false;
 
+	to_csv_open_file(f, _list_separator);
+
+	fclose(f);
+
+	return true;
+}
+//-----------------------------------------------------------------
+bool t_mep_data::to_csv_open_file(FILE*f, char _list_separator) const
+{
+	// this list separator is sent from outside
+
+	if (!f)
+		return false;
+
 	if (_data_double) {
 		for (unsigned int d = 0; d < num_data; d++) {
 			for (unsigned int v = 0; v < num_cols - 1; v++)
@@ -289,10 +303,6 @@ bool t_mep_data::to_csv(const char* filename, char _list_separator) const
 				fprintf(f, "\n");
 			}
 		}
-
-	fclose(f);
-
-	//_modified = false;
 	return true;
 }
 //-----------------------------------------------------------------

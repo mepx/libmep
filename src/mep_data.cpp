@@ -984,12 +984,16 @@ unsigned int t_mep_data::get_num_classes(void)const
 //-----------------------------------------------------------------
 void t_mep_data::count_num_classes(unsigned int target_col)
 {
-	if (num_outputs && num_data) {
-		unsigned int max_value = (unsigned int)_data_double[0][target_col];
-		for (unsigned int i = 1; i < num_data; i++)
-			if (max_value < _data_double[i][target_col])
-				max_value = (unsigned int)_data_double[i][target_col];
-		num_classes = max_value + 1;
+	if (data_type == MEP_DATA_DOUBLE) {
+		if (num_outputs && num_data) {
+			unsigned int max_value = (unsigned int)_data_double[0][target_col];
+			for (unsigned int i = 1; i < num_data; i++)
+				if (max_value < _data_double[i][target_col])
+					max_value = (unsigned int)_data_double[i][target_col];
+			num_classes = max_value + 1;
+		}
+		else
+			num_classes = 0;
 	}
 	else
 		num_classes = 0;

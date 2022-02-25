@@ -123,6 +123,7 @@ public:
 
 	// saves the training data to a csv files
 	bool to_csv(const char *file_name, char ListSeparator) const;
+	bool to_csv_open_file(FILE* f, char _list_separator) const;
 	
 	// loads the data from a csv file
 //	bool from_csv(const char *filename, char list_separator, char decimal_separator);
