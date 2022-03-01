@@ -926,7 +926,7 @@ bool t_mep_chromosome::evaluate_double(double *inputs, double *outputs, unsigned
 			eval_vect[i] = eval_vect[prg[i].addr1] < 0 || eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 			break;
 		case O_IF_A_XOR_B_CD:
-			eval_vect[i] = (eval_vect[prg[i].addr1] < 0) != (eval_vect[prg[i].addr2] < 0) ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr1] < 0 != eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 			break;
 		case O_FMOD:
 			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
@@ -1087,7 +1087,7 @@ bool t_mep_chromosome::get_first_max_index(double *inputs, unsigned int &max_ind
 			eval_vect[i] = eval_vect[prg[i].addr1] < 0 || eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 			break;
 		case O_IF_A_XOR_B_CD:
-			eval_vect[i] = (eval_vect[prg[i].addr1] < 0) != (eval_vect[prg[i].addr2] < 0) ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr1] < 0 != eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 			break;
 		case O_FMOD:
 			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
@@ -1410,7 +1410,7 @@ void t_mep_chromosome::compute_eval_matrix_double(unsigned int num_training_data
 			break;
 		case O_IF_A_XOR_B_CD:
 			for (unsigned int k = 0; k < num_training_data; k++)
-				eval[k] = (arg1[k] < 0) != (arg2[k] < 0) ? arg3[k] : arg4[k];
+				eval[k] = arg1[k] < 0 != arg2[k] < 0 ? arg3[k] : arg4[k];
 			break;
 		case O_FMOD:
 			for (unsigned int k = 0; k < num_training_data; k++)

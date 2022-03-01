@@ -225,7 +225,7 @@ void t_mep_chromosome::fitness_regression_double_no_cache(const t_mep_data& mep_
 				break;
 
 			case O_IF_A_XOR_B_CD:
-				eval_vect[i] = (eval_vect[prg[i].addr1] < 0) != (eval_vect[prg[i].addr2] < 0) ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+				eval_vect[i] = eval_vect[prg[i].addr1] < 0 != eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
 				break;
 
 			case O_FMOD:

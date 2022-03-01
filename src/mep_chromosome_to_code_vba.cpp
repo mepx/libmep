@@ -99,7 +99,7 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 		sprintf(tmp_s, "IIf (prg(%u) < 0 Or prg(%u) < 0, prg(%u), prg(%u)) ' if_a_or_b_cd", adr1, adr2, adr3, adr4);
 		break;
 	case O_IF_A_XOR_B_CD:
-		sprintf(tmp_s, "IIf (prg(%u) < 0 <> prg(%u) < 0, prg(%u), prg(%u)) ' if_a_xor_b_cd", adr1, adr2, adr3, adr4);
+		sprintf(tmp_s, "IIf (prg(%u) < 0 Xor prg(%u) < 0, prg(%u), prg(%u)) ' if_a_xor_b_cd", adr1, adr2, adr3, adr4);
 		break;
 
 	case O_NUM_INPUTS:
