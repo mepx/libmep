@@ -35,6 +35,7 @@ t_mep_chromosome::t_mep_chromosome()
 	num_utilized_genes = 0;
 	num_program_outputs = 1;
 	num_classes = 0;
+	//class_index = NULL;
 
 	centers = NULL;
 }
@@ -66,8 +67,10 @@ void t_mep_chromosome::allocate_memory(unsigned int _code_length, unsigned int n
 	if (num_program_outputs)
 		index_best_genes = new unsigned int[num_program_outputs];
 
-	if (num_classes)
+	if (num_classes) {
 		centers = new double[num_classes];
+		//class_index = new int[num_classes];
+	}
 }
 //---------------------------------------------------------------------------
 t_mep_chromosome::~t_mep_chromosome()
@@ -105,6 +108,12 @@ void t_mep_chromosome::clear(void)
 		delete[] centers;
 		centers = NULL;
 	}
+	/*
+	if (class_index) {
+		delete[] class_index;
+		class_index = NULL;
+	}
+	*/
 
 	num_incorrectly_classified = 0;
 	max_index_best_genes = 0;
@@ -149,6 +158,12 @@ t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
 
 		num_incorrectly_classified = source.num_incorrectly_classified;
 		num_classes = source.num_classes;
+		if (source.centers) {
+			if (!centers)
+				centers = new double[num_classes];
+			for (unsigned int i = 0; i < num_classes; i++)
+				centers[i] = source.centers[i];          // the index of the best expression in t_mep_chromosome
+		}
 		if (source.centers) {
 			if (!centers)
 				centers = new double[num_classes];

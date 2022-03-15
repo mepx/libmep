@@ -48,10 +48,10 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 		sprintf(tmp_s, "Log(prg(%u)) / Log(2#)", adr1);
 		break;
 	case O_FLOOR:
-		sprintf(tmp_s, "Floor_Precise(prg(%u))", adr1);
+		sprintf(tmp_s, "Int(prg(%u))", adr1);// floor
 		break;
 	case O_CEIL:
-		sprintf(tmp_s, "Ceil_Precise(prg(%u))", adr1);
+		sprintf(tmp_s, "-Int(-prg(%u))", adr1);// ceil
 		break;
 	case O_ABS:
 		sprintf(tmp_s, "Abs(prg(%u))", adr1);
@@ -87,7 +87,7 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 		sprintf(tmp_s, "Acos(prg(%u))", adr1);
 		break;
 	case O_ATAN:
-		sprintf(tmp_s, "Atan(prg(%u))", adr1);
+		sprintf(tmp_s, "Atn(prg(%u))", adr1);
 		break;
 	case O_IFLZ:
 		sprintf(tmp_s, "IIf (prg(%u) < 0, prg(%u), prg(%u)) ' ifalzbc", adr1, adr2, adr3);

@@ -39,6 +39,7 @@ private:
 
 	double num_incorrectly_classified;		// this is identical with fitness in some cases
 	unsigned int num_classes;
+	//int *class_index;
 	double* centers;						// center for each class;
 
 	void mark(unsigned int position, bool* marked);
