@@ -81,10 +81,10 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 		sprintf(tmp_s, "Tan(prg(%u))", adr1);
 		break;
 	case O_ASIN:
-		sprintf(tmp_s, "Asin(prg(%u))", adr1);
+		sprintf(tmp_s, "WorksheetFunction.Asin(prg(%u))", adr1);
 		break;
 	case O_ACOS:
-		sprintf(tmp_s, "Acos(prg(%u))", adr1);
+		sprintf(tmp_s, "WorksheetFunction.Acos(prg(%u))", adr1);
 		break;
 	case O_ATAN:
 		sprintf(tmp_s, "Atn(prg(%u))", adr1);
