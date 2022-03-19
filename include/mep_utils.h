@@ -6,6 +6,7 @@
 #ifndef mep_utils_H
 #define mep_utils_H
 //----------------------------------------------------------------
+#include <stddef.h>
 struct s_value_class{
 	double value;
 	int data_class;
