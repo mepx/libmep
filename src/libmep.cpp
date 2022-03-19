@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2022.03.16.0-beta");
+	strcpy(version, "2022.03.19.0-beta");
 
 	num_selected_operators = 0;
 
@@ -1473,6 +1473,14 @@ char* t_mep::program_as_C(unsigned int run_index, bool simplified, double* input
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_double(
 			simplified, inputs,
 		mep_parameters.get_problem_type(),
+		mep_parameters.get_error_measure(),
+		version);
+}
+//---------------------------------------------------------------------------
+char* t_mep::program_as_C_infix(unsigned int run_index, double* inputs) const
+{
+	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_infix_double(
+		inputs, mep_parameters.get_problem_type(),
 		mep_parameters.get_error_measure(),
 		version);
 }

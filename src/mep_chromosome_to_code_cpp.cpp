@@ -134,23 +134,6 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 	strcat(prog, "{");
 	strcat(prog, "\n");
 
-	// here I have to declare the constants
-	if (num_constants) {
-		strcat(prog, "//constants ...");
-
-		strcat(prog, "\n");
-
-		sprintf(tmp_s, "  double constants[%u];", num_constants);
-		strcat(prog, tmp_s);
-		strcat(prog, "\n");
-		for (unsigned int i = 0; i < num_constants; i++) {
-			sprintf(tmp_s, "  constants[%u] = %lf;", i, real_constants[i]);
-			strcat(prog, tmp_s);
-			strcat(prog, "\n");
-		}
-		strcat(prog, "\n");
-	}
-
 	if (simplified) {
 		strcat(prog, "  double prg[");
 		sprintf(tmp_s, "%u", num_utilized_genes);
@@ -174,7 +157,7 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants[%u];", (unsigned int)simplified_prg[i].op - num_total_variables);
+					sprintf(tmp_s, "%lg;", real_constants[simplified_prg[i].op - num_total_variables]);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -248,7 +231,7 @@ char* t_mep_chromosome::to_C_double(bool simplified, double* data,
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants[%u];", prg[i].op - num_total_variables);
+					sprintf(tmp_s, "%lg;", real_constants[prg[i].op - num_total_variables]);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}

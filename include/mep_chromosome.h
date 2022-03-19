@@ -123,6 +123,9 @@ public:
 	char* to_Python_double(bool simplified, double* data,
 		unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
 
+	char* to_C_infix_double(double* data, unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
+	void code_to_infix_C(unsigned int mep_index, char* &tmp_s, size_t& capacity);
+
 	double get_fitness(void);
     
 	void generate_random(const t_mep_parameters &parameters, const t_mep_constants & mep_constants, 

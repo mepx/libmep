@@ -166,6 +166,8 @@ public:
 	// returns the chromosome as a C program
 	char* program_as_C(unsigned int run_index, bool simplified, double *inputs) const;
 
+	char* program_as_C_infix(unsigned int run_index, double* inputs) const;
+		
 	// returns the chromosome as an Excel function
 	char* program_as_Excel_function(unsigned int run_index, bool simplified, double* inputs) const;
 

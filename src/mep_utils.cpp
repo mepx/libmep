@@ -36,3 +36,23 @@ int my_strcmp(char *s1, char *s2)
 	return result;
 }
 //---------------------------------------------------------------------------
+void increase_string_capacity(char*& s_prg, size_t& capacity, size_t actual_length, size_t extra_length)
+{
+	if (actual_length + extra_length >= capacity) {
+		capacity += extra_length + 100;
+		char* s = new char[capacity];
+		strcpy(s, s_prg);
+		delete[] s_prg;
+		s_prg = s;
+	}
+}
+//---------------------------------------------------------------------------
+void increase_string_capacity2(char*& s_prg, size_t& capacity, size_t extra_length)
+{
+	capacity += extra_length + 2;
+	char* s = new char[capacity];
+	strcpy(s, s_prg);
+	delete[] s_prg;
+	s_prg = s;
+}
+//---------------------------------------------------------------------------

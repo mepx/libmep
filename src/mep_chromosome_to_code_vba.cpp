@@ -127,22 +127,6 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 	strcat(prog, "Function mepx(x As Range) As Double");
 	strcat(prog, "\n");
 
-	// here I have to declare the constants
-	if (num_constants) {
-		strcat(prog, "'constants ...");
-
-		strcat(prog, "\n");
-
-		sprintf(tmp_s, "  Dim constants(%u) As Double", num_constants - 1);// -1 because in VB the size is actual the last index
-		strcat(prog, tmp_s);
-		strcat(prog, "\n");
-		for (unsigned int i = 0; i < num_constants; i++) {
-			sprintf(tmp_s, "  constants(%u) = %lf", i, real_constants[i]);
-			strcat(prog, tmp_s);
-			strcat(prog, "\n");
-		}
-		strcat(prog, "\n");
-	}
 
 	if (simplified) {
 		sprintf(tmp_s, "  Dim prg(%u) as Double\n", num_utilized_genes - 1);
@@ -168,7 +152,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants(%u)", (unsigned int)simplified_prg[i].op - num_total_variables);
+					sprintf(tmp_s, "%lg", real_constants[simplified_prg[i].op - num_total_variables]);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
@@ -250,7 +234,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 					strcat(prog, "\n");
 				}
 				else {
-					sprintf(tmp_s, "constants(%u)", (unsigned int)prg[i].op - num_total_variables);
+					sprintf(tmp_s, "%lg", real_constants[prg[i].op - num_total_variables]);
 					strcat(prog, tmp_s);
 					strcat(prog, "\n");
 				}
