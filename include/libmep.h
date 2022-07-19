@@ -29,7 +29,7 @@ private:
 	t_mep_parameters mep_parameters;
 	t_mep_constants mep_constants;
 
-	t_sub_population* pop; // array of subpopulations
+	t_sub_population* population; // array of subpopulations
 	double **cached_eval_variables_matrix_double;
 	double *cached_sum_of_errors, *cached_threashold;
 	unsigned int best_individual_index;
@@ -108,6 +108,7 @@ private:
 	void compute_previous_data_for_validation(double* previous_data);
 	void compute_previous_data_for_test(double* previous_data);
 	void compute_previous_data_for_prediction(double* previous_data);
+    
 public:
 
 	t_mep();
@@ -210,7 +211,7 @@ public:
 	long long get_memory_consumption(void) const;
 
 	// returns true if parameters are correct
-	bool validate_project(char*);
+	bool validate_project(char* error_str);
 
 	void compute_list_of_enabled_variables(void);
 

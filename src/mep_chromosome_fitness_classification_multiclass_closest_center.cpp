@@ -22,16 +22,22 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center(
 	fitness_multi_class_classification_closest_center_double_cache_all_training_data(
 		mep_dataset, random_subset_indexes, random_subset_selection_size,
 		cached_variables_eval_matrix,
-		num_actual_variables, actual_enabled_variables, eval_matrix_double, seed);
+		num_actual_variables, actual_enabled_variables, eval_matrix_double,
+		seed);
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_closest_center_error_on_double_data(
-	double** data, unsigned int num_data, unsigned int output_col, double& error)
+	const t_mep_data& mep_dataset, double& error)
 {
 	error = 0;
 
 	unsigned int index_error_gene;
 	double out[1];
+	
+	double** data = mep_dataset.get_data_matrix_double();
+	unsigned int *class_index = mep_dataset.get_class_label_index_as_array();
+	unsigned int num_data = mep_dataset.get_num_rows();
+	
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], out, index_error_gene)){
 			double min_dist = DBL_MAX;
@@ -42,7 +48,7 @@ bool t_mep_chromosome::compute_multi_class_classification_closest_center_error_o
 					closest_class_index = c;
 				}
 			}
-			if (closest_class_index != (unsigned int)data[k][output_col])
+			if ((int)closest_class_index != class_index[k])
 				error++;
 		}
 		else
@@ -55,13 +61,18 @@ bool t_mep_chromosome::compute_multi_class_classification_closest_center_error_o
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_closest_center_error_on_double_data_return_error(
-	double** data, unsigned int num_data, unsigned int output_col,
+const t_mep_data& mep_dataset,
 	double& error, unsigned int& index_error_gene, double& _num_incorrectly_classified)
 {
 	error = 0;
 
 //	unsigned int index_error_gene;
 	double out[1];
+
+	double** data = mep_dataset.get_data_matrix_double();
+	unsigned int* class_index = mep_dataset.get_class_label_index_as_array();
+	unsigned int num_data = mep_dataset.get_num_rows();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], out, index_error_gene)) {
 			double min_dist = DBL_MAX;
@@ -72,7 +83,7 @@ bool t_mep_chromosome::compute_multi_class_classification_closest_center_error_o
 					closest_class_index = c;
 				}
 			}
-			if (closest_class_index != (unsigned int)data[k][output_col])
+			if ((int)closest_class_index != class_index[k])
 				error++;
 		}
 		else
@@ -94,7 +105,8 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center_double_
 	unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
 	double** cached_variables_eval_matrix,
 	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
-	double** eval_matrix_double, t_seed& seed)
+	double** eval_matrix_double, 
+	t_seed& seed)
 {
 
 	// evaluate a_chromosome
@@ -102,6 +114,7 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center_double_
 
 	double** data = mep_dataset.get_data_matrix_double();
 	//unsigned int num_rows = mep_dataset.get_num_rows();
+	unsigned int* class_labels_index = mep_dataset.get_class_label_index_as_array();
 
 	int* line_of_constants = NULL;
 	if (num_constants) {
@@ -110,7 +123,10 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center_double_
 			line_of_constants[i] = -1;
 	}
 
-	compute_eval_matrix_double(random_subset_selection_size, cached_variables_eval_matrix, num_actual_variables, actual_enabled_variables, line_of_constants, eval_matrix_double, seed);
+	compute_eval_matrix_double(random_subset_selection_size,
+							   cached_variables_eval_matrix,
+							   num_actual_variables, actual_enabled_variables,
+							   line_of_constants, eval_matrix_double, seed);
 
 	double* local_centers = new double[num_classes];
 	num_incorrectly_classified = UINT32_MAX;
@@ -126,7 +142,7 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center_double_
 
 				if (prg[i].op >= 0) {// variable or constant
 					if (prg[i].op < (int)num_total_variables) {
-						if (fabs((unsigned int)data[rs_index][num_total_variables] - c) < 1e-6) { // class c
+						if (class_labels_index[rs_index] == c) { // class c
 							local_centers[c] += cached_variables_eval_matrix[prg[i].op][rs_index];
 							count_class_c++;
 						}
@@ -139,7 +155,7 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center_double_
 					}
 				}
 				else {// an operator
-					if (fabs((unsigned int)data[rs_index][num_total_variables] - c) < 1e-6) { // class c
+					if (fabs(class_labels_index[rs_index] - c) < 1e-6) { // class c
 						local_centers[c] += eval_matrix_double[i][rs_index];
 						count_class_c++;
 					}
@@ -178,7 +194,7 @@ void t_mep_chromosome::fitness_multi_class_classification_closest_center_double_
 				}// end an operator
 			} // end for c
 
-			if (fabs(data[rs_index][num_total_variables] - closest_class_index) > 1E-6)
+			if (class_labels_index[rs_index] != closest_class_index)
 				tmp_num_incorrectly_classified++;
 		}
 

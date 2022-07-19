@@ -116,7 +116,7 @@ void print_instruction_to_Basic(int op, unsigned int adr1, unsigned int adr2, un
 }
 //---------------------------------------------------------------------------
 char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
-	unsigned int problem_type, unsigned int error_measure, const char* libmep_version)
+	const char* libmep_version)
 {
 	setlocale(LC_NUMERIC, "C");
 
@@ -127,6 +127,18 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 	strcat(prog, "Function mepx(x As Range) As Double");
 	strcat(prog, "\n");
 
+	if (problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION){
+		// here print the class labels
+		strcat(prog, "\n");
+		sprintf(tmp_s, "  Dim class_labels(%u) as Integer\n", num_classes - 1);
+		strcat(prog, tmp_s);
+		for (unsigned int i = 0; i < num_classes; i++) {
+			sprintf(tmp_s, "  class_labels(%u) = %d\n", i, class_labels[i]);
+			strcat(prog, tmp_s);
+		}
+		strcat(prog, "\n");
+	}
+	
 
 	if (simplified) {
 		sprintf(tmp_s, "  Dim prg(%u) as Double\n", num_utilized_genes - 1);
@@ -167,7 +179,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			sprintf(tmp_s, "  If (prg(%u) <= %lf) Then\n   mepx = 0\n  Else\n    mepx = 1\n Endif\n", num_utilized_genes - 1, best_class_threshold);
+			sprintf(tmp_s, "  If (prg(%u) <= %lf) Then\n   mepx = %d\n  Else\n    mepx = %d\n Endif\n", num_utilized_genes - 1, best_class_threshold, class_labels[0], class_labels[1]);
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
@@ -198,7 +210,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 				strcat(prog, "      closest_class_index = c\n");
 				strcat(prog, "    Endif\n");
 				strcat(prog, "  Next\n");
-				strcat(prog, "  mepx = closest_class_index\n");
+				strcat(prog, "  mepx = class_labels(closest_class_index)\n");
 			}
 			else {
 				// should never be here
@@ -250,7 +262,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 			break;
 
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			sprintf(tmp_s, "  If (prg(%u) <= %lg) Then\n    mepx = 0\n  Else\n    mepx = 1\n  End If\n", index_best_genes[0], best_class_threshold);
+			sprintf(tmp_s, "  If (prg(%u) <= %lg) Then\n    mepx = %d\n  Else\n    mepx = %d\n  End If\n", index_best_genes[0], best_class_threshold, class_labels[0], class_labels[1]);
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
@@ -268,7 +280,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 				strcat(prog, "    If max_value < prg(i) Then\n      max_value = prg(i)\n      index_max_value = i\n    EndIf\n");
 				strcat(prog, "  Next\n");
 
-				sprintf(tmp_s, "  mepx = index_max_value Mod %u\n", num_classes);
+				sprintf(tmp_s, "  mepx = class_labels(index_max_value Mod %u)\n", num_classes);
 				strcat(prog, tmp_s);
 				break;
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
@@ -322,7 +334,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 				strcat(prog, "    Next\n");
 
 				strcat(prog, "  EndIf\n");
-				sprintf(tmp_s, "  mepx = class_index\n");
+				sprintf(tmp_s, "  mepx = class_labels(class_index)\n");
 				strcat(prog, tmp_s);
 				break;
 			case MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR:
@@ -352,7 +364,7 @@ char* t_mep_chromosome::to_Excel_VBA_function_double(bool simplified, double*,
 				strcat(prog, "      closest_class_index = c\n");
 				strcat(prog, "    Endif\n");
 				strcat(prog, "  Next\n");
-				strcat(prog, "  mepx = closest_class_index\n");
+				strcat(prog, "  mepx = class_labels(closest_class_index)\n");
 
 				break;
 			}

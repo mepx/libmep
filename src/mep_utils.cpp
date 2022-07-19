@@ -36,6 +36,12 @@ int my_strcmp(char *s1, char *s2)
 	return result;
 }
 //---------------------------------------------------------------------------
+int compare_int (const void * a, const void * b)
+{
+  return ( *(int*)a - *(int*)b );
+}
+//---------------------------------------------------------------------------
+
 void increase_string_capacity(char*& s_prg, size_t& capacity, size_t actual_length, size_t extra_length)
 {
 	if (actual_length + extra_length >= capacity) {

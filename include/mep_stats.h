@@ -38,7 +38,9 @@ public:
 	t_mep_run_statistics& operator=(const t_mep_run_statistics& source);
 
 	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure);
+	int from_xml(pugi::xml_node parent,
+				 unsigned int problem_type, unsigned int error_measure,
+				 unsigned int num_classes);
 
 };
 //-----------------------------------------------------------------
@@ -105,6 +107,7 @@ public:
 	// save statistics to csv file
 	int to_csv(const char* file_name, unsigned int problem_type)const;
 	int to_tex(const char* file_name, unsigned int problem_type)const;
+	int to_html(const char* file_name, unsigned int problem_type)const;
 
 	void sort_stats_by_running_time(bool ascending);
 	void sort_stats_by_training_error(bool ascending);
@@ -118,10 +121,12 @@ public:
 	void append(unsigned int num_generations);
 	void create(unsigned int _num_runs);
 
-	void compute_mean_stddev(bool compute_on_validation, bool compute_on_test, unsigned int problem_type);
+	void compute_mean_stddev(bool compute_on_validation, bool compute_on_test);
 
 	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure);
+	int from_xml(pugi::xml_node parent,
+				 unsigned int problem_type, unsigned int error_measure,
+				 unsigned int num_classes);
 };
 //-----------------------------------------------------------------
 #endif

@@ -7,6 +7,7 @@
 #define mep_utils_H
 //----------------------------------------------------------------
 #include <stddef.h>
+//----------------------------------------------------------------
 struct s_value_class{
 	double value;
 	int data_class;
@@ -14,7 +15,7 @@ struct s_value_class{
 //----------------------------------------------------------------
 int sort_function_value_class(const void *a, const void *b);
 //----------------------------------------------------------------
-
+int compare_int (const void * a, const void * b);
 int my_strcmp(char *s1, char *s2);
 void increase_string_capacity(char*& s_prg, size_t& capacity, size_t actual_length, size_t extra_length);
 void increase_string_capacity2(char*& s_prg, size_t& capacity, size_t extra_length);

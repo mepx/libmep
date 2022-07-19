@@ -24,7 +24,7 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_fixed
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_fixed_error_on_double_data(
-	double** data, unsigned int num_data, unsigned int output_col, double& error)
+	const t_mep_data& mep_data, double& error)
 {
 	error = 0;
 	//	double actual_output_double[1];
@@ -32,9 +32,14 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_fixed
 	unsigned int max_index;
 	unsigned int index_error_gene;
 	double max_value;
+
+	unsigned int num_data = mep_data.get_num_rows();
+	double** data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (get_first_max_index(data[k], max_index, max_value, index_error_gene, NULL)) {
-			if (fabs(max_index % num_classes - data[k][output_col]) > 1E-6)
+			if (fabs(max_index % num_classes - class_labels_index[k]) > 1E-6)
 				error++;
 		}
 		else
@@ -47,7 +52,7 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_fixed
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_error_on_double_data_return_error(
-	double** data, unsigned int num_data, unsigned int output_col,
+const t_mep_data& mep_data,
 	double& error, unsigned int& index_error_gene, double& _num_incorrectly_classified)
 {
 	// this function is the same for winner takes all fixed and smooth
@@ -57,9 +62,13 @@ bool t_mep_chromosome::compute_multi_class_classification_error_on_double_data_r
 	unsigned int max_index;
 	double max_value;
 
+	unsigned int num_data = mep_data.get_num_rows();
+	double** data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (get_first_max_index(data[k], max_index, max_value, index_error_gene, NULL)) {
-			if (fabs(max_index % num_classes - data[k][output_col]) > 1E-6)
+			if (fabs(max_index % num_classes - class_labels_index[k]) > 1E-6)
 				error++;
 		}
 		else {
@@ -87,8 +96,9 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_fixed
 	// evaluate a_chromosome
 	// partial results are stored and used later in other sub-expressions
 
-	double** data = mep_dataset.get_data_matrix_double();
+	//double** data = mep_dataset.get_data_matrix_double();
 	unsigned int num_rows = mep_dataset.get_num_rows();
+	unsigned int* class_labels_index = mep_dataset.get_class_label_index_as_array();
 
 	int* line_of_constants = NULL;
 	if (num_constants) {
@@ -130,7 +140,7 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_fixed
 					max_index = i;
 				}
 		}
-		if (max_index % num_classes != (unsigned int)data[rs_index][num_total_variables])
+		if (max_index % num_classes != class_labels_index[rs_index])
 			num_incorrectly_classified++;
 	}
 

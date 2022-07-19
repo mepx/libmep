@@ -116,7 +116,7 @@ void print_instruction_to_Python(int op, unsigned int adr1, unsigned int adr2, u
 }
 //---------------------------------------------------------------------------------
 char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
-	unsigned int problem_type, unsigned int error_measure, const char* libmep_version)
+	const char* libmep_version)
 {
 	setlocale(LC_NUMERIC, "C");
 
@@ -132,6 +132,21 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 	strcat(prog, "import math\n");
 	strcat(prog, "def mepx(x, outputs):");
 	strcat(prog, "\n");
+	
+	if (problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION){
+		// here print the class labels
+		strcat(prog, "\n");
+		sprintf(tmp_s, "  class_labels = [");
+		strcat(prog, tmp_s);
+		for (unsigned int i = 0; i < num_classes; i++) {
+			sprintf(tmp_s, "%d", class_labels[i]);
+			strcat(prog, tmp_s);
+			if (i < num_classes - 1)
+				strcat(prog, ", ");
+		}
+		strcat(prog, "]\n");
+		strcat(prog, "\n");
+	}
 
 	if (simplified) {
 		
@@ -168,19 +183,19 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			sprintf(tmp_s, "  if prg[%u] <= %lf:\n    outputs[0] = 0\n  else:\n    outputs[0] = 1", num_utilized_genes - 1, best_class_threshold);
+			sprintf(tmp_s, "  if prg[%u] <= %lf:\n    outputs[0] = %d\n  else:\n    outputs[0] = %d", num_utilized_genes - 1, best_class_threshold, class_labels[0], class_labels[1]);
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
 			if (error_measure == MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR) {
 				strcat(prog, "  centers = [\n");
-				for (unsigned int c = 0; c < num_classes - 1; c++) {
-					sprintf(tmp_s, "  %lf,\n", centers[c]);
+				for (unsigned int c = 0; c < num_classes; c++) {
+					sprintf(tmp_s, "%lf", centers[c]);
 					strcat(prog, tmp_s);
+					if (c < num_classes - 1)
+						strcat(prog, ", ");
 				}
-				sprintf(tmp_s, "  %lf\n", centers[num_classes - 1]);
-				strcat(prog, tmp_s); 
-				strcat(prog, "  ]\n");
+				strcat(prog, "]\n");
 				
 				sprintf(tmp_s, "  min_dist = abs(prg[%u] - centers[0])\n", num_utilized_genes - 1);
 				strcat(prog, tmp_s);
@@ -197,15 +212,13 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 
 				strcat(prog, "      closest_class_index = c\n");
 
-				strcat(prog, "  outputs[0] = closest_class_index\n");
+				strcat(prog, "  outputs[0] = class_labels[closest_class_index]\n");
 			}
 			else {
 				// should never be here
 			}
 			break;
 		}
-
-
 	}
 	else {// not simplified
 		sprintf(tmp_s, "  prg = [0] * %u\n", code_length);
@@ -243,7 +256,7 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 			break;
 
 		case MEP_PROBLEM_BINARY_CLASSIFICATION:
-			sprintf(tmp_s, "  if prg[%u] <= %lg:\n    outputs[0] = 0\n  else:\n    outputs[0] = 1", index_best_genes[0], best_class_threshold);
+			sprintf(tmp_s, "  if prg[%u] <= %lg:\n    outputs[0] = %d\n  else:\n    outputs[0] = %d", index_best_genes[0], best_class_threshold, class_labels[0], class_labels[1]);
 			strcat(prog, tmp_s);
 			break;
 		case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
@@ -260,7 +273,7 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 
 				strcat(prog, "    if max_value < prg[i]:\n      max_value = prg[i]\n      index_max_value = i\n    \n");
 
-				sprintf(tmp_s, "  outputs[0] = index_max_value %% %u\n", num_classes);
+				sprintf(tmp_s, "  outputs[0] = class_labels[index_max_value %% %u]\n", num_classes);
 				strcat(prog, tmp_s);
 				break;
 			case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
@@ -268,14 +281,15 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 				sprintf(tmp_s, "# index of genes holding the output for each class\n");
 				strcat(prog, tmp_s);
 
-				sprintf(tmp_s, "  index_best_genes = [\n");
+				sprintf(tmp_s, "  index_best_genes = [");
 				strcat(prog, tmp_s);
-				for (unsigned int c = 0; c < num_classes - 1; c++) {
-					sprintf(tmp_s, "  %u,\n", index_best_genes[c]);
+				for (unsigned int c = 0; c < num_classes; c++) {
+					sprintf(tmp_s, "%u\n", index_best_genes[c]);
 					strcat(prog, tmp_s);
+					if (c < num_classes - 1)
+						strcat(prog, ", ");
 				}
-				sprintf(tmp_s, "  %u\n", index_best_genes[num_classes - 1]); // last one
-				strcat(prog, tmp_s);
+				
 				strcat(prog, "]\n");
 
 				sprintf(tmp_s, "# find maximal value\n");
@@ -313,20 +327,21 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 
 				strcat(prog, "        class_index = c\n");
 
-				sprintf(tmp_s, "  outputs[0] = class_index\n");
+				sprintf(tmp_s, "  outputs[0] = class_labels[class_index]\n");
 				strcat(prog, tmp_s);
 				break;
 
 			case MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR:
-				sprintf(tmp_s, "  centers = [\n");
+				sprintf(tmp_s, "  centers = [");
 				strcat(prog, tmp_s);
-				for (unsigned int c = 0; c < num_classes - 1; c++) {
-					sprintf(tmp_s, "  %lf,\n", centers[c]);
+				for (unsigned int c = 0; c < num_classes; c++) {
+					sprintf(tmp_s, "%lf", centers[c]);
 					strcat(prog, tmp_s);
+					if (c < num_classes - 1)
+						strcat(prog, ", ");
 				}
-				sprintf(tmp_s, "  %lf\n", centers[num_classes - 1]);
-				strcat(prog, tmp_s);
-				strcat(prog, "  ]\n");
+				
+				strcat(prog, "]\n");
 
 				sprintf(tmp_s, "  min_dist = abs(prg[%u] - centers[0])\n", index_best_genes[0]);
 				strcat(prog, tmp_s);
@@ -342,7 +357,7 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 				strcat(prog, tmp_s);
 
 				strcat(prog, "      closest_class_index = c\n");
-				strcat(prog, "  outputs[0] = closest_class_index\n");
+				strcat(prog, "  outputs[0] = class_labels[closest_class_index]\n");
 				break;
 			}// end switch error_measure
 			break;
@@ -379,7 +394,7 @@ char* t_mep_chromosome::to_Python_double(bool simplified, double* data,
 		break;
 	case MEP_PROBLEM_BINARY_CLASSIFICATION:
 	case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
-		strcat(prog, "print(\"class index = \", int(outputs[0]))\n");
+		strcat(prog, "print(\"class = \", int(outputs[0]))\n");
 		break;
 	}
 

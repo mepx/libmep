@@ -10,7 +10,7 @@
 #include <regex>
 
 #ifdef _WIN32
-#include <windows.h>
+	#include <windows.h>
 #endif // WIN32
 
 #include "mep_data.h"
@@ -57,6 +57,15 @@ void t_mep_data::delete_data(void)
 {
 	delete_double_data();
 	delete_string_data();
+	if (class_index_of_output_col) {
+		delete[] class_index_of_output_col;
+        class_index_of_output_col = NULL;
+	}
+	
+	if (class_labels){
+		delete[] class_labels;
+		class_labels = NULL;
+	}
 }
 //-----------------------------------------------------------------
 void t_mep_data::clear_data(void)
@@ -90,13 +99,18 @@ void t_mep_data::init(void)
 
 	_modified = false;
 	num_class_0 = 0;
+    class_index_of_output_col = NULL;
+	class_labels = NULL;
 }
 //-----------------------------------------------------------------
-void t_mep_data::count_0_class(unsigned int target_col)
+void t_mep_data::count_0_class(void)
 {
 	num_class_0 = 0;
+	if (!class_index_of_output_col)
+		return;
+
 	for (unsigned int i = 0; i < num_data; i++)
-		if (fabs(_data_double[i][target_col]) < 1e-6)
+		if (class_index_of_output_col[i] == 0)
 			num_class_0++;
 }
 //-----------------------------------------------------------------
@@ -352,7 +366,8 @@ int t_mep_data::to_numeric(t_mep_data *other_data1, t_mep_data* other_data2, cha
 	}
 }
 //-----------------------------------------------------------------
-int t_mep_data::to_interval_selected_col(double min, double max, unsigned int col, t_mep_data *other_data1, t_mep_data* other_data2)
+int t_mep_data::to_interval_selected_col(double min, double max, unsigned int col, 
+	t_mep_data *other_data1, t_mep_data* other_data2)
 {
 	if (num_data || other_data1 && other_data1->num_data || other_data2 && other_data2->num_data) {
 		if (data_type != MEP_DATA_DOUBLE || other_data1 && other_data1->num_data && other_data1->data_type != MEP_DATA_DOUBLE || other_data2 && other_data2->num_data && other_data2->data_type != MEP_DATA_DOUBLE) // string
@@ -448,7 +463,8 @@ int t_mep_data::to_interval_selected_col(double min, double max, unsigned int co
 
 }
 //-----------------------------------------------------------------
-int t_mep_data::to_interval_everywhere(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
+int t_mep_data::to_interval_everywhere(double min, double max, 
+	t_mep_data *other_data1, t_mep_data* other_data2)
 {
 	int result = to_interval_all_variables(min, max, other_data1, other_data2);
 	if (result != MEP_OK)
@@ -458,7 +474,8 @@ int t_mep_data::to_interval_everywhere(double min, double max, t_mep_data *other
 	return MEP_OK;
 }
 //-----------------------------------------------------------------
-int t_mep_data::to_interval_all_variables(double min, double max, t_mep_data *other_data1, t_mep_data* other_data2)
+int t_mep_data::to_interval_all_variables(double min, double max, 
+	t_mep_data *other_data1, t_mep_data* other_data2)
 {
 	for (unsigned int v = 0; v < num_cols - 1; v++) {
 		int result = to_interval_selected_col(min, max, v, other_data1, other_data2);
@@ -738,99 +755,58 @@ void t_mep_data::shuffle(t_seed &seed)
 	_modified = true;
 }
 //-----------------------------------------------------------------
+bool t_mep_data::are_all_output_int(void)const
+{
+	for (unsigned int i = 0; i < num_data; i++) {
+		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)
+			// all must be int
+			return false;
+	}
+    return true;
+}
+//-----------------------------------------------------------------
 bool t_mep_data::is_binary_classification_problem(void)const
 {
+	// call compute_class_labels first!!!
 	if (num_cols < 2)
 		return false;
-	bool zero_class_exists = false;
-	bool one_class_exists = false;
 
-	for (unsigned int i = 0; i < num_data; i++) {
-		if (fabs(_data_double[i][num_cols - 1]) > 1E-6 ||
-			fabs(_data_double[i][num_cols - 1] - 1.0) > 1E-6)
-			return false;
-
-		if (fabs(_data_double[i][num_cols - 1]) < 1E-6)
-			zero_class_exists = true;
-		if (fabs(_data_double[i][num_cols - 1] - 1.0) < 1E-6)
-			one_class_exists = true;
-	}
-
-	if (!zero_class_exists || !one_class_exists)
+	if (num_classes != 2)
 		return false;
+
 	return true;
 }
 //-----------------------------------------------------------------
 bool t_mep_data::is_multi_class_classification_problem(void)const
 {
+	// call compute_class_labels first!!!
 	if (num_cols < 2)
 		return false;
-	// compute max value
-	unsigned int tmp_num_classes;
-	if (num_outputs && num_data) {
-		unsigned int max_value = (unsigned int)_data_double[0][num_cols - 1];
-		for (unsigned int i = 1; i < num_data; i++)
-			if (max_value < _data_double[i][num_cols - 1])
-				max_value = (unsigned int)_data_double[i][num_cols - 1];
-		tmp_num_classes = max_value + 1;
-	}
-	else
-		tmp_num_classes = 0;
 
-	if (tmp_num_classes < 2)
+	if (num_classes < 2)
 		return false;
-	// test if all possitive and integer
-	for (unsigned int i = 0; i < num_data; i++) {
-		if (_data_double[i][num_cols - 1] < 0) // all must be greater than 0
-			return false;
-		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)// all must be int
-			return false;
-	}
 
-	// lets mark all classes to see if all appears
-	bool *marked = new bool[tmp_num_classes];
-	for (unsigned int c = 0; c < tmp_num_classes; c++)
-		marked[c] = false;
-	for (unsigned int i = 0; i < num_data; i++)
-		marked[(int)_data_double[i][num_cols - 1]] = true;
-	for (unsigned int c = 0; c < tmp_num_classes; c++)
-		if (!marked[c]) {
-			delete[] marked;
-			return false;// a class does not appear
-		}
-
-	delete[] marked;
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::is_multi_class_classification_problem_within_range(unsigned int max_class_index)const
+bool t_mep_data::is_multi_class_classification_problem_within_class_labels(
+	int *training_class_labels, unsigned long num_labels) const
 {
 	if (num_cols < 2)
 		return false;
-	// compute max value
-	unsigned int tmp_num_classes;
-	if (num_outputs && num_data) {
-		unsigned int max_value = (unsigned int)_data_double[0][num_cols - 1];
-		for (unsigned int i = 1; i < num_data; i++)
-			if (max_value < _data_double[i][num_cols - 1])
-				max_value = (unsigned int)_data_double[i][num_cols - 1];
-		tmp_num_classes = max_value + 1;
-	}
-	else
-		tmp_num_classes = 0;
 
-	if (tmp_num_classes < 2)
-		return false;
-	// test if all possitive and integer
 	for (unsigned int i = 0; i < num_data; i++) {
-		if (_data_double[i][num_cols - 1] < 0) // all must be greater than 0
-			return false;
-		if (fabs(_data_double[i][num_cols - 1] - (int)_data_double[i][num_cols - 1]) > 1E-6)// all must be int
-			return false;
+		bool found = false;
+		for (unsigned long j = 0; j < num_labels; j++) {
+			if ((int)_data_double[i][num_cols - 1] == training_class_labels[j]) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			return false; // some data has another target different from existing class labels
+		}
 	}
-
-	if (tmp_num_classes - 1 > max_class_index)
-		return false;
 
 	return true;
 }
@@ -902,94 +878,20 @@ void t_mep_data::to_one_of_m_multi_class_classification_problem(unsigned int pre
 	num_outputs = 1;
 }
 //-----------------------------------------------------------------
-unsigned int t_mep_data::get_num_rows(void)const
-{
-	return num_data;
-}
-//-----------------------------------------------------------------
-unsigned int t_mep_data::get_num_cols(void)const
-{
-	return num_cols;
-}
-//-----------------------------------------------------------------
-unsigned int t_mep_data::get_data_type(void)const
-{
-	return data_type;
-}
-//-----------------------------------------------------------------
-double* t_mep_data::get_row_as_double(unsigned int row)const
-{
-	return _data_double[row];
-}
-//-----------------------------------------------------------------
-long long* t_mep_data::get_row_as_long_long(unsigned int row)const
-{
-	return _data_long_long[row];
-}
-//-----------------------------------------------------------------
-double t_mep_data::get_value_double(unsigned int row, unsigned int col)const
-{
-	return _data_double[row][col];
-}
-//-----------------------------------------------------------------
-long long t_mep_data::get_value_long_long(unsigned int row, unsigned int col)const
-{
-	return _data_long_long[row][col];
-}
-//-----------------------------------------------------------------
-char* t_mep_data::get_value_string(unsigned int row, unsigned int col)const
-{
-	return _data_string[row][col];
-}
-//-----------------------------------------------------------------
 bool t_mep_data::is_modified(void)const
 {
 	return _modified;
 }
 //-----------------------------------------------------------------
-unsigned int t_mep_data::get_num_outputs(void)const
-{
-	return num_outputs;
-}
-//-----------------------------------------------------------------
-double** t_mep_data::get_data_matrix_double(void) const
-{
-	return _data_double;
-}
-//-----------------------------------------------------------------
-long long** t_mep_data::get_data_matrix_long_long(void) const
-{
-	return _data_long_long;
-}
-//-----------------------------------------------------------------
-unsigned int t_mep_data::get_num_items_class_0(void)const
-{
-	return num_class_0;
-}
-//-----------------------------------------------------------------
-char*** t_mep_data::get_data_matrix_string(void)const
-{
-	return _data_string;
-}
-//-----------------------------------------------------------------
-void t_mep_data::set_num_outputs(unsigned int new_num)
-{
-	num_outputs = new_num;
-}
-//-----------------------------------------------------------------
-unsigned int t_mep_data::get_num_classes(void)const
-{
-	return num_classes;
-}
-//-----------------------------------------------------------------
-void t_mep_data::count_num_classes(unsigned int target_col)
+/*
+void t_mep_data::count_num_classes(int * training_class_labels)
 {
 	if (data_type == MEP_DATA_DOUBLE) {
 		if (num_outputs && num_data) {
-			unsigned int max_value = (unsigned int)_data_double[0][target_col];
+			unsigned int max_value = (unsigned int)_data_double[0][num_cols - 1];
 			for (unsigned int i = 1; i < num_data; i++)
-				if (max_value < _data_double[i][target_col])
-					max_value = (unsigned int)_data_double[i][target_col];
+				if (max_value < _data_double[i][num_cols - 1])
+					max_value = (unsigned int)_data_double[i][num_cols - 1];
 			num_classes = max_value + 1;
 		}
 		else
@@ -998,6 +900,7 @@ void t_mep_data::count_num_classes(unsigned int target_col)
 	else
 		num_classes = 0;
 }
+*/
 //-----------------------------------------------------------------
 void t_mep_data::add_string_data(unsigned int row, unsigned int col, const char* data)
 {
@@ -1242,5 +1145,96 @@ bool t_mep_data::compute_min_max_of_target(double& min_target, double& max_targe
 			max_target = _data_double[0][num_cols - 1];
 	}
 	return true;
+}
+//-----------------------------------------------------------------
+void t_mep_data::compute_class_labels(void)
+{
+    // this is for training data only
+    // for all others use the next function
+	if (class_labels) {
+		delete[] class_labels;
+		class_labels = NULL;
+	}
+    
+    if (class_index_of_output_col){
+        delete[] class_index_of_output_col;
+        class_index_of_output_col = NULL;
+    }
+
+	if (data_type == MEP_DATA_DOUBLE) {
+		// count num classes first
+
+		num_classes = 0;
+		if (num_outputs && num_data) {
+			class_labels = new int[num_data]; // I allocate more memory than required because I do not know yet how many classes are there
+			// get the list of labels
+			for (unsigned int i = 0; i < num_data; i++) {
+				bool found = false;
+				for (unsigned int j = 0; j < num_classes; j++)
+					if ((int)_data_double[i][num_cols - 1] == class_labels[j]) {
+						found = true;
+						break;
+					}
+				if (!found) {
+					class_labels[num_classes] = (int)_data_double[i][num_cols - 1];
+					num_classes++;
+				}
+			}
+			// now I sort the class labels
+			qsort(class_labels, num_classes, sizeof(int), compare_int);
+			// and I assign an index of a label to each
+			class_index_of_output_col = new unsigned int[num_data];
+			for (unsigned int i = 0; i < num_data; i++) {
+				bool found = false;
+				unsigned int j;
+				for (j = 0; j < num_classes; j++)
+					if ((int)_data_double[i][num_cols - 1] == class_labels[j]) {
+						found = true;
+						break;
+					}
+				if (found) {
+					class_index_of_output_col[i] = j;
+				}
+			}
+		}
+		else
+			num_classes = 0;
+	}
+	else
+		num_classes = 0;
+
+}
+//-----------------------------------------------------------------
+int* t_mep_data::get_class_labels_ptr(void)
+{
+	return class_labels;
+}
+//-----------------------------------------------------------------
+void t_mep_data::assign_class_index_from_training_class_labels(
+    int* training_class_labels, unsigned int training_num_classes)
+{
+    if (class_index_of_output_col){
+        delete[] class_index_of_output_col;
+        class_index_of_output_col = NULL;
+    }
+    
+    if (num_data && training_num_classes)
+        class_index_of_output_col = new unsigned int[num_data];
+	num_classes = 0;
+    for (unsigned int i = 0; i < num_data; i++) {
+        bool found = false;
+        for (unsigned int j = 0; j < training_num_classes; j++)
+            if (training_class_labels[j] ==
+                (int)_data_double[i][num_cols - 1]) {
+                found = true;
+				class_index_of_output_col[i] = j;
+                break;
+            }
+        if (found) {
+            num_classes++;
+        }
+        else
+            class_index_of_output_col[i] = training_num_classes;// assign the highest class index plus one
+    }
 }
 //-----------------------------------------------------------------

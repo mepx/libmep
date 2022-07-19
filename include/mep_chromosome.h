@@ -41,13 +41,18 @@ private:
 	unsigned int num_classes;
 	//int *class_index;
 	double* centers;						// center for each class;
+	
+	unsigned int problem_type;
+	unsigned int error_measure;
+	
+	int *class_labels;
 
 	void mark(unsigned int position, bool* marked);
-	void compute_eval_matrix_double(unsigned int num_training_data, double **cached_eval_matrix_double, 
+	void compute_eval_matrix_double(unsigned int num_training_data,
+									double **cached_eval_matrix_double,
 		unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
 		int *line_of_constants, double ** eval_double, t_seed& seed);
 	
-
 	void fitness_regression_double_cache_all_training_data(const t_mep_data &mep_dataset, 
 		unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
 			double** cached_eval_matrix, double * cached_sum_of_errors, 
@@ -77,21 +82,23 @@ private:
 		unsigned int *random_subset_indexes, unsigned int random_subset_selection_size,
 				double **cached_variables_eval_matrix, 
 		unsigned int num_actual_variables, unsigned int * actual_enabled_variables,
-				double **eval_matrix_double, t_seed& seed);
+				double **eval_matrix_double,
+		t_seed& seed);
 
 	void fitness_multi_class_classification_winner_takes_all_dynamic_double_cache_all_training_data(
 				const t_mep_data &mep_dataset, unsigned int *random_subset_indexes, unsigned int random_subset_selection_size,
 				double **cached_eval_matrix,
 		unsigned int num_actual_variables, unsigned int * actual_enabled_variables,
-				double **eval_matrix_double, t_seed &seed);
-
+				double **eval_matrix_double,
+		t_seed &seed);
 
 	void fitness_multi_class_classification_closest_center_double_cache_all_training_data(
 		const t_mep_data& mep_dataset,
 		unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
 		double** cached_variables_eval_matrix,
 		unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
-		double** eval_matrix_double, t_seed& seed);
+		double** eval_matrix_double,
+		t_seed& seed);
 public:
 
 	// constructor
@@ -100,8 +107,12 @@ public:
 	// destructor - deletes memory
 	~t_mep_chromosome();
 
-	void allocate_memory(unsigned int code_length, unsigned int num_total_vars, bool use_constants,
-		const t_mep_constants* constants, unsigned int num_outputs, unsigned int num_classes);
+	void allocate_memory(unsigned int code_length, unsigned int num_total_vars,
+						 bool use_constants,
+						 const t_mep_constants* constants,
+						 unsigned int num_outputs, unsigned int num_classes,
+						 unsigned int problem_type, unsigned int error_measure,
+						 const int* training_class_labels);
 
 	t_mep_chromosome& operator=(const t_mep_chromosome& source);
 	void swap_pointers(t_mep_chromosome& source);
@@ -113,17 +124,17 @@ public:
 	// set the operator inside a gene
 	void set_gene_operation(unsigned int gene_index, int new_operation);
 
-
 	// converts the MEP program into a C program
 	// a row of data is also required because the main C program will also contain an example on how to run the obtained program
-	char * to_C_double(bool simplified, double *data, 
-				unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
-	char* to_Excel_VBA_function_double(bool simplified, double* data, 
-				unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
+	char * to_C_double(bool simplified, double *data,
+				const char* libmep_version);
+	char* to_Excel_VBA_function_double(bool simplified, double* data,
+				const char* libmep_version);
 	char* to_Python_double(bool simplified, double* data,
-		unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
+		const char* libmep_version);
 
-	char* to_C_infix_double(double* data, unsigned int problem_type, unsigned int error_measure, const char* libmep_version);
+	char* to_C_infix_double(double* data, 
+		 const char* libmep_version);
 	void code_to_infix_C(unsigned int mep_index, char* &tmp_s, size_t& capacity);
 
 	double get_fitness(void);
@@ -148,7 +159,7 @@ public:
 		double** cached_eval_matrix, double* cached_sum_of_errors, 
 		double* cached_threashold, s_value_class* tmp_value_class,
 		unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
-		double**, unsigned int problem_type, unsigned int error_measure, 
+		double**,
 		t_seed& seed);
 
 	void fitness_regression(const t_mep_data &mep_dataset, 
@@ -161,45 +172,44 @@ public:
 			unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
 			double **cached_eval_matrix, double * cached_sum_of_errors, double * cached_threashold, 
 		unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
-		double **eval_matrix_double, s_value_class *tmp_value_class, t_seed &seed);
+		double **eval_matrix_double, s_value_class *tmp_value_class, 
+		t_seed &seed);
 
 	void fitness_multi_class_classification_smooth(const t_mep_data &mep_dataset, 
 		unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
 		double **cached_eval_matrix, unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
-		double **eval_matrix_double, t_seed &seed);
+		double **eval_matrix_double, 
+		t_seed &seed);
 
 	void fitness_multi_class_classification_winner_takes_all_fixed(const t_mep_data &mep_dataset, 
 			unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
 			double **cached_eval_matrix, unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
-			double **eval_matrix_double, t_seed &seed);
+			double **eval_matrix_double, 
+		 t_seed &seed);
 
 	void fitness_multi_class_classification_winner_takes_all_dynamic(const t_mep_data &mep_dataset, 
 		unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
 			double **cached_eval_matrix, unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
-		double **eval_matrix_double, t_seed &seed);
+		double **eval_matrix_double, 
+		t_seed &seed);
 
-	bool compute_binary_classification_error_on_double_data_return_error(double **inputs, 
-		unsigned int num_data, unsigned int output_col, double &error, unsigned int &index_error_gene);
+	bool compute_binary_classification_error_on_double_data_return_error(
+		const t_mep_data& mep_data, double &error, unsigned int &index_error_gene);
 
-	bool compute_binary_classification_error_on_double_data(double **data, unsigned int num_data, 
-				unsigned int output_col, double &error);
+	bool compute_binary_classification_error_on_double_data(
+                const t_mep_data &mep_data, double &error);
 	
-	bool compute_multi_class_classification_error_on_double_data_return_error(double **inputs, 
-		unsigned int num_data, unsigned int output_col,
+	bool compute_multi_class_classification_error_on_double_data_return_error(const t_mep_data &mep_data,
 		double &error, unsigned int &index_error_gene, double &num_incorrectly_classified);
 		
-	bool compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data_return_error(double **data, 
-		unsigned int num_data, unsigned int output_col, 
+	bool compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data_return_error(const t_mep_data &mep_data,
 		double &error, unsigned int &index_error_gene, double &_num_incorrectly_classified);
 
-	bool compute_multi_class_classification_winner_takes_all_fixed_error_on_double_data(double **data, 
-		unsigned int num_data, unsigned int output_col, double &error);
+	bool compute_multi_class_classification_winner_takes_all_fixed_error_on_double_data(const t_mep_data &mep_data, double &error);
 
-	bool compute_multi_class_classification_smooth_error_on_double_data(double **data, 
-		unsigned int num_data, unsigned int output_col,double &error);
+	bool compute_multi_class_classification_smooth_error_on_double_data(const t_mep_data &mep_data, double &error);
 
-	bool compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data(double **data, 
-		unsigned int num_data, unsigned int output_col, double &error);
+	bool compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data(const t_mep_data &mep_data, double &error);
 
 	bool compute_regression_error_on_double_data_return_error(double **inputs, 
 			unsigned int num_data, unsigned int output_col, 
@@ -229,10 +239,11 @@ public:
 		double* output, char* valid_data);
 
 	bool compute_multi_class_classification_closest_center_error_on_double_data_return_error(
-		double** data, unsigned int num_data, unsigned int output_col,
+		const t_mep_data &mep_data,
 		double& error, unsigned int& index_error_gene, double& _num_incorrectly_classified);
+	
 	bool compute_multi_class_classification_closest_center_error_on_double_data(
-		double** data, unsigned int num_data, unsigned int output_col, double& error);
+const t_mep_data &mep_data, double& error);
 
 	void fitness_multi_class_classification_closest_center(
 		const t_mep_data& mep_dataset,
@@ -248,7 +259,7 @@ public:
 							double* values_for_output_genes);
 	bool get_error_double(double *inputs, double *outputs);
 
-	unsigned int get_closest_class_index(double program_output);
+	unsigned int get_closest_class_index_from_center(double program_output);
 
 	void simplify(void);
 
@@ -259,8 +270,15 @@ public:
 
 	bool get_class_index_for_winner_takes_all_dynamic(double* inputs, unsigned int& class_index);
 
-	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent);
+	void to_xml_node(pugi::xml_node parent);
+	int from_xml_node(pugi::xml_node parent,
+				 unsigned int _problem_type,
+						  unsigned int _error_measure,
+						  unsigned int _training_num_classes);
+	
+	unsigned int get_problem_type(void);
+	
+	int get_class_label(unsigned int class_index);
 };
 //-----------------------------------------------------------------
 #endif

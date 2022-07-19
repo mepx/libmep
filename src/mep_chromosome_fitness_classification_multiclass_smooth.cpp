@@ -25,16 +25,21 @@ void t_mep_chromosome::fitness_multi_class_classification_smooth(
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_smooth_error_on_double_data(
-	double** data, unsigned int num_data, unsigned int output_col, double& error)
+	const t_mep_data& mep_data, double& error)
 {
 	error = 0;
 
 	unsigned int max_index;
 	unsigned int index_error_gene;
 	double max_value;
+
+	unsigned int num_data = mep_data.get_num_rows();
+	double** data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (get_first_max_index(data[k], max_index, max_value, index_error_gene, NULL)) {
-			if (fabs(max_index % num_classes - data[k][output_col]) > 1E-6)
+			if (max_index % num_classes != class_labels_index[k])
 				error++;
 		}
 		else
@@ -56,9 +61,10 @@ void t_mep_chromosome::fitness_multi_class_classification_smooth_double_cache_al
 	// evaluate a_chromosome
 	// partial results are stored and used later in other sub-expressions
 
-	double** data = mep_dataset.get_data_matrix_double();
+	//double** data = mep_dataset.get_data_matrix_double();
 	unsigned int num_rows = mep_dataset.get_num_rows();
-
+	unsigned int* class_labels_index = mep_dataset.get_class_label_index_as_array();
+	
 	int* line_of_constants = NULL;
 	if (num_constants) {
 		line_of_constants = new int[num_constants];// line where a constant was firstly computed
@@ -172,7 +178,7 @@ void t_mep_chromosome::fitness_multi_class_classification_smooth_double_cache_al
 			errno = 0;
 		}
 
-		unsigned int target = (unsigned int)data[rs_index][num_total_variables];
+		unsigned int target = class_labels_index[rs_index];
 
 		for (unsigned int i = 0; i < target; i++)
 			if (max_value_per_class[i] >= max_value_per_class[target])
@@ -196,7 +202,7 @@ void t_mep_chromosome::fitness_multi_class_classification_smooth_double_cache_al
 			for (unsigned int i = target + 1; i < num_classes; i++)
 				fitness += max_value_per_class[i];
 		}
-		if (max_index % num_classes != (unsigned int)data[rs_index][num_total_variables])
+		if (max_index % num_classes != class_labels_index[rs_index])
 			num_incorrectly_classified++;
 	}
 

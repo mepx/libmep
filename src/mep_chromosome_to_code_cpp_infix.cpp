@@ -11,7 +11,8 @@
 #include "mep_chromosome.h"
 #include "mep_functions.h"
 //---------------------------------------------------------------------------------
-char* t_mep_chromosome::to_C_infix_double(double* data, unsigned int problem_type, unsigned int error_measure, const char* libmep_version)
+char* t_mep_chromosome::to_C_infix_double(
+    double* data, const char* libmep_version)
 {
 	setlocale(LC_NUMERIC, "C");
 
@@ -28,7 +29,20 @@ char* t_mep_chromosome::to_C_infix_double(double* data, unsigned int problem_typ
 	strcat(prog, "{");
 	strcat(prog, "\n");
 
-	// here I have to declare the constants
+	if (problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION){
+		// here print the class labels
+		strcat(prog, "\n");
+		sprintf(tmp_s, "  int class_labels[%d] = {", num_classes);
+		strcat(prog, tmp_s);
+		for (unsigned int i = 0; i < num_classes; i++) {
+			sprintf(tmp_s, "%d", class_labels[i]);
+			strcat(prog, tmp_s);
+			if (i < num_classes - 1)
+				strcat(prog, ", ");
+		}
+		strcat(prog, "};\n");
+		strcat(prog, "\n");
+	}
 
 	size_t string_capacity = 1000;
 
@@ -47,7 +61,7 @@ char* t_mep_chromosome::to_C_infix_double(double* data, unsigned int problem_typ
 		code_to_infix_C(index_best_genes[0], prog, string_capacity);
 		increase_string_capacity2(prog, string_capacity, 100);
 		strcat(prog, ";\n");
-		sprintf(tmp_s, "  if (result <= %lg)\n    outputs[0] = 0;\n  else\n    outputs[0] = 1;", best_class_threshold);
+		sprintf(tmp_s, "  if (result <= %lg)\n    outputs[0] = %d;\n  else\n    outputs[0] = %d;", best_class_threshold, class_labels[0], class_labels[1]);
 		strcat(prog, tmp_s);
 		break;
 	case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
@@ -55,7 +69,7 @@ char* t_mep_chromosome::to_C_infix_double(double* data, unsigned int problem_typ
 		case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR:
 		case MEP_MULTICLASS_CLASSIFICATION_SMOOTH_ERROR:
 		case MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_DYNAMIC_ERROR:
-			strcat(prog, "// No code generated for this case! Use the three address code for this strategy!\n");
+			strcat(prog, "// Currently there is no code generated for this case! Use the standard C++ code for this strategy.\n");
 			break;
 
 		case MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR:
@@ -90,7 +104,7 @@ char* t_mep_chromosome::to_C_infix_double(double* data, unsigned int problem_typ
 
 			strcat(prog, "      closest_class_index = c;\n");
 			strcat(prog, "    }\n");
-			strcat(prog, "  outputs[0] = closest_class_index;\n");
+			strcat(prog, "  outputs[0] = class_labels[closest_class_index];\n");
 			break;
 		}// end switch error_measure
 		break;
@@ -128,7 +142,7 @@ char* t_mep_chromosome::to_C_infix_double(double* data, unsigned int problem_typ
 		break;
 	case MEP_PROBLEM_BINARY_CLASSIFICATION:
 	case MEP_PROBLEM_MULTICLASS_CLASSIFICATION:
-		strcat(prog, "  printf(\"class index = %d\", (unsigned int)outputs[0]);\n");
+		strcat(prog, "  printf(\"class index = %d\", (int)outputs[0]);\n");
 		break;
 	}
 

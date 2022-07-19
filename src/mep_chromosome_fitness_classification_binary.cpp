@@ -15,13 +15,15 @@ void t_mep_chromosome::fitness_binary_classification(const t_mep_data& mep_datas
 	unsigned int random_subset_selection_size,
 	double** cached_variables_eval_matrix, double* cached_sum_of_errors, double* cached_threashold,
 	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
-	double** eval_matrix_double, s_value_class* tmp_value_class, t_seed& seed)
+	double** eval_matrix_double, s_value_class* tmp_value_class,
+	t_seed& seed)
 {
 	fitness_binary_classification_double_cache_all_training_data(mep_dataset,
 		random_subset_indexes, random_subset_selection_size,
 		cached_variables_eval_matrix, cached_sum_of_errors, cached_threashold,
 		num_actual_variables, actual_enabled_variables,
-		eval_matrix_double, tmp_value_class, seed);
+		eval_matrix_double, 
+		tmp_value_class, seed);
 }
 //---------------------------------------------------------------------------
 void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_data(
@@ -30,13 +32,15 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 	double** cached_variables_eval_matrix, double* cached_sum_of_errors,
 	double* cached_threashold,
 	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
-	double** eval_matrix_double, s_value_class* tmp_value_class, t_seed& seed)
+	double** eval_matrix_double, s_value_class* tmp_value_class,
+	t_seed& seed)
 {
 
 	// evaluate a_chromosome
 	// partial results are stored and used later in other sub-expressions
 
-	double** data = mep_dataset.get_data_matrix_double();
+	//double** data = mep_dataset.get_data_matrix_double();
+	unsigned int *class_index = mep_dataset.get_class_label_index_as_array();
 	unsigned int num_rows = mep_dataset.get_num_rows();
 
 	fitness = DBL_MAX;
@@ -56,7 +60,7 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 	double best_threshold;
 	for (unsigned int i = 0; i < code_length; i++) {   // read the t_mep_chromosome from top to down
 		double sum_of_errors;
-		if (prg[i].op >= 0)// a vairable
+		if (prg[i].op >= 0)// a variable
 			if (prg[i].op < (int)num_total_variables) { // a variable, which is cached already
 				sum_of_errors = cached_sum_of_errors[prg[i].op];
 				best_threshold = cached_threashold[prg[i].op];
@@ -79,8 +83,8 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 			int num_0_incorrect = 0;
 			for (unsigned int k = 0; k < random_subset_selection_size; k++) {
 				tmp_value_class[k].value = eval[random_subset_indexes[k]];
-				tmp_value_class[k].data_class = (int)data[random_subset_indexes[k]][num_total_variables];
-				if (data[random_subset_indexes[k]][num_total_variables] < 0.5)
+				tmp_value_class[k].data_class = class_index[random_subset_indexes[k]];
+				if (tmp_value_class[k].data_class < 0.5)
 					num_0_incorrect++;
 			}
 			qsort((void*)tmp_value_class, random_subset_selection_size, sizeof(s_value_class), sort_function_value_class);
@@ -92,18 +96,20 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 
 			for (unsigned int t = 0; t < random_subset_selection_size; t++) {
 				unsigned int j = t + 1;
-				while (j < random_subset_selection_size && fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
+				while (j < random_subset_selection_size && 
+					fabs(tmp_value_class[t].value - tmp_value_class[j].value) < 1e-6)// toate care sunt egale ca sa pot stabili thresholdul
 					j++;
 
-				// le verific pe toate intre i si j si le cataloghez ca apartinant la clasa 0
+				// check all between i and j and label them with class 0
 				for (unsigned int k = t; k < j; k++)
 					if (tmp_value_class[k].data_class == 0)
 						num_0_incorrect--;
-					else
+					else {
 						if (tmp_value_class[k].data_class == 1) {
 							//num_0_incorrect--;
 							num_1_incorrect++;
 						}
+					}
 				if (num_0_incorrect + num_1_incorrect < sum_of_errors) {
 					sum_of_errors = num_0_incorrect + num_1_incorrect;
 					best_threshold = tmp_value_class[t].value;
@@ -128,20 +134,23 @@ void t_mep_chromosome::fitness_binary_classification_double_cache_all_training_d
 		delete[] line_of_constants;
 }
 //---------------------------------------------------------------------------
-bool t_mep_chromosome::compute_binary_classification_error_on_double_data(double** data, unsigned int num_data,
-	unsigned int output_col, double& error)
+bool t_mep_chromosome::compute_binary_classification_error_on_double_data(
+    const t_mep_data &mep_data, double& error)
 {
 	error = 0;
 	double actual_output_double[1];
 
-	//	int num_valid = 0;
+    unsigned int num_data = mep_data.get_num_rows();
+    double **data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	unsigned int index_error_gene;
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], actual_output_double, index_error_gene)) {
 			if (actual_output_double[0] <= best_class_threshold)
-				error += data[k][output_col];
+				error += (class_labels_index[k] > 0); // I do this because, maybe I have more than 2 classes in validation or test
 			else
-				error += 1 - data[k][output_col];
+				error += (class_labels_index[k] != 1);
 		}
 		else
 			error++;
@@ -153,18 +162,22 @@ bool t_mep_chromosome::compute_binary_classification_error_on_double_data(double
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_binary_classification_error_on_double_data_return_error(
-	double** data, unsigned int num_data, unsigned int output_col, double& error, unsigned int& index_error_gene)
+	const t_mep_data &mep_data,
+    double& error, unsigned int& index_error_gene)
 {
 	error = 0;
 	double actual_output_double[1];
 
-	//	int num_valid = 0;
+	unsigned int num_data = mep_data.get_num_rows();
+	double **data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (evaluate_double(data[k], actual_output_double, index_error_gene)) {
 			if (actual_output_double[0] <= best_class_threshold)
-				error += data[k][output_col];
+				error += (class_labels_index[k] > 0); // class 0; // I do this because, maybe I have more than 2 classes in validation or test
 			else
-				error += 1 - data[k][output_col];
+				error += (class_labels_index[k] != 1);
 		}
 		else
 			return false;

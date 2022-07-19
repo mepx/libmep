@@ -47,12 +47,14 @@ private:
 
 	unsigned int num_classes;
 
-	unsigned char data_type; // 0-double, 1- string, 2-long long
+	unsigned char data_type; // 0-double, 1-string, 2-long long
 
 	char list_separator;
 	//char decimal_separator;
 
 	bool _modified;
+	int *class_labels;// it is computed for training data only
+	unsigned int* class_index_of_output_col;
 
 	//bool from_csv_double(const char *file_name);
 	bool from_csv_string_old(const char* file_name);
@@ -110,7 +112,10 @@ public:
 	double get_value_double(unsigned int row, unsigned int col)const;
 	char* get_value_string(unsigned int row, unsigned int col)const;
 	long long get_value_long_long(unsigned int row, unsigned int col)const;
-
+    
+    int get_class_label_index(unsigned int row) const;
+    unsigned int* get_class_label_index_as_array(void) const;
+    
 	// clears the data internal structures and deletes memory
 	void clear_data(void);
 	void delete_data(void);
@@ -129,11 +134,6 @@ public:
 //	bool from_csv(const char *filename, char list_separator, char decimal_separator);
 	bool from_csv_file(const char* file_name, char _list_separator, char _decimal_separator);
 	bool from_csv_file_no_conversion_to_double(const char* filename, char _list_separator);
-
-	// loads from PROBEN1 format
-	// num_classes must be known in advanced because it is an "1 of m" format
-	// if num_classes is 0, it means that is a regression problem
-	//bool from_one_of_m_format(const char *filename, unsigned int num_classes, char list_separator, char decimal_separator);
 
 	// transform string values to real values
 	int to_numeric(t_mep_data *other_data1, t_mep_data* other_data2, char decimal_separator);
@@ -164,7 +164,7 @@ public:
 	int move_to(t_mep_data *, unsigned int count);
 
 	// computes how many row belong to the first class
-	void count_0_class(unsigned int target_col);
+	void count_0_class(void);
 
 	// returns true if the problem is a binary classification problem
 	bool is_binary_classification_problem(void)const;
@@ -182,7 +182,7 @@ public:
 	unsigned int get_num_items_class_0(void)const;
 
 	// counts the number of classes and stores them into an internal variable
-	void count_num_classes(unsigned int target_col);
+	//void count_num_classes(int *class_labels);
 
 	// returns the number of classes
 	unsigned int get_num_classes(void)const;
@@ -207,7 +207,16 @@ public:
 
 	int is_one_of_m_multi_class_classification_problem(unsigned int num_classes)const;
 	void to_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes);
-	bool is_multi_class_classification_problem_within_range(unsigned int max_class)const;
+	bool is_multi_class_classification_problem_within_class_labels(int* training_class_labels,
+																   unsigned long num_training_labels)const;
+
+	void compute_class_labels(void);
+	int* get_class_labels_ptr(void);
+    void assign_class_index_from_training_class_labels(
+													   int* training_class_labels,
+													   unsigned int training_num_classes);
+
+	bool are_all_output_int(void)const;
 };
 //-----------------------------------------------------------------
 #endif // DATA_CLASS_H_INCLUDED

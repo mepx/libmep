@@ -26,7 +26,7 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_dynam
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data(
-	double** data, unsigned int num_data, unsigned int output_col, double& error)
+const t_mep_data& mep_data, double& error)
 {
 	error = 0;
 
@@ -35,9 +35,14 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynam
 	unsigned int index_error_gene;
 	unsigned int critical_errors = 0;
 	double* values_for_output_genes = new double[num_classes];
+
+	unsigned int num_data = mep_data.get_num_rows();
+	double** data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (get_first_max_index(data[k], max_index, max_value, index_error_gene, values_for_output_genes)) {
-			unsigned int target_class = (unsigned int)data[k][output_col];
+			int target_class = class_labels_index[k];
 			unsigned int predicted_class = num_classes;
 			for (unsigned int c = 0; c < num_classes; c++) {
 				if (max_index == index_best_genes[c]) {
@@ -54,11 +59,11 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynam
 						class_index = c;
 					}
 				}
-				if (class_index != target_class)
+				if ((int)class_index != target_class)
 					error++;
 			}
 			else {
-				if (predicted_class != target_class)
+				if ((int)predicted_class != target_class)
 					error++;
 			}
 
@@ -77,7 +82,7 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynam
 }
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynamic_error_on_double_data_return_error(
-	double** data, unsigned int num_data, unsigned int output_col,
+const t_mep_data& mep_data,
 	double& error, unsigned int& index_error_gene, double& _num_incorrectly_classified)
 {
 	error = 0;
@@ -87,9 +92,13 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynam
 	double max_value;
 	double* values_for_output_genes = new double[num_classes];
 
+	unsigned int num_data = mep_data.get_num_rows();
+	double** data = mep_data.get_data_matrix_double();
+	unsigned int* class_labels_index = mep_data.get_class_label_index_as_array();
+
 	for (unsigned int k = 0; k < num_data; k++) {
 		if (get_first_max_index(data[k], max_index, max_value, index_error_gene, values_for_output_genes)) {
-			unsigned int target_class = (unsigned int)data[k][output_col];
+			int target_class = class_labels_index[k];
 			unsigned int predicted_class = num_classes;
 			for (unsigned int c = 0; c < num_classes; c++) {
 				if (max_index == index_best_genes[c]) {
@@ -107,11 +116,11 @@ bool t_mep_chromosome::compute_multi_class_classification_winner_takes_all_dynam
 						class_index = c;
 					}
 				}
-				if (class_index != target_class)
+				if ((int)class_index != target_class)
 					error++;
 			}
 			else {
-				if (predicted_class != target_class) 
+				if ((int)predicted_class != target_class)
 					error++;
 			}
 		}
@@ -143,9 +152,10 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_dynam
 	// evaluate a_chromosome
 	// partial results are stored and used later in other sub-expressions
 
-	double** data = mep_dataset.get_data_matrix_double();
+	//double** data = mep_dataset.get_data_matrix_double();
 	//unsigned int num_rows = mep_dataset.get_num_rows();
-
+	unsigned int* class_labels_index = mep_dataset.get_class_label_index_as_array();
+	
 	int* line_of_constants = NULL;
 	if (num_constants) {
 		line_of_constants = new int[num_constants];// line where a constant was firstly computed
@@ -199,7 +209,7 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_dynam
 
 	for (unsigned int t = 0; t < random_subset_selection_size; t++) {
 		unsigned int rs_index = random_subset_indexes[t];
-		unsigned int target_class = (unsigned int)data[rs_index][num_total_variables];
+		unsigned int target_class = class_labels_index[rs_index];
 		for (unsigned int i = 0; i < code_length; i++)
 			if (index_of_max[t] != i)
 				errors[i][target_class]++;
@@ -260,7 +270,7 @@ void t_mep_chromosome::fitness_multi_class_classification_winner_takes_all_dynam
 	for (unsigned int t = 0; t < random_subset_selection_size; t++) {
 		// find the maximal value
 		unsigned int rs_index = random_subset_indexes[t];
-		unsigned int target_class = (unsigned int)data[rs_index][num_total_variables];
+		unsigned int target_class = class_labels_index[rs_index];
 		unsigned int predicted_class = num_classes;
 		for (unsigned int c = 0; c < num_classes; c++) {
 			if (index_of_max[t] == index_best_genes[c]) {

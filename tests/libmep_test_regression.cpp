@@ -2,6 +2,7 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
+// last update on 2022.07.19
 
 #include "libmep.h"
 #include <locale.h>
@@ -60,7 +61,7 @@ int main(void)
 
 	printf("\nFinal error = %lf\n", error);
 
-	printf("Program = \n%s\n", mep.program_as_C(0, true, training_data->get_row(0)));
+	printf("Program = \n%s\n", mep.program_as_C(0, true, training_data->get_row_as_double(0)));
 
 	printf("Press Enter...");
 	

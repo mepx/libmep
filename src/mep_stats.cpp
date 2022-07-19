@@ -174,14 +174,16 @@ int t_mep_run_statistics::to_xml(pugi::xml_node parent)
 	data.set_value(tmp_str2);
 
 	node = parent.append_child("program");
-	best_program.to_xml(node);
+	best_program.to_xml_node(node);
 
 	delete[] tmp_str;
 
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_run_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure)
+int t_mep_run_statistics::from_xml(pugi::xml_node parent,
+								   unsigned int problem_type, unsigned int error_measure,
+								   unsigned int num_classes)
 {
 	delete_memory();
 
@@ -349,16 +351,14 @@ int t_mep_run_statistics::from_xml(pugi::xml_node parent, unsigned int problem_t
 	}
 
 	node = parent.child("program");
-	if (node)
-	{
-		best_program.from_xml(node);
+	if (node){
+		best_program.from_xml_node(node, problem_type, error_measure, num_classes);
 
 		if (problem_type != MEP_PROBLEM_MULTICLASS_CLASSIFICATION ||
-			problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION &&
-			error_measure == MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR)
+			(problem_type == MEP_PROBLEM_MULTICLASS_CLASSIFICATION &&
+			error_measure == MEP_MULTICLASS_CLASSIFICATION_CLOSEST_CENTER_ERROR))
 			best_program.simplify();
 	}
-
 
 	return true;
 }
@@ -393,7 +393,8 @@ t_mep_statistics::t_mep_statistics()
 	stats = NULL;
 }
 //---------------------------------------------------------------------------
-void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool compute_on_test, unsigned int problem_type)
+void t_mep_statistics::compute_mean_stddev(bool compute_on_validation,
+										   bool compute_on_test)
 {
 	stddev_training_error = stddev_validation_error = stddev_test_error = stddev_runtime = 0;
 	mean_training_error = mean_validation_error = mean_test_error = mean_runtime = 0;
@@ -401,6 +402,8 @@ void t_mep_statistics::compute_mean_stddev(bool compute_on_validation, bool comp
 
 	if (!num_runs)
 		return;
+	
+	unsigned int problem_type =stats[0].best_program.get_problem_type();
 
 	best_training_error = stats[0].best_training_error[stats[0].last_generation];
 	if (compute_on_validation)
@@ -838,7 +841,7 @@ int t_mep_statistics::to_tex(const char *filename, unsigned int problem_type) co
 		fprintf(f, "%lf\\\\ \n", stddev_runtime);
 	}
 	else {// MEP CLASSIFICATION
-		fprintf(f, "Run \\# & training num incorrect (\\%%) & validation num incorrect (\\%%) & test num incorrect (\\%%) & running time(s)\\\\ \n");
+		fprintf(f, "Run \\# & training num incorrect (\\%%) & validation num incorrect (\\%%) & test num incorrect (\\%%) & running time\\\\ \n");
 		for (unsigned int r = 0; r < num_runs; r++) {
 			fprintf(f, "%u & %lf &", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
 			if (stats[r].best_validation_num_incorrect > -1E-6)
@@ -891,6 +894,177 @@ int t_mep_statistics::to_tex(const char *filename, unsigned int problem_type) co
 	}
 
 	fprintf(f, "\\end{tabular}\n");
+
+	fclose(f);
+	return true;
+}
+//---------------------------------------------------------------------------
+int t_mep_statistics::to_html(const char* filename, unsigned int problem_type) const
+{
+	FILE* f = NULL;
+#ifdef _WIN32
+	int count_chars = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+	wchar_t* w_filename = new wchar_t[count_chars];
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, w_filename, count_chars);
+
+	f = _wfopen(w_filename, L"w");
+	delete[] w_filename;
+
+#else
+	f = fopen(filename, "w");
+#endif
+
+	if (!f)
+		return false;
+
+	fprintf(f, "<!DOCTYPE html>\n");
+
+	fprintf(f, "<head>\n");
+	fprintf(f, "<style>\n");
+	fprintf(f, "th{\n");
+	fprintf(f, "border:1px solid black;\n");
+		fprintf(f, "}\n");
+	fprintf(f, "tr:nth-child(even) {\n");
+	fprintf(f, "background-color: #D6EEEE;\n");
+	fprintf(f, "}\n");
+	fprintf(f, "</style>\n");
+	fprintf(f, "</head>\n");
+
+	fprintf(f, "<html>\n");
+	fprintf(f, "<body>\n");
+
+	fprintf(f, "<table>\n");
+
+	if (problem_type == MEP_PROBLEM_REGRESSION || problem_type == MEP_PROBLEM_TIME_SERIE) {
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<th>Run #</th><th>Training error</th><th>Validation error</th><th>Test error</th><th>Running time</th>\n");
+		fprintf(f, "</tr>\n");
+		for (unsigned int r = 0; r < num_runs; r++) {
+			fprintf(f, "<tr>\n");
+			fprintf(f, "<td>%u</td><td>%lf</td>", r + 1, stats[r].best_training_error[stats[r].last_generation]);
+
+			if (stats[r].best_validation_error > -1E-6)
+				fprintf(f, "<td>%lf</td>", stats[r].best_validation_error);
+			else
+				fprintf(f, "<td></td>");
+			if (stats[r].test_error > -1E-6)
+				fprintf(f, "<td>%lf</td>", stats[r].test_error);
+			else
+				fprintf(f, "<td></td>");
+
+			fprintf(f, "<td>%lf</td>\n", stats[r].running_time);
+			fprintf(f, "</tr>\n");
+		}
+
+		// best
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<td>Best</td><td>%lf</td>", best_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "<td>%lf</td>", best_validation_error);
+		else
+			fprintf(f, "<td></td>");
+		if (best_test_error > -1E-6)
+			fprintf(f, "<td>%lf</td>", best_test_error);
+		else
+			fprintf(f, "<td></td>");
+		fprintf(f, "<td>%lf</td>\n", best_runtime);
+		fprintf(f, "</tr>\n");
+
+		// average
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<td>Average</td><td>%lf</td>", mean_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "<td>%lf</td>", mean_validation_error);
+		else
+			fprintf(f, "<td></td>");
+		if (best_test_error > -1E-6)
+			fprintf(f, "<td>%lf</td>", mean_test_error);
+		else
+			fprintf(f, "<td></td>");
+		fprintf(f, "<td>%lf</td>\n", mean_runtime);
+		fprintf(f, "</tr>\n");
+
+		//std dev
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<td>StdDev</td><td>%lf</td>", stddev_training_error);
+		if (best_validation_error > -1E-6)
+			fprintf(f, "<td>%lf</td>", stddev_validation_error);
+		else
+			fprintf(f, "<td></td>");
+		if (best_test_error > -1E-6)
+			fprintf(f, "<td>%lf</td>", stddev_test_error);
+		else
+			fprintf(f, "<td></td>");
+		fprintf(f, "<td>%lf</td>\n", stddev_runtime);
+		fprintf(f, "</tr>\n");
+	}
+	else {// MEP CLASSIFICATION
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<th>Run #</th><th>Training num incorrect (%%)</th><th>Validation num incorrect (%%)</th><th>Test num incorrect (%%)</th><th>Running time</th>\n");
+		fprintf(f, "</tr>\n");
+
+		for (unsigned int r = 0; r < num_runs; r++) {
+			fprintf(f, "<tr>\n");
+			fprintf(f, "<td>%u</td><td>%lf</td>", r + 1, stats[r].best_training_num_incorrect[stats[r].last_generation]);
+			if (stats[r].best_validation_num_incorrect > -1E-6)
+				fprintf(f, "<td>%lf</td>", stats[r].best_validation_num_incorrect);
+			else
+				fprintf(f, "<td></td>");
+
+			if (stats[r].test_error > -1E-6)
+				fprintf(f, "<td>%lf</td>", stats[r].test_num_incorrect);
+			else
+				fprintf(f, "<td></td>");
+			fprintf(f, "<td>%lf</td>\n", stats[r].running_time);
+			fprintf(f, "</tr>\n");
+		}
+
+		// best
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<td>Best</td><td>%lf</td>", best_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "<td>%lf</td>", best_validation_num_incorrect);
+		else
+			fprintf(f, "<td></td>");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "<td>%lf</td>", best_test_num_incorrect);
+		else
+			fprintf(f, "<td></td>");
+		fprintf(f, "<td>%lf</td>\n", best_runtime);
+		fprintf(f, "</tr>\n");
+
+		// average
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<td>Average</td><td>%lf</td>", mean_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "<td>%lf</td>", mean_validation_num_incorrect);
+		else
+			fprintf(f, "<td></td>");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "<td>%lf</td>", mean_test_num_incorrect);
+		else
+			fprintf(f, "<td></td>");
+		fprintf(f, "<td>%lf</td>\n", mean_runtime);
+		fprintf(f, "</tr>\n");
+
+		//std dev
+		fprintf(f, "<tr>\n");
+		fprintf(f, "<td>StdDev</td><td>%lf</td>", stddev_training_num_incorrect);
+		if (best_validation_num_incorrect > -1E-6)
+			fprintf(f, "<td>%lf</td>", stddev_validation_num_incorrect);
+		else
+			fprintf(f, "<td></td>");
+		if (best_test_num_incorrect > -1E-6)
+			fprintf(f, "<td>%lf</td>", stddev_test_num_incorrect);
+		else
+			fprintf(f, "<td></td>");
+		fprintf(f, "<td>%lf</td>\n", stddev_runtime);
+		fprintf(f, "</tr>\n");
+	}
+
+	fprintf(f, "</table>\n");
+	fprintf(f, "</body>\n");
+	fprintf(f, "</html>\n");
 
 	fclose(f);
 	return true;
@@ -1054,7 +1228,10 @@ int t_mep_statistics::to_xml(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type, unsigned int error_measure)
+int t_mep_statistics::from_xml(pugi::xml_node parent,
+							   unsigned int problem_type,
+							   unsigned int error_measure,
+							   unsigned int num_classes)
 {
 	num_runs = 0;
 	pugi::xml_node node_results = parent.child("results");
@@ -1065,7 +1242,7 @@ int t_mep_statistics::from_xml(pugi::xml_node parent, unsigned int problem_type,
 		stats = new t_mep_run_statistics[num_runs];
 		num_runs = 0;
 		for (pugi::xml_node row = node_results.child("run"); row; row = row.next_sibling("run"), num_runs++)
-			stats[num_runs].from_xml(row, problem_type, error_measure);
+			stats[num_runs].from_xml(row, problem_type, error_measure, num_classes);
 	}
 	return true;
 }
