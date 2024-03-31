@@ -1,7 +1,9 @@
 # Multi Expression Programming library
 **version 2024.03.31.0-beta**
 
-Implements the Multi Expression Programming (MEP) technique for solving symbolic regression, classification (binary and multiclass) and time-series prediction problems. MEP is a Genetic Programming (GP) variant with linear representation of chromosomes.
+Implements the Multi Expression Programming (MEP) technique for solving symbolic regression, classification (binary and multiclass) and time-series prediction problems. 
+
+MEP is a [Genetic Programming (GP)](https://en.wikipedia.org/wiki/Genetic_programming) variant with linear representation of chromosomes.
 
 MEP introduced a unique feature: the ability to encode multiple solutions in the same chromosome. This means that we can explore much more from the search space compared to other techniques which encode a single solution in the chromosome. In most cases this advantage comes with no penalty regarding the running time or the involved resources.
 
