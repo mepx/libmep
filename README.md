@@ -23,14 +23,20 @@ Include paths must point to the [include](include) folder of this project.
 You need some a file with training data.
 We provided several files (located in the [data](data) folder) for test:
 
-- bulding1.csv for regression problems,
-- cancer1.csv for classification problems.
+- _bulding1.csv_ for symbolic regression problems,
+- _cancer1.csv_ for binary classification problems with 0/1 output.
+- _cancer1_output1-1.csv_ for binary classification problems with -1/1 output.
+- _iris.txt_ for multiclass classification problems.
 
 Make sure that the instruction (from the **main** function):
 
 	if (!training_data->from_csv_file("../data/building1.csv")) ...
 	
 has the correct path of the file.
+
+# Graphical user interface
+
+**libmep** is used by [MEPX](https://mepx.org).
 
 # Documentation
 
@@ -41,7 +47,7 @@ It will be updated soon.
 
 # More info:
 
-[www.mepx.org](https://www.mepx.org)
+[mepx.org](https://mepx.org)
 
 [mepx.github.io](https://mepx.github.io)
 
