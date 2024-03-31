@@ -2,10 +2,9 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2022.7.19
+// last update on 2024.3.31
 //-----------------------------------------------------------------
 #include "libmep.h"
-#include <locale.h>
 //-----------------------------------------------------------------
 static unsigned int generation_index;
 t_mep mep;
@@ -24,10 +23,11 @@ int main(void)
 	t_mep_functions* mep_functions = mep.get_functions_ptr();
 	t_mep_parameters* mep_parameters = mep.get_parameters_ptr();
 	//t_mep_constants* mep_constants = mep.get_constants_ptr();
-	setlocale(LC_NUMERIC, ""); // do this because after from_csv_file call, the LC_NUMERIC is set to ""
+	
 	printf("Loading data ...\n");
 	// sample input file taken from the https://github.com/mepx/libmep/tree/master/data folder
-	if (!training_data->from_csv_file("c:/Mihai/Dropbox/mep/src/libmep/data/cancer1.csv", ' ', '.')) {
+	//if (!training_data->from_csv_file("cancer1.csv", ' ', '.')) {
+	if (!training_data->from_csv_file("cancer1_output1-1.csv", ';', '.')) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!\n");
 		printf("Press Enter...");
 		getchar();
@@ -47,7 +47,7 @@ int main(void)
 	mep_functions->set_iflz(true);
 
 	mep_parameters->set_num_subpopulations(4);// should be multiple of num_threads
-	mep_parameters->set_num_generations(200);
+	mep_parameters->set_num_generations(20);
 	mep_parameters->set_subpopulation_size(200);
 	mep_parameters->set_code_length(100);
 	mep_parameters->set_problem_type(MEP_PROBLEM_BINARY_CLASSIFICATION);
@@ -70,7 +70,7 @@ int main(void)
 
 	printf("\nFinal Num incorrectly classified = %lf\n", num_incorrectly_classified_percent);
 
-	printf("Program = \n%s\n", mep.program_as_C(0, 0, training_data->get_row_as_double(0)));
+	printf("Program = \n%s\n", mep.program_as_C(0, true, training_data->get_data_matrix_as_double(), NULL));
 	
 	printf("Press Enter...");
 	

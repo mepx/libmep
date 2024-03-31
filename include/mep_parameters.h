@@ -7,7 +7,7 @@
 #define mep_parameters_H
 
 //-----------------------------------------------------------------
-#include "pugixml.hpp"
+#include "utils/pugixml.hpp"
 #include "mep_constants.h"
 
 //-----------------------------------------------------------------
@@ -32,6 +32,11 @@
 #define MEP_TIME_SERIES_TEST 0
 #define MEP_TIME_SERIES_PREDICTION 1
 //-----------------------------------------------------------------
+#define MEP_DATA_DOUBLE 0
+#define MEP_DATA_STRING 1
+#define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
+//-----------------------------------------------------------------
+
 class t_mep_parameters{
 private:
     double mutation_probability;                // mutation probability
@@ -64,15 +69,20 @@ private:
 
 	unsigned int time_series_mode;
 	unsigned int window_size;
+	
+	unsigned int num_problem_outputs;
+	
+	char data_type;
+	double precision;
 
 public:
 
 	t_mep_parameters(void);
     void init (void);
-    int to_xml(pugi::xml_node parent);
+    void to_xml(pugi::xml_node parent);
     int from_xml(pugi::xml_node parent);
 
-	bool operator ==(const t_mep_parameters&);
+	bool operator ==(const t_mep_parameters&) const;
 
 	// returns the mutation probability
 	double get_mutation_probability(void) const;
@@ -222,6 +232,19 @@ public:
 	unsigned int get_window_size(void) const;
 
 	void set_window_size(unsigned int window_size);
+	
+	//
+	void set_data_type(char _new_data_type);
+	char get_data_type(void) const;
+	
+	// returns the number of outputs of the program
+	unsigned int get_num_outputs(void) const;
+	void set_num_outputs(unsigned int new_num);
+	
+	// precision to compare values
+	double get_precision(void) const;
+	void set_precision(double new_precision);
+	
 };
 //-----------------------------------------------------------------
 #endif // PARAMETERS_CLASS_H_INCLUDED

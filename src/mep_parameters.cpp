@@ -6,9 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 //---------------------------------------------------------------------------
-
 #include "mep_parameters.h"
-
 //---------------------------------------------------------------------------
 t_mep_parameters::t_mep_parameters(void)
 {
@@ -40,131 +38,144 @@ void t_mep_parameters::init(void)
 	time_series_mode = MEP_TIME_SERIES_TEST;
 	num_predictions = 10;
 	window_size = 2;
+	num_problem_outputs = 1;
+	
+	data_type = MEP_DATA_DOUBLE;
+	
+	precision = 1E-6;
 	
 	modified = false;
 }
 //---------------------------------------------------------------------------
-int t_mep_parameters::to_xml(pugi::xml_node parent)
+void t_mep_parameters::to_xml(pugi::xml_node parent)
 {
-	char tmp_str[30];
+	char tmp_str[100];
 	pugi::xml_node node = parent.append_child("mutation_probability");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lg", mutation_probability);
+	snprintf(tmp_str, 100, "%lg", mutation_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("crossover_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lg", crossover_probability);
+	snprintf(tmp_str, 100, "%lg", crossover_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("crossover_type");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", crossover_type);
+	snprintf(tmp_str, 100, "%u", crossover_type);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("chromosome_length");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", code_length);
+	snprintf(tmp_str, 100, "%u", code_length);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("subpopulation_size");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", subpopulation_size);
+	snprintf(tmp_str, 100, "%u", subpopulation_size);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_subpopulations");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", num_subpopulations);
+	snprintf(tmp_str, 100, "%u", num_subpopulations);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("tournament_size");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", tournament_size);
+	snprintf(tmp_str, 100, "%u", tournament_size);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("number_of_generations");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", num_generations);
+	snprintf(tmp_str, 100, "%u", num_generations);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("problem_type");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", problem_type);
+	snprintf(tmp_str, 100, "%u", problem_type);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("random_seed");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", random_seed);
+	snprintf(tmp_str, 100, "%u", random_seed);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("operators_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lg", operators_probability);
+	snprintf(tmp_str, 100, "%lg", operators_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("variables_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lg", variables_probability);
+	snprintf(tmp_str, 100, "%lg", variables_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("constants_probability");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%lg", constants_probability);
+	snprintf(tmp_str, 100, "%lg", constants_probability);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_runs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", num_runs);
+	snprintf(tmp_str, 100, "%u", num_runs);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_validation_data");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", use_validation_data);
+	snprintf(tmp_str, 100, "%u", use_validation_data);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("simplified");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", simplified_programs);
+	snprintf(tmp_str, 100, "%d", simplified_programs);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_threads");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", num_threads);
+	snprintf(tmp_str, 100, "%u", num_threads);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("random_subset_selection_size_percent");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", random_subset_selection_size_percent);
+	snprintf(tmp_str, 100, "%d", random_subset_selection_size_percent);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("error_measure");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", error_measure);
+	snprintf(tmp_str, 100, "%u", error_measure);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_generations_for_which_random_subset_is_kept_fixed");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", num_generations_for_which_random_subset_is_kept_fixed);
+	snprintf(tmp_str, 100, "%u", num_generations_for_which_random_subset_is_kept_fixed);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("time_series_mode");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", time_series_mode);
+	snprintf(tmp_str, 100, "%u", time_series_mode);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("num_predictions");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", num_predictions);
+	snprintf(tmp_str, 100, "%u", num_predictions);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("window_size");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%u", window_size);
+	snprintf(tmp_str, 100, "%u", window_size);
+	data.set_value(tmp_str);
+	
+	node = parent.append_child("data_type");
+	data = node.append_child(pugi::node_pcdata);
+	snprintf(tmp_str, 100, "%d", (int)data_type);
+	data.set_value(tmp_str);
+	
+	node = parent.append_child("num_problem_outputs");
+	data = node.append_child(pugi::node_pcdata);
+	snprintf(tmp_str, 100, "%u", num_problem_outputs);
 	data.set_value(tmp_str);
 
 	modified = false;
-
-	return true;
 }
 //---------------------------------------------------------------------------
 int t_mep_parameters::from_xml(pugi::xml_node parent)
@@ -383,6 +394,22 @@ int t_mep_parameters::from_xml(pugi::xml_node parent)
 			error_measure = MEP_MULTICLASS_CLASSIFICATION_WINNER_TAKES_ALL_ERROR;
 			break;
 	}
+	
+	node = parent.child("data_type");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		data_type = (char)atoi(value_as_cstring);
+	}
+	else
+		data_type = MEP_DATA_DOUBLE;
+	
+	node = parent.child("num_problem_outputs");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		num_problem_outputs = (unsigned int)atoi(value_as_cstring);
+	}
+	else
+		num_problem_outputs = 1;
 
 	modified = false;
 
@@ -668,7 +695,7 @@ void t_mep_parameters::set_time_series_mode(unsigned int new_value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-bool t_mep_parameters::operator ==(const t_mep_parameters& other)
+bool t_mep_parameters::operator ==(const t_mep_parameters& other) const
 {
 	if (mutation_probability != other.mutation_probability)
 		return false;
@@ -729,6 +756,9 @@ bool t_mep_parameters::operator ==(const t_mep_parameters& other)
 
 	if (time_series_mode != other.time_series_mode)
 		return false;
+	
+	if (data_type != other.data_type)
+		return false;
 
 	return true;
 }
@@ -746,3 +776,34 @@ void t_mep_parameters::set_window_size(unsigned int new_window_size)
 	}
 }
 //---------------------------------------------------------------------------
+void t_mep_parameters::set_data_type(char new_data_type)
+{
+	data_type = new_data_type;
+	modified = true;
+}
+//---------------------------------------------------------------------------
+char t_mep_parameters::get_data_type(void) const
+{
+	return data_type;
+}
+//---------------------------------------------------------------------------
+unsigned int t_mep_parameters::get_num_outputs(void)const
+{
+	return num_problem_outputs;
+}
+//-----------------------------------------------------------------
+void t_mep_parameters::set_num_outputs(unsigned int new_num)
+{
+	num_problem_outputs = new_num;
+}
+//-----------------------------------------------------------------
+double t_mep_parameters::get_precision(void) const
+{
+	return precision;
+}
+//-----------------------------------------------------------------
+void t_mep_parameters::set_precision(double new_precision)
+{
+	precision = new_precision;
+}
+//-----------------------------------------------------------------

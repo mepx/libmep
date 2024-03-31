@@ -17,9 +17,9 @@ public:
 
 	t_sub_population();
 
-	void compute_worst_index(unsigned int pop_size);
+	void compute_index_of_the_worst(unsigned int pop_size, double precision);
 
-	void compute_best_index(unsigned int pop_size);
+	void compute_index_of_the_best(unsigned int pop_size, double precision);
 };
 //-----------------------------------------------------------------
 #endif

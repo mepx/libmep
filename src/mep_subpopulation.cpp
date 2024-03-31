@@ -3,8 +3,9 @@
 // https://github.com/mepx
 // License: MIT
 //---------------------------------------------------------------------------
-#include "mep_subpopulation.h"
+#include <stdlib.h>
 
+#include "mep_subpopulation.h"
 //-----------------------------------------------------------------
 t_sub_population::t_sub_population()
 {
@@ -12,25 +13,19 @@ t_sub_population::t_sub_population()
 	worst_index = best_index = 0;
 }
 //-----------------------------------------------------------------
-void t_sub_population::compute_worst_index(unsigned int pop_size)
+void t_sub_population::compute_index_of_the_worst(unsigned int pop_size, double precision)
 {
 	worst_index = 0;
-	double worst_fitness = individuals[0].get_fitness();
 	for (unsigned int i = 1; i < pop_size; i++)
-		if (individuals[i].get_fitness() > worst_fitness) {
-			worst_fitness = individuals[i].get_fitness();
+		if (individuals[i].compare(individuals[worst_index], precision) > 0)
 			worst_index = i;
-		}
 }
 //-----------------------------------------------------------------
-void t_sub_population::compute_best_index(unsigned int pop_size)
+void t_sub_population::compute_index_of_the_best(unsigned int pop_size, double precision)
 {
 	best_index = 0;
-	double best_fitness = individuals[0].get_fitness();
 	for (unsigned int i = 1; i < pop_size; i++)
-		if (individuals[i].get_fitness() < best_fitness) {
-			best_fitness = individuals[i].get_fitness();
+		if (individuals[i].compare(individuals[best_index], precision) < 0)
 			best_index = i;
-		}
 }
 //-----------------------------------------------------------------

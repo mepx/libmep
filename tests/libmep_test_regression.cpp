@@ -2,10 +2,9 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2022.07.19
+// last update on 2024.03.31
 
 #include "libmep.h"
-#include <locale.h>
 //-----------------------------------------------------------------
 static int generation_index;
 t_mep mep;
@@ -19,17 +18,16 @@ void on_generation(void)
 //-----------------------------------------------------------------
 int main(void)
 {
-	
 	printf("libmep version = %s\n", mep.get_version());
+
 	t_mep_data* training_data = mep.get_training_data_ptr(); // store objects in some local variables for easier access
 	t_mep_functions* mep_functions = mep.get_functions_ptr();
 	t_mep_parameters* mep_parameters = mep.get_parameters_ptr();
 	//t_mep_constants* mep_constants = mep.get_constants_ptr();
 
-	setlocale(LC_NUMERIC, ""); // do this because after from_csv_file call, the LC_NUMERIC is set to ""
-
 // take the input data from the https://github.com/mepx/libmep/tree/master/data folder
-	if (!training_data->from_csv_file("c:/Mihai/Dropbox/mep/src/libmep/data/building1.csv", ' ', '.')) {
+
+	if (!training_data->from_csv_file("building1.csv", ' ', '.')) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
 		printf("Press Enter...");
 		getchar();
@@ -61,7 +59,7 @@ int main(void)
 
 	printf("\nFinal error = %lf\n", error);
 
-	printf("Program = \n%s\n", mep.program_as_C(0, true, training_data->get_row_as_double(0)));
+	printf("Program = \n%s\n", mep.program_as_C(0, true, training_data->get_data_matrix_as_double(), NULL));
 
 	printf("Press Enter...");
 	

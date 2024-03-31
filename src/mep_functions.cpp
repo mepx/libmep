@@ -3,11 +3,11 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "mep_functions.h"
+#include "mep_data.h"
 //---------------------------------------------------------------------------
 t_mep_functions::t_mep_functions(void)
 {
@@ -35,196 +35,196 @@ void t_mep_functions::init(void)
 //---------------------------------------------------------------------------
 int t_mep_functions::to_xml(pugi::xml_node parent)
 {
-	char tmp_str[10];
+	char tmp_str[15];
 	pugi::xml_node node = parent.append_child("use_addition");
 	pugi::xml_node data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_addition);
+	snprintf(tmp_str, 15, "%d", use_addition);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_subtraction");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_subtraction);
+	snprintf(tmp_str, 15, "%d", use_subtraction);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_multiplication");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_multiplication);
+	snprintf(tmp_str, 15, "%d", use_multiplication);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_division");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_division);
+	snprintf(tmp_str, 15, "%d", use_division);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_power");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_power);
+	snprintf(tmp_str, 15, "%d", use_power);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_sqrt");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_sqrt);
+	snprintf(tmp_str, 15, "%d", use_sqrt);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_exp");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_exp);
+	snprintf(tmp_str, 15, "%d", use_exp);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_pow10");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_pow10);
+	snprintf(tmp_str, 15, "%d", use_pow10);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_ln");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_ln);
+	snprintf(tmp_str, 15, "%d", use_ln);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_log10");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_log10);
+	snprintf(tmp_str, 15, "%d", use_log10);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_log2");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_log2);
+	snprintf(tmp_str, 15, "%d", use_log2);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_floor");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_floor);
+	snprintf(tmp_str, 15, "%d", use_floor);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_ceil");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_ceil);
+	snprintf(tmp_str, 15, "%d", use_ceil);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_abs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_abs);
+	snprintf(tmp_str, 15, "%d", use_abs);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_inv");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_inv);
+	snprintf(tmp_str, 15, "%d", use_inv);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_neg");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_neg);
+	snprintf(tmp_str, 15, "%d", use_neg);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_x2");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_x2);
+	snprintf(tmp_str, 15, "%d", use_x2);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_min");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_min);
+	snprintf(tmp_str, 15, "%d", use_min);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_max");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_max);
+	snprintf(tmp_str, 15, "%d", use_max);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_not");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_not);
+	snprintf(tmp_str, 15, "%d", use_not);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_and");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_and);
+	snprintf(tmp_str, 15, "%d", use_and);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_or");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_or);
+	snprintf(tmp_str, 15, "%d", use_or);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_xor");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_xor);
+	snprintf(tmp_str, 15, "%d", use_xor);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_nand");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_nand);
+	snprintf(tmp_str, 15, "%d", use_nand);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_nor");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_nor);
+	snprintf(tmp_str, 15, "%d", use_nor);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_sin");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_sin);
+	snprintf(tmp_str, 15, "%d", use_sin);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_cos");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_cos);
+	snprintf(tmp_str, 15, "%d", use_cos);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_tan");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_tan);
+	snprintf(tmp_str, 15, "%d", use_tan);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_asin");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_asin);
+	snprintf(tmp_str, 15, "%d", use_asin);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_acos");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_acos);
+	snprintf(tmp_str, 15, "%d", use_acos);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_atan");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_atan);
+	snprintf(tmp_str, 15, "%d", use_atan);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_iflz");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_iflz);
+	snprintf(tmp_str, 15, "%d", use_iflz);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_ifalbcd");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_ifalbcd);
+	snprintf(tmp_str, 15, "%d", use_ifalbcd);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_if_a_or_b_cd");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_if_a_or_b_cd);
+	snprintf(tmp_str, 15, "%d", use_if_a_or_b_cd);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_if_a_xor_b_cd");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_if_a_xor_b_cd);
+	snprintf(tmp_str, 15, "%d", use_if_a_xor_b_cd);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_fmod");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_fmod);
+	snprintf(tmp_str, 15, "%d", use_fmod);
 	data.set_value(tmp_str);
 
 	/*
 	node = parent.append_child("use_num_inputs");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_num_inputs);
+	snprintf(tmp_str, "%d", use_num_inputs);
 	data.set_value(tmp_str);
 
 	node = parent.append_child("use_inputs_average");
 	data = node.append_child(pugi::node_pcdata);
-	sprintf(tmp_str, "%d", use_inputs_average);
+	snprintf(tmp_str, "%d", use_inputs_average);
 	data.set_value(tmp_str);
 	*/
 
@@ -590,7 +590,7 @@ unsigned int t_mep_functions::get_list_of_operators(int *actual_operators)
 		num_operators++;
 	}
 	if (use_log2) {
-		actual_operators[num_operators] = O_lOG2;
+		actual_operators[num_operators] = O_LOG2;
 		num_operators++;
 	}
 	if (use_floor) {
@@ -684,7 +684,7 @@ unsigned int t_mep_functions::get_list_of_operators(int *actual_operators)
 	return num_operators;
 }
 //---------------------------------------------------------------------------
-unsigned int t_mep_functions::count_operators(void)
+unsigned int t_mep_functions::count_operators(void) const
 {
 	unsigned int num_operators = 0;
 	if (use_addition)
@@ -791,9 +791,19 @@ bool t_mep_functions::get_addition(void) const
 	return use_addition;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_addition_enabled(int /*data_type*/) const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_subtraction(void)const
 {
 	return use_subtraction;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_subtraction_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_multiplication(void)const
@@ -801,9 +811,19 @@ bool t_mep_functions::get_multiplication(void)const
 	return use_multiplication;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_multiplication_enabled(int /*data_type*/)const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_division(void)const
 {
 	return use_division;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_division_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_power(void)const
@@ -811,9 +831,19 @@ bool t_mep_functions::get_power(void)const
 	return use_power;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_power_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_sqrt(void)const
 {
 	return use_sqrt;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_sqrt_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_exp(void)const
@@ -821,9 +851,19 @@ bool t_mep_functions::get_exp(void)const
 	return use_exp;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_exp_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_pow10(void)const
 {
 	return use_pow10;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_pow10_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_ln(void)const
@@ -831,9 +871,19 @@ bool t_mep_functions::get_ln(void)const
 	return use_ln;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_ln_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_log10(void)const
 {
 	return use_log10;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_log10_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_log2(void)const
@@ -841,9 +891,19 @@ bool t_mep_functions::get_log2(void)const
 	return use_log2;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_log2_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_floor(void)const
 {
 	return use_floor;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_floor_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_ceil(void)const
@@ -851,9 +911,19 @@ bool t_mep_functions::get_ceil(void)const
 	return use_ceil;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_ceil_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_abs(void)const
 {
 	return use_abs;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_abs_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_inv(void)const
@@ -861,9 +931,19 @@ bool t_mep_functions::get_inv(void)const
 	return use_inv;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_inv_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_neg(void)const
 {
 	return use_neg;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_neg_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_x2(void)const
@@ -871,9 +951,19 @@ bool t_mep_functions::get_x2(void)const
 	return use_x2;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_x2_enabled(int /*data_type*/)const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_min(void)const
 {
 	return use_min;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_min_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_max(void)const
@@ -881,9 +971,19 @@ bool t_mep_functions::get_max(void)const
 	return use_max;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_max_enabled(int /*data_type*/)const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_sin(void)const
 {
 	return use_sin;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_sin_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_cos(void)const
@@ -891,9 +991,19 @@ bool t_mep_functions::get_cos(void)const
 	return use_cos;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_cos_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_tan(void)const
 {
 	return use_tan;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_tan_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_asin(void)const
@@ -901,9 +1011,19 @@ bool t_mep_functions::get_asin(void)const
 	return use_asin;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_asin_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_acos(void)const
 {
 	return use_acos;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_acos_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_atan(void)const
@@ -911,9 +1031,19 @@ bool t_mep_functions::get_atan(void)const
 	return use_atan;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_atan_enabled(int data_type)const
+{
+	return data_type == MEP_DATA_DOUBLE;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_iflz(void)const
 {
 	return use_iflz;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_iflz_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_ifalbcd(void)const
@@ -921,9 +1051,19 @@ bool t_mep_functions::get_ifalbcd(void)const
 	return use_ifalbcd;
 }
 //---------------------------------------------------------------------------
+bool t_mep_functions::get_ifalbcd_enabled(int /*data_type*/)const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
 bool t_mep_functions::get_if_a_or_b_cd(void)const
 {
 	return use_if_a_or_b_cd;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_if_a_or_b_cd_enabled(int /*data_type*/)const
+{
+	return true;
 }
 //---------------------------------------------------------------------------
 bool t_mep_functions::get_if_a_xor_b_cd(void)const
@@ -931,10 +1071,22 @@ bool t_mep_functions::get_if_a_xor_b_cd(void)const
 	return use_if_a_xor_b_cd;
 }
 //---------------------------------------------------------------------------
-bool t_mep_functions::get_fmod(void)const
+bool t_mep_functions::get_if_a_xor_b_cd_enabled(int /*data_type*/)const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_mod(void)const
 {
 	return use_fmod;
 }
+//---------------------------------------------------------------------------
+bool t_mep_functions::get_mod_enabled(int /*data_type*/)const
+{
+	return true;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 void t_mep_functions::set_addition(bool value)
 {
@@ -1110,7 +1262,7 @@ void t_mep_functions::set_if_a_xor_b_cd(bool value)
 	modified = true;
 }
 //---------------------------------------------------------------------------
-void t_mep_functions::set_fmod(bool value)
+void t_mep_functions::set_mod(bool value)
 {
 	use_fmod = value;
 	modified = true;
@@ -1145,7 +1297,7 @@ modified = true;
 }
 //---------------------------------------------------------------------------
 */
-bool t_mep_functions::operator==(const t_mep_functions &other)
+bool t_mep_functions::operator==(const t_mep_functions &other) const
 {
 	if (use_addition != other.use_addition)
 		return false;
