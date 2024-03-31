@@ -1,4 +1,4 @@
-# libmep 2022.01.10.0-beta
+# libmep 2024.03.31.0-beta
 
 # Multi Expression Programming library
 
@@ -20,7 +20,7 @@ Include paths must point to the [include](include) folder of this project.
 # To run:
 
 You need some file with training data.
-We provided 2 files (located in the [data](data) folder) for test:
+We provided several files (located in the [data](data) folder) for test:
 
 - bulding1.csv for regression problems,
 - cancer1.csv for classification problems.
