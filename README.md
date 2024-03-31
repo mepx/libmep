@@ -27,6 +27,7 @@ We provided several files (located in the [data](data) folder) for test:
 - _cancer1.csv_ for binary classification problems with 0/1 output.
 - _cancer1_output1-1.csv_ for binary classification problems with -1/1 output.
 - _iris.txt_ for multiclass classification problems.
+- _fibonacci.txt_ for univariate time series.
 
 Make sure that the instruction (from the **main** function):
 
