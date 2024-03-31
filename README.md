@@ -1,11 +1,11 @@
 # Multi Expression Programming library
 **version 2024.03.31.0-beta**
 
-Implements the Multi Expression Programming (MEP) technique for solving symbolic regression, classification (binary and multiclass) and time-series prediction problems. 
+Implements the Multi Expression Programming (MEP) technique for solving symbolic regression, classification (binary and multiclass), and time-series prediction problems. 
 
-MEP is a [Genetic Programming (GP)](https://en.wikipedia.org/wiki/Genetic_programming) variant with linear representation of chromosomes.
+MEP is a [Genetic Programming (GP)](https://en.wikipedia.org/wiki/Genetic_programming) variant with a linear representation of chromosomes.
 
-MEP introduced a unique feature: the ability to encode multiple solutions in the same chromosome. This means that we can explore much more from the search space compared to other techniques which encode a single solution in the chromosome. In most cases this advantage comes with no penalty regarding the running time or the involved resources.
+MEP introduced a unique feature: the ability to encode multiple solutions in the same chromosome. This means that we can explore much more from the search space compared to other techniques that encode a single solution in the chromosome. In most cases, this advantage comes with no penalty regarding running time or resources involved.
 
 # To compile: 
 
@@ -20,7 +20,7 @@ Include paths must point to the [include](include) folder of this project.
 
 # To run:
 
-You need some file with training data.
+You need some a file with training data.
 We provided several files (located in the [data](data) folder) for test:
 
 - bulding1.csv for regression problems,
@@ -28,7 +28,7 @@ We provided several files (located in the [data](data) folder) for test:
 
 Make sure that the instruction (from the **main** function):
 
-	if (!training_data->from_csv("../data/building1.csv")) ...
+	if (!training_data->from_csv_file("../data/building1.csv")) ...
 	
 has the correct path of the file.
 
@@ -36,7 +36,7 @@ has the correct path of the file.
 
 [https://github.com/mepx/libmep/wiki](https://github.com/mepx/libmep/wiki)
 
-It is obsolete.
+Documentation is currently obsoleted.
 It will be updated soon.
 
 # More info:
