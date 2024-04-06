@@ -8,6 +8,9 @@
 //-----------------------------------------------------------------
 #include "utils/pugixml.hpp"
 //-----------------------------------------------------------------
+#define MEP_CONSTANTS_USER_DEFINED 0
+#define MEP_CONSTANTS_AUTOMATIC 1
+//-----------------------------------------------------------------
 class t_mep_constants{
 private:
 	unsigned int num_automatic_constants;

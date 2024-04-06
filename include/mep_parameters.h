@@ -8,16 +8,14 @@
 //-----------------------------------------------------------------
 #include "utils/pugixml.hpp"
 //-----------------------------------------------------------------
+#define MEP_DATA_DOUBLE 0
+#define MEP_DATA_STRING 1
+#define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
+//-----------------------------------------------------------------
 #define MEP_PROBLEM_REGRESSION 0
 #define MEP_PROBLEM_BINARY_CLASSIFICATION 1
 #define MEP_PROBLEM_MULTICLASS_CLASSIFICATION 2
 #define MEP_PROBLEM_TIME_SERIE 3
-//-----------------------------------------------------------------
-#define MEP_CONSTANTS_USER_DEFINED 0
-#define MEP_CONSTANTS_AUTOMATIC 1
-//-----------------------------------------------------------------
-#define MEP_UNIFORM_CROSSOVER 0
-#define MEP_ONE_CUTTING_POINT_CROSSOVER 1
 //-----------------------------------------------------------------
 #define MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 0
 #define MEP_REGRESSION_MEAN_SQUARED_ERROR 1
@@ -32,11 +30,9 @@
 #define MEP_TIME_SERIES_TEST 0
 #define MEP_TIME_SERIES_PREDICTION 1
 //-----------------------------------------------------------------
-#define MEP_DATA_DOUBLE 0
-#define MEP_DATA_STRING 1
-#define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
+#define MEP_UNIFORM_CROSSOVER 0
+#define MEP_ONE_CUTTING_POINT_CROSSOVER 1
 //-----------------------------------------------------------------
-
 class t_mep_parameters{
 private:
     double mutation_probability;                // mutation probability
@@ -74,7 +70,6 @@ private:
 	
 	char data_type;
 	double precision;
-
 public:
 
 	t_mep_parameters(void);

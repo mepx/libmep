@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------
 #include "mep_constants.h"
 #include "mep_parameters.h"
-//#include "utils\func_utils.h"
 #include "mep_binary_classification_utils.h"
 #include "mep_data.h"
 #include "mep_error_functions.h"
