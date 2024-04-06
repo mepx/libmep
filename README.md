@@ -14,7 +14,7 @@ C++ 11 is required due to the use of C++ 11 threads.
 Create a new project and add:
 
 - all files from [src](src) and 
-- one file from [tests](tests) folder (which contains the **main** function). 
+- one file from [main](main) folder (which contains the **main** function). 
 
 Include paths must point to the [include](include) folder of this project.
 
