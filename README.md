@@ -18,6 +18,8 @@ Create a new project and add:
 
 Include paths must point to the [include](include) folder of this project.
 
+If you use the MS compiler, add _CRT_SECURE_NO_WARNINGS and _CRT_NONSTDC_NO_DEPRECATE to the preprocessor definitions.
+
 # To run:
 
 You need some a file with training data.
