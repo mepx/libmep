@@ -8,6 +8,7 @@
 #include <string.h>
 //---------------------------------------------------------------------------
 #include "mep_constants.h"
+#include "mep_parameters.h"
 #include "utils/validation_double.h"
 //---------------------------------------------------------------------------
 t_mep_constants::t_mep_constants(void)
@@ -50,7 +51,7 @@ void t_mep_constants::init(void)
 	}
 	constants_long = NULL;
 
-	constants_type = MEP_AUTOMATIC_CONSTANTS; // automatically generated
+	constants_type = MEP_CONSTANTS_AUTOMATIC; // automatically generated
 	constants_can_evolve = true;
 	constants_mutation_max_deviation_double = 1;
 	constants_mutation_max_deviation_long = 1;
@@ -184,7 +185,7 @@ bool t_mep_constants::from_xml(pugi::xml_node parent)
 		constants_type = (unsigned int)atoi(value_as_cstring);
 	}
 	else
-		constants_type = MEP_AUTOMATIC_CONSTANTS;
+		constants_type = MEP_CONSTANTS_AUTOMATIC;
 
 	node = parent.child("num_automatic_constants");
 	if (node) {
@@ -202,7 +203,7 @@ bool t_mep_constants::from_xml(pugi::xml_node parent)
 	else
 		num_user_defined_constants = 0;
 
-	if (constants_type == MEP_AUTOMATIC_CONSTANTS){
+	if (constants_type == MEP_CONSTANTS_AUTOMATIC){
 		num_user_defined_constants = 0;
 	}
 	else{ // user defined constants

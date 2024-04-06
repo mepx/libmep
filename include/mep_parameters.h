@@ -13,8 +13,8 @@
 #define MEP_PROBLEM_MULTICLASS_CLASSIFICATION 2
 #define MEP_PROBLEM_TIME_SERIE 3
 //-----------------------------------------------------------------
-#define MEP_USER_DEFINED_CONSTANTS 0
-#define MEP_AUTOMATIC_CONSTANTS 1
+#define MEP_CONSTANTS_USER_DEFINED 0
+#define MEP_CONSTANTS_AUTOMATIC 1
 //-----------------------------------------------------------------
 #define MEP_UNIFORM_CROSSOVER 0
 #define MEP_ONE_CUTTING_POINT_CROSSOVER 1

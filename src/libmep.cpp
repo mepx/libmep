@@ -1438,18 +1438,18 @@ bool t_mep::validate_project(char* error_message, size_t buffer_size)
 	}
 
 	if (mep_parameters.get_constants_probability() > 0) {
-		if (mep_constants.get_constants_type() == MEP_USER_DEFINED_CONSTANTS &&
+		if (mep_constants.get_constants_type() == MEP_CONSTANTS_USER_DEFINED &&
 			!mep_constants.get_num_user_defined_constants()) {
 			strcpy(error_message, "If constant's type is user defined, you must enter some constants!");
 			return false;
 		}
-		if (mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS &&
+		if (mep_constants.get_constants_type() == MEP_CONSTANTS_AUTOMATIC &&
 			!mep_constants.get_num_automatic_constants()) {
 			strcpy(error_message, "If constant's type is program generated, you must set the number of constants to a value greater than 0!");
 			return false;
 		}
 
-		if (mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS &&
+		if (mep_constants.get_constants_type() == MEP_CONSTANTS_AUTOMATIC &&
 			mep_constants.get_min_constants_interval_double() >= mep_constants.get_max_constants_interval_double()) {
 			strcpy(error_message, "The lower bound for constant's interval must be smaller than upper bound!");
 			return false;

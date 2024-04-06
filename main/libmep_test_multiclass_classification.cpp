@@ -69,7 +69,7 @@ int main(void)
 	mep_parameters->set_constants_probability(0.2); // do this is you want constants to be used in evolution
 
 
-	mep_constants->set_constants_type(MEP_AUTOMATIC_CONSTANTS);
+	mep_constants->set_constants_type(MEP_CONSTANTS_AUTOMATIC);
 	mep_constants->set_num_automatic_constants(5); // 5 constants
 	mep_constants->set_min_constants_interval_double(0);
 	mep_constants->set_max_constants_interval_double(1);

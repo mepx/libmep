@@ -71,7 +71,7 @@ void t_mep_chromosome::allocate_memory(unsigned int _code_length,
 	num_utilized_genes = -1;
 
 	if (use_constants) {
-		if (constants->get_constants_type() == MEP_USER_DEFINED_CONSTANTS) {
+		if (constants->get_constants_type() == MEP_CONSTANTS_USER_DEFINED) {
 			num_constants = constants->get_num_user_defined_constants();
 			if (num_constants){
 				if (data_type == MEP_DATA_DOUBLE)
@@ -439,7 +439,7 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 {
 	// I have to generate the constants for this individuals
 	if (parameters.get_constants_probability() > 1E-6) {
-		if (mep_constants.get_constants_type() == MEP_USER_DEFINED_CONSTANTS) {
+		if (mep_constants.get_constants_type() == MEP_CONSTANTS_USER_DEFINED) {
 			if (data_type == MEP_DATA_LONG_LONG)
 				for (unsigned int c = 0; c < num_constants; c++)
 					long_constants[c] = mep_constants.get_constants_long(c);
@@ -541,7 +541,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 	// lets see if I can evolve constants
 
 	if (mep_constants.get_constants_can_evolve() && 
-		mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS){
+		mep_constants.get_constants_type() == MEP_CONSTANTS_AUTOMATIC){
 		if (data_type == MEP_DATA_LONG_LONG)
 		for (unsigned int c = 0; c < num_constants; c++) {
 			p = mep_real_rand(seed, 0, 1);      // mutate the operator
@@ -614,7 +614,7 @@ void t_mep_chromosome::one_cut_point_crossover(const t_mep_chromosome &parent2,
 	}
 
 	if (num_constants && mep_constants.get_constants_can_evolve() &&
-			mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS) {
+			mep_constants.get_constants_type() == MEP_CONSTANTS_AUTOMATIC) {
 		pct = 1 + mep_unsigned_int_rand(seed, 0, num_constants - 1);
 		
 		if (data_type == MEP_DATA_LONG_LONG){
@@ -664,7 +664,7 @@ void t_mep_chromosome::uniform_crossover(
 		}
 
     if (mep_constants.get_constants_can_evolve() &&
-		mep_constants.get_constants_type() == MEP_AUTOMATIC_CONSTANTS){
+		mep_constants.get_constants_type() == MEP_CONSTANTS_AUTOMATIC){
 		if (data_type == MEP_DATA_LONG_LONG){
 			for (unsigned int c = 0; c < num_constants; c++) {
 				offspring1.long_constants[c] = long_constants[c];
