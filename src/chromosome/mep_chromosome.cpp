@@ -13,7 +13,6 @@
 //---------------------------------------------------------------------------
 #include "mep_chromosome.h"
 #include "mep_functions.h"
-#include "mep_constants.h"
 #include "mep_data.h"
 #include "utils/rands_generator_utils.h"
 //---------------------------------------------------------------------------

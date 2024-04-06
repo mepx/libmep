@@ -5,16 +5,16 @@
 //-----------------------------------------------------------------
 #ifndef mep_parameters_H
 #define mep_parameters_H
-
 //-----------------------------------------------------------------
 #include "utils/pugixml.hpp"
-#include "mep_constants.h"
-
 //-----------------------------------------------------------------
 #define MEP_PROBLEM_REGRESSION 0
 #define MEP_PROBLEM_BINARY_CLASSIFICATION 1
 #define MEP_PROBLEM_MULTICLASS_CLASSIFICATION 2
 #define MEP_PROBLEM_TIME_SERIE 3
+//-----------------------------------------------------------------
+#define MEP_USER_DEFINED_CONSTANTS 0
+#define MEP_AUTOMATIC_CONSTANTS 1
 //-----------------------------------------------------------------
 #define MEP_UNIFORM_CROSSOVER 0
 #define MEP_ONE_CUTTING_POINT_CROSSOVER 1
@@ -79,6 +79,7 @@ public:
 
 	t_mep_parameters(void);
     void init (void);
+	
     void to_xml(pugi::xml_node parent);
     int from_xml(pugi::xml_node parent);
 
