@@ -111,7 +111,11 @@ void print_instruction_to_Basic(int op,
 		snprintf(tmp_s, 100, "IIf (prg(%u) < 0 Xor prg(%u) < 0, prg(%u), prg(%u)) ' if_a_xor_b_cd", adr1, adr2, adr3, adr4);
 		break;
 	case O_FMOD:
+		if (data_type == MEP_DATA_LONG_LONG)
 			snprintf(tmp_s, 100, "prg(%u) Mod prg(%u)", adr1, adr2);
+		else // for double
+			snprintf(tmp_s, 100, "Evaluate(\"MOD(\" & prg(%u) & \",\" & prg(%u) & \")\")", adr1, adr2);
+
 		break;
 	case O_NUM_INPUTS:
 		snprintf(tmp_s, 100, "%d ' num. inputs", 0);
