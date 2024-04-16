@@ -848,7 +848,7 @@ double t_mep_all_runs_statistics::get_num_utilized_instructions(unsigned int run
 	return stats[run].best_program.get_num_utilized_genes();
 }
 //---------------------------------------------------------------------------
-int t_mep_all_runs_statistics::to_csv(const char *filename, unsigned int problem_type)const
+bool t_mep_all_runs_statistics::to_csv_file(const char *filename, unsigned int problem_type)const
 {
 	FILE *f = NULL;
 #ifdef _WIN32
@@ -978,7 +978,7 @@ int t_mep_all_runs_statistics::to_csv(const char *filename, unsigned int problem
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_all_runs_statistics::to_tex(const char *filename, unsigned int problem_type) const
+bool t_mep_all_runs_statistics::to_tex_file(const char *filename, unsigned int problem_type) const
 {
 	FILE *f = NULL;
 #ifdef _WIN32
@@ -1117,7 +1117,7 @@ int t_mep_all_runs_statistics::to_tex(const char *filename, unsigned int problem
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_all_runs_statistics::to_html(const char* filename, unsigned int problem_type) const
+bool t_mep_all_runs_statistics::to_html_file(const char* filename, unsigned int problem_type) const
 {
 	FILE* f = NULL;
 #ifdef _WIN32
@@ -1445,16 +1445,15 @@ void t_mep_all_runs_statistics::append(unsigned int num_generations)
 	num_runs++;
 }
 //---------------------------------------------------------------------------
-int t_mep_all_runs_statistics::to_xml(pugi::xml_node parent)
+void t_mep_all_runs_statistics::to_xml_node(pugi::xml_node parent) const
 {
 	for (unsigned int r = 0; r < num_runs; r++) {
 		pugi::xml_node run_node = parent.append_child("run");
 		stats[r].to_xml(run_node);
 	}
-	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_all_runs_statistics::from_xml(pugi::xml_node parent,
+bool t_mep_all_runs_statistics::from_xml_node(pugi::xml_node parent,
 							   unsigned int problem_type,
 							   unsigned int error_measure,
 							   unsigned int num_classes,

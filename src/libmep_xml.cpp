@@ -59,7 +59,7 @@ void t_mep::to_xml_node(pugi::xml_node parent)
 
 	pugi::xml_node results_node = parent.append_child("results");
 
-	statistics.to_xml(results_node);
+	statistics.to_xml_node(results_node);
 
 	modified_project = false;
 }
@@ -201,7 +201,7 @@ bool t_mep::from_xml_node(pugi::xml_node parent)
 		test_data.assign_class_index_from_training_class_labels(training_data.get_class_labels_ptr(), training_data.get_num_classes());
 	}
 
-	statistics.from_xml(parent,
+	statistics.from_xml_node(parent,
 						mep_parameters.get_problem_type(),
 						mep_parameters.get_error_measure(),
 						training_data.get_num_classes(),
