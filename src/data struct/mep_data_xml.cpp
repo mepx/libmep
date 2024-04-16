@@ -9,7 +9,7 @@
 //-----------------------------------------------------------------
 #include "mep_data.h"
 //-----------------------------------------------------------------
-int t_mep_data::from_xml(pugi::xml_node parent)
+bool t_mep_data::from_xml_node(pugi::xml_node parent)
 {
 	clear_data();
 
@@ -148,7 +148,7 @@ int t_mep_data::from_xml(pugi::xml_node parent)
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_xml(pugi::xml_node parent)
+bool t_mep_data::to_xml_node(pugi::xml_node parent)
 {
 	char temp_str[100];
 

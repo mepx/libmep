@@ -119,8 +119,8 @@ public:
 	// init data
     void init(void);
 
-    int from_xml(pugi::xml_node parent);
-    bool to_xml(pugi::xml_node parent);
+    bool from_xml_node(pugi::xml_node parent);
+    bool to_xml_node(pugi::xml_node parent);
 
 	// saves the training data to a csv files
 	bool to_csv(const char *file_name, char ListSeparator) const;

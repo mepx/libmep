@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2024.4.16.0-beta");
+	strcpy(version, "2024.4.16.1-beta");
 
 	num_selected_operators = 0;
 

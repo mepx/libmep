@@ -20,11 +20,11 @@ void t_mep::to_pugixml_node(pugi::xml_node parent)
 	// utilized variables
 
 	pugi::xml_node training_node = parent.append_child("training");
-	training_data.to_xml(training_node);
+	training_data.to_xml_node(training_node);
 	pugi::xml_node validation_node = parent.append_child("validation");
-	validation_data.to_xml(validation_node);
+	validation_data.to_xml_node(validation_node);
 	pugi::xml_node testing_node = parent.append_child("test");
-	test_data.to_xml(testing_node);
+	test_data.to_xml_node(testing_node);
 
 	if (mep_parameters.get_problem_type() != MEP_PROBLEM_TIME_SERIE) {
 		if (variables_enabled && training_data.get_num_cols()) {
@@ -104,7 +104,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	training_data.clear_data();
 	node = parent.child("training");
 	if (node) {
-		training_data.from_xml(node);
+		training_data.from_xml_node(node);
 		if (training_data.get_num_cols() > 0)
 			num_total_variables = training_data.get_num_cols() - mep_parameters.get_num_outputs();
 		else
@@ -175,12 +175,12 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	validation_data.clear_data();
 	node = parent.child("validation");
 	if (node)
-		validation_data.from_xml(node);
+		validation_data.from_xml_node(node);
 
 	test_data.clear_data();
 	node = parent.child("test");
 	if (node) {
-		test_data.from_xml(node);
+		test_data.from_xml_node(node);
 	}
 
 	node = parent.child("operators");
