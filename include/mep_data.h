@@ -127,7 +127,6 @@ public:
 	bool to_csv_open_file(FILE* f, char _list_separator) const;
 	
 	// loads the data from a csv file
-//	bool from_csv(const char *filename, char list_separator, char decimal_separator);
 	bool from_csv_file(const char* file_name, char _list_separator, char _decimal_separator);
 	bool from_csv_file_no_conversion(const char* filename, char _list_separator);
 
