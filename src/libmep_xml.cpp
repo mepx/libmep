@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------
-void t_mep::to_pugixml_node(pugi::xml_node parent)
+void t_mep::to_xml_node(pugi::xml_node parent)
 {
 	// utilized variables
 
@@ -64,7 +64,7 @@ void t_mep::to_pugixml_node(pugi::xml_node parent)
 	modified_project = false;
 }
 //---------------------------------------------------------------------------
-void t_mep::to_pugixml_node_current_generation(pugi::xml_node parent)
+void t_mep::to_xml_node_current_generation(pugi::xml_node parent)
 {
 	unsigned int num_subpops = mep_parameters.get_num_subpopulations();
 	
@@ -81,8 +81,7 @@ void t_mep::to_pugixml_node_current_generation(pugi::xml_node parent)
 	}
 }
 //---------------------------------------------------------------------------
-
-int t_mep::from_pugixml_node(pugi::xml_node parent)
+bool t_mep::from_xml_node(pugi::xml_node parent)
 {
 	//get the utilized variables first
 
@@ -219,7 +218,7 @@ int t_mep::from_pugixml_node(pugi::xml_node parent)
 	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep::to_xml(const char* filename)
+bool t_mep::to_xml_file(const char* filename)
 {
 	char* old_locale = setlocale(LC_NUMERIC, NULL);
 	char* saved_locale = strdup (old_locale);
@@ -238,7 +237,7 @@ int t_mep::to_xml(const char* filename)
 	data.set_value(problem_description);
 
 	pugi::xml_node alg_node = body.append_child("algorithm");
-	to_pugixml_node(alg_node);
+	to_xml_node(alg_node);
 
 	modified_project = false;
 
@@ -259,7 +258,7 @@ int t_mep::to_xml(const char* filename)
 
 }
 //-----------------------------------------------------------------
-int t_mep::to_xml_file_current_generation(const char* filename)
+bool t_mep::to_xml_file_current_generation(const char* filename)
 {
 	char* old_locale = setlocale(LC_NUMERIC, NULL);
 	char* saved_locale = strdup (old_locale);
@@ -269,7 +268,7 @@ int t_mep::to_xml_file_current_generation(const char* filename)
 	// add node with some name
 	pugi::xml_node body = doc.append_child("population");
 	
-	to_pugixml_node_current_generation(body);
+	to_xml_node_current_generation(body);
 	
 	setlocale(LC_NUMERIC, saved_locale);
 	free (saved_locale);
@@ -287,7 +286,7 @@ int t_mep::to_xml_file_current_generation(const char* filename)
 #endif
 }
 //-----------------------------------------------------------------
-int t_mep::from_xml(const char* filename)
+bool t_mep::from_xml_file(const char* filename)
 {
 	char* old_locale = setlocale(LC_NUMERIC, NULL);
 	char* saved_locale = strdup (old_locale);
@@ -350,7 +349,7 @@ int t_mep::from_xml(const char* filename)
 		return false;
 	}
 
-	from_pugixml_node(alg_node);
+	from_xml_node(alg_node);
 
 	setlocale(LC_NUMERIC, saved_locale);
 	free (saved_locale);

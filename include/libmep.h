@@ -181,18 +181,18 @@ public:
 	bool get_output(unsigned int run_index, long long *inputs, long long *outputs) const;
 
 	// saves everything to an xml file
-	int to_xml(const char* file_name);
-	int to_xml_file_current_generation(const char* filename);
+	bool to_xml_file(const char* file_name);
+	bool to_xml_file_current_generation(const char* filename);
 
 	// saves everything to an xml file
-	int from_xml(const char* file_name);
+	bool from_xml_file(const char* file_name);
 
 	// saves everything to a pugixml node
-	void to_pugixml_node(pugi::xml_node parent);
-	void to_pugixml_node_current_generation(pugi::xml_node parent);
+	void to_xml_node(pugi::xml_node parent);
+	void to_xml_node_current_generation(pugi::xml_node parent);
 	
 	// loads everything from a pugixml node
-	int from_pugixml_node(pugi::xml_node parent);
+	bool from_xml_node(pugi::xml_node parent);
 
 	t_mep_functions* get_functions_ptr(void);
 	t_mep_constants* get_constants_ptr(void);
