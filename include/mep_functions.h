@@ -89,8 +89,8 @@ class t_mep_functions
 	
 	void init(void);
 
-    int to_xml(pugi::xml_node parent);
-    int from_xml(pugi::xml_node parent);
+    void to_xml_node(pugi::xml_node parent);
+    bool from_xml_node(pugi::xml_node parent);
 
 	unsigned int get_list_of_operators(int *actual_operators);
 	unsigned int count_operators(void) const;

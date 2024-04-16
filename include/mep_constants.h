@@ -40,8 +40,8 @@ public:
 
 	bool operator==(const t_mep_constants& other) const;
 	void init(void);
-	void to_xml(pugi::xml_node parent);
-	bool from_xml(pugi::xml_node parent);
+	void to_xml_node(pugi::xml_node parent);
+	bool from_xml_node(pugi::xml_node parent);
 
 	t_mep_constants& operator=(const t_mep_constants &source);
 

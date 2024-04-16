@@ -33,7 +33,7 @@ void t_mep_functions::init(void)
 	modified = false;
 }
 //---------------------------------------------------------------------------
-int t_mep_functions::to_xml(pugi::xml_node parent)
+void t_mep_functions::to_xml_node(pugi::xml_node parent)
 {
 	char tmp_str[15];
 	pugi::xml_node node = parent.append_child("use_addition");
@@ -229,11 +229,9 @@ int t_mep_functions::to_xml(pugi::xml_node parent)
 	*/
 
 	modified = false;
-
-	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_functions::from_xml(pugi::xml_node parent)
+bool t_mep_functions::from_xml_node(pugi::xml_node parent)
 {
 	pugi::xml_node node = parent.child("use_addition");
 	if (node) {

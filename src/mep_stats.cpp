@@ -89,7 +89,7 @@ void t_mep_single_run_statistics::delete_memory(void)
 	}
 }
 //---------------------------------------------------------------------------
-int t_mep_single_run_statistics::to_xml(pugi::xml_node parent)
+void t_mep_single_run_statistics::to_xml_node(pugi::xml_node parent) const
 {
 	char tmp_str2[100];
 	pugi::xml_node node = parent.append_child("running_time");
@@ -223,11 +223,9 @@ int t_mep_single_run_statistics::to_xml(pugi::xml_node parent)
 	best_program.to_xml_node(node);
 
 	delete[] tmp_str;
-
-	return true;
 }
 //---------------------------------------------------------------------------
-int t_mep_single_run_statistics::from_xml(pugi::xml_node parent,
+bool t_mep_single_run_statistics::from_xml_node(pugi::xml_node parent,
 								   unsigned int problem_type,
 										  unsigned int error_measure,
 								   unsigned int num_classes,
@@ -1449,7 +1447,7 @@ void t_mep_all_runs_statistics::to_xml_node(pugi::xml_node parent) const
 {
 	for (unsigned int r = 0; r < num_runs; r++) {
 		pugi::xml_node run_node = parent.append_child("run");
-		stats[r].to_xml(run_node);
+		stats[r].to_xml_node(run_node);
 	}
 }
 //---------------------------------------------------------------------------
@@ -1468,7 +1466,7 @@ bool t_mep_all_runs_statistics::from_xml_node(pugi::xml_node parent,
 		stats = new t_mep_single_run_statistics[num_runs];
 		num_runs = 0;
 		for (pugi::xml_node row = node_results.child("run"); row; row = row.next_sibling("run"), num_runs++)
-			stats[num_runs].from_xml(row, problem_type, error_measure, num_classes, code_length);
+			stats[num_runs].from_xml_node(row, problem_type, error_measure, num_classes, code_length);
 	}
 	return true;
 }

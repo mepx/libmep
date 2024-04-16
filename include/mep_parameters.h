@@ -75,8 +75,8 @@ public:
 	t_mep_parameters(void);
     void init (void);
 	
-    void to_xml(pugi::xml_node parent);
-    int from_xml(pugi::xml_node parent);
+    void to_xml_node(pugi::xml_node parent);
+    bool from_xml_node(pugi::xml_node parent);
 
 	bool operator ==(const t_mep_parameters&) const;
 

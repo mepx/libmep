@@ -49,13 +49,13 @@ void t_mep::to_xml_node(pugi::xml_node parent)
 	}
 
 	pugi::xml_node parameters_node = parent.append_child("parameters");
-	mep_parameters.to_xml(parameters_node);
+	mep_parameters.to_xml_node(parameters_node);
 
 	pugi::xml_node constants_node = parent.append_child("constants");
-	mep_constants.to_xml(constants_node);
+	mep_constants.to_xml_node(constants_node);
 
 	pugi::xml_node operators_node = parent.append_child("operators");
-	mep_operators.to_xml(operators_node);
+	mep_operators.to_xml_node(operators_node);
 
 	pugi::xml_node results_node = parent.append_child("results");
 
@@ -92,7 +92,7 @@ bool t_mep::from_xml_node(pugi::xml_node parent)
 
 	pugi::xml_node node = parent.child("parameters");
 	if (node) {
-		mep_parameters.from_xml(node);
+		mep_parameters.from_xml_node(node);
 		if (mep_parameters.get_random_subset_selection_size_percent() == 0) {
 			mep_parameters.set_random_subset_selection_size_percent(100);
 		}
@@ -184,13 +184,13 @@ bool t_mep::from_xml_node(pugi::xml_node parent)
 
 	node = parent.child("operators");
 	if (node)
-		mep_operators.from_xml(node);
+		mep_operators.from_xml_node(node);
 	else
 		mep_operators.init();
 
 	node = parent.child("constants");
 	if (node)
-		mep_constants.from_xml(node);
+		mep_constants.from_xml_node(node);
 	else
 		mep_constants.init();
 	

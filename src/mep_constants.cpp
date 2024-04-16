@@ -60,7 +60,7 @@ void t_mep_constants::init(void)
 	modified = false;
 }
 //---------------------------------------------------------------------------
-void t_mep_constants::to_xml(pugi::xml_node parent)
+void t_mep_constants::to_xml_node(pugi::xml_node parent)
 {
 	char tmp_str[100];
 	
@@ -168,7 +168,7 @@ void t_mep_constants::to_xml(pugi::xml_node parent)
 	modified = false;
 }
 //---------------------------------------------------------------------------
-bool t_mep_constants::from_xml(pugi::xml_node parent)
+bool t_mep_constants::from_xml_node(pugi::xml_node parent)
 {
 	pugi::xml_node node = parent.child("data_type");
 	if (node) {

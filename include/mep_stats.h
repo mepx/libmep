@@ -40,8 +40,8 @@ public:
 
 	t_mep_single_run_statistics& operator=(const t_mep_single_run_statistics& source);
 
-	int to_xml(pugi::xml_node parent);
-	int from_xml(pugi::xml_node parent,
+	void to_xml_node(pugi::xml_node parent) const;
+	bool from_xml_node(pugi::xml_node parent,
 				 unsigned int problem_type,
 				 unsigned int error_measure,
 				 unsigned int num_classes,

@@ -47,7 +47,7 @@ void t_mep_parameters::init(void)
 	modified = false;
 }
 //---------------------------------------------------------------------------
-void t_mep_parameters::to_xml(pugi::xml_node parent)
+void t_mep_parameters::to_xml_node(pugi::xml_node parent)
 {
 	char tmp_str[100];
 	pugi::xml_node node = parent.append_child("mutation_probability");
@@ -178,7 +178,7 @@ void t_mep_parameters::to_xml(pugi::xml_node parent)
 	modified = false;
 }
 //---------------------------------------------------------------------------
-int t_mep_parameters::from_xml(pugi::xml_node parent)
+bool t_mep_parameters::from_xml_node(pugi::xml_node parent)
 {
 	pugi::xml_node node = parent.child("mutation_probability");
 	if (node) {
