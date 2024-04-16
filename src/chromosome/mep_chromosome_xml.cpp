@@ -9,7 +9,7 @@
 //---------------------------------------------------------------------------
 #include "mep_chromosome.h"
 //---------------------------------------------------------------------------
-void t_mep_chromosome::to_xml_node(pugi::xml_node parent)
+void t_mep_chromosome::to_xml_node(pugi::xml_node parent) const
 {
 	char tmp_str[100];
 

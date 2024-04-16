@@ -753,17 +753,17 @@ return true;
 }
 //---------------------------------------------------------------------------
 */
-double t_mep_chromosome::get_fitness(void)
+double t_mep_chromosome::get_fitness(void) const
 {
 	return fitness;
 }
 //---------------------------------------------------------------------------
-unsigned int t_mep_chromosome::get_index_best_gene(unsigned int output_index)
+unsigned int t_mep_chromosome::get_index_best_gene(unsigned int output_index) const
 {
 	return index_best_genes[output_index];
 }
 //---------------------------------------------------------------------------
-double t_mep_chromosome::get_best_class_threshold(void)
+double t_mep_chromosome::get_best_class_threshold(void) const
 {
 	return best_class_threshold;
 }
@@ -774,7 +774,7 @@ void t_mep_chromosome::set_gene_operation(unsigned int gene_index, int new_opera
 		prg[gene_index].op = new_operation;
 }
 //---------------------------------------------------------------------------
-double t_mep_chromosome::get_num_incorrectly_classified(void)
+double t_mep_chromosome::get_num_incorrectly_classified(void) const
 {
 	return num_incorrectly_classified;
 }
@@ -880,7 +880,7 @@ void t_mep_chromosome::compute_fitness(const t_mep_data& mep_dataset,
 	count_num_utilized_genes();
 }
 //---------------------------------------------------------------------------
-unsigned int t_mep_chromosome::get_closest_class_index_from_center(double program_output)
+unsigned int t_mep_chromosome::get_closest_class_index_from_center(double program_output) const
 {
 	double min_dist = DBL_MAX;
 	unsigned int closest_class_index = 0;
@@ -895,7 +895,7 @@ unsigned int t_mep_chromosome::get_closest_class_index_from_center(double progra
 //---------------------------------------------------------------------------
 bool t_mep_chromosome::get_class_index_for_winner_takes_all_dynamic(
 	double *inputs,
-	unsigned int& class_index)
+	unsigned int& class_index) const
 {
 	unsigned int index_error_gene;
 	unsigned int max_index;
@@ -929,12 +929,12 @@ bool t_mep_chromosome::get_class_index_for_winner_takes_all_dynamic(
 	return true;
 }
 //---------------------------------------------------------------------------
-unsigned int t_mep_chromosome::get_problem_type(void)
+unsigned int t_mep_chromosome::get_problem_type(void) const
 {
 	return problem_type;
 }
 //---------------------------------------------------------------------------
-int t_mep_chromosome::get_class_label(unsigned int class_index)
+int t_mep_chromosome::get_class_label(unsigned int class_index) const
 {
 	return class_labels[class_index];
 }

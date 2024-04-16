@@ -3,8 +3,8 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#ifndef MEP_DATA_CLASS_H
-#define MEP_DATA_CLASS_H
+#ifndef MEP_DATA_H
+#define MEP_DATA_H
 //-----------------------------------------------------------------
 #include "mep_parameters.h"
 #include "utils/pugixml.hpp"

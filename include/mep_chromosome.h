@@ -209,7 +209,7 @@ public:
 	
 	char* to_Latex_code(const char* libmep_version);
 
-	double get_fitness(void);
+	double get_fitness(void) const;
     
 	void generate_random(const t_mep_parameters &parameters, const t_mep_constants & mep_constants, 
 		const int *actual_operators, unsigned int num_actual_operators,
@@ -219,8 +219,10 @@ public:
 	int compare(const t_mep_chromosome &other, double precision);
 
 	void mutation(const t_mep_parameters &parameters, 
-			const t_mep_constants & mep_constants, const int *actual_operators, unsigned int num_actual_operators,
-		const unsigned int *actual_used_variables, unsigned int num_actual_used_variables, t_seed& seed);
+			const t_mep_constants & mep_constants, 
+				  const int *actual_operators, unsigned int num_actual_operators,
+				  const unsigned int *actual_used_variables, 
+				  unsigned int num_actual_used_variables, t_seed& seed);
 
 	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, 
 							const t_mep_constants & mep_constants, t_seed& seed);
@@ -276,8 +278,9 @@ public:
 
 	void fitness_multi_class_classification_winner_takes_all_fixed(const t_mep_data &mep_dataset, 
 			unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
-			double **cached_eval_matrix, unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
-			double **eval_matrix_double, 
+			double **cached_eval_matrix, 
+			unsigned int num_actual_variables, unsigned int * actual_enabled_variables,
+			double **eval_matrix_double,
 		 t_seed &seed);
 
 	void fitness_multi_class_classification_winner_takes_all_dynamic(const t_mep_data &mep_dataset, 
@@ -416,29 +419,29 @@ public:
 							unsigned int &index_error_gene, 
 							double* values_for_output_genes) const;
 	
-	bool get_error_double(double *inputs, double *outputs);
+	bool get_error_double(double *inputs, double *outputs) const;
 
-	unsigned int get_closest_class_index_from_center(double program_output);
+	unsigned int get_closest_class_index_from_center(double program_output) const;
 
 	void simplify(void);
 
-	unsigned int get_index_best_gene(unsigned int output_index);
-	double get_best_class_threshold(void);
+	unsigned int get_index_best_gene(unsigned int output_index) const;
+	double get_best_class_threshold(void) const;
 
-	double get_num_incorrectly_classified(void);
+	double get_num_incorrectly_classified(void) const;
 
-	bool get_class_index_for_winner_takes_all_dynamic(double* inputs, unsigned int& class_index);
+	bool get_class_index_for_winner_takes_all_dynamic(double* inputs, unsigned int& class_index) const;
 
-	void to_xml_node(pugi::xml_node parent);
+	void to_xml_node(pugi::xml_node parent) const;
 	int from_xml_node(pugi::xml_node parent,
 					  unsigned int _problem_type,
 					  unsigned int _error_measure,
 					  unsigned int _training_num_classes,
 					  unsigned int _code_length);
 	
-	unsigned int get_problem_type(void);
+	unsigned int get_problem_type(void) const;
 	
-	int get_class_label(unsigned int class_index);
+	int get_class_label(unsigned int class_index) const;
 	int count_num_utilized_genes(void);
 	int get_num_utilized_genes(void);
 };
