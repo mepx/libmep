@@ -123,7 +123,7 @@ public:
     bool to_xml_node(pugi::xml_node parent);
 
 	// saves the training data to a csv files
-	bool to_csv(const char *file_name, char ListSeparator) const;
+	bool to_csv_file(const char *file_name, char ListSeparator) const;
 	bool to_csv_open_file(FILE* f, char _list_separator) const;
 	
 	// loads the data from a csv file

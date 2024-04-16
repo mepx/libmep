@@ -215,7 +215,7 @@ bool t_mep_data::from_csv_file_no_conversion(const char* filename, char _list_se
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_csv(const char* filename, char _list_separator) const
+bool t_mep_data::to_csv_file(const char* filename, char _list_separator) const
 {
 	// this list separator is sent from outside
 
