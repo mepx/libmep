@@ -1,5 +1,5 @@
 # Multi Expression Programming library
-**version 2024.03.31.0-beta**
+**version 2024.04.18.0-beta**
 
 Implements the Multi Expression Programming (MEP) technique for solving symbolic regression, classification (binary and multiclass), and time-series prediction problems. 
 
@@ -29,11 +29,12 @@ We provided several files (located in the [data](data) folder) for test:
 - _cancer1.csv_ for binary classification problems with 0/1 output.
 - _cancer1_output1-1.csv_ for binary classification problems with -1/1 output.
 - _iris.txt_ for multiclass classification problems.
-- _fibonacci.txt_ for univariate time series.
+- _fibonacci.txt_ for univariate time-series.
+- _wage\_growth.csv.txt_ for multi-variate time-series.
 
 Make sure that the instruction (from the **main** function):
 
-	if (!training_data->from_csv_file("../data/building1.csv")) ...
+	if (!training_data->from_tabular_file("../data/building1.csv")) ...
 	
 has the correct path of the file.
 
