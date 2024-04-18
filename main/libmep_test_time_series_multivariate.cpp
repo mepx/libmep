@@ -5,7 +5,7 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2024.04.18
+// last update on 2024.04.18.1
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------
@@ -29,7 +29,13 @@ int main(void)
 
 	t_mep_functions* mep_functions = mep.get_functions_ptr();
 
-	//t_mep_constants* mep_constants = mep.get_constants_ptr();
+	t_mep_constants* mep_constants = mep.get_constants_ptr();
+	mep_constants->set_constants_type(MEP_CONSTANTS_AUTOMATIC);
+	mep_constants->set_num_automatic_constants(5);
+	mep_constants->set_min_constants_interval_double(0);
+	mep_constants->set_max_constants_interval_double(1);
+	mep_constants->set_constants_can_evolve(true);
+	mep_constants->set_constants_mutation_max_deviation_double(1.0);
 
 // take the input data from the https://github.com/mepx/libmep/tree/master/data folder
 
@@ -46,17 +52,27 @@ int main(void)
 	mep_functions->set_subtraction(true);
 	mep_functions->set_multiplication(true);
 	mep_functions->set_division(true);
+	mep_functions->set_exp(true);
+	mep_functions->set_ln(true);
+	mep_functions->set_sin(true);
+	mep_functions->set_cos(true);
+	mep_functions->set_iflz(true);
+	mep_functions->set_ifalbcd(true);
 
 	mep_parameters->set_num_subpopulations(4);
-	mep_parameters->set_subpopulation_size(10);
-	mep_parameters->set_num_generations(200);
-	mep_parameters->set_code_length(50);
+	mep_parameters->set_subpopulation_size(200);
+	mep_parameters->set_num_generations(100);
+	mep_parameters->set_code_length(100);
 	mep_parameters->set_problem_type(MEP_PROBLEM_TIME_SERIE);
 	mep_parameters->set_time_series_mode(MEP_TIME_SERIES_PREDICTION); // to predict future values; NOT to predict on test data
 	mep_parameters->set_window_size(5);
 	mep_parameters->set_random_subset_selection_size_percent(100);
-	mep_parameters->set_num_threads(4);
 	mep_parameters->set_error_measure(MEP_REGRESSION_MEAN_ABSOLUTE_ERROR);
+	mep_parameters->set_operators_probability(0.5);
+	mep_parameters->set_variables_probability(0.4);
+	mep_parameters->set_constants_probability(0.1);
+
+	mep_parameters->set_num_threads(4);
 	mep_parameters->set_num_runs(1);
 	
 	printf("Training / Evolving ... \n");
