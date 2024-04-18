@@ -63,7 +63,8 @@ int main(void)
 	generation_index = 0;
 	mep.start(on_generation, NULL, NULL);
 
-	double error = mep.get_stats_ptr()->get_best_training_error(0, mep_parameters->get_num_generations() - 1);
+	double error = mep.get_stats_ptr()->get_best_training_error(0, 
+																mep_parameters->get_num_generations() - 1);
 
 	printf("\nFinal error = %lf\n", error);
 

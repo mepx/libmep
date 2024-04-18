@@ -631,7 +631,8 @@ void t_mep_parameters::set_error_measure(unsigned int value)
 	switch (problem_type) {
 	case MEP_PROBLEM_REGRESSION:
 	case MEP_PROBLEM_TIME_SERIE:
-		if (value == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR || value == MEP_REGRESSION_MEAN_SQUARED_ERROR)
+		if (value == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR 
+			|| value == MEP_REGRESSION_MEAN_SQUARED_ERROR)
 			error_measure = value;
 		else
 			error_measure = MEP_REGRESSION_MEAN_ABSOLUTE_ERROR;
