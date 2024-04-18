@@ -195,7 +195,7 @@ class t_mep_functions
 	bool get_atan(void)const;
 	bool get_atan_enabled(int data_type)const;
 
-	// returns true if the "if lower than zero" operator is used
+	// returns true if the "if a < 0 then b else c" operator is used
 	bool get_iflz(void)const;
 	bool get_iflz_enabled(int data_type)const;
 
@@ -293,7 +293,7 @@ class t_mep_functions
 	// sets if the atan operator is used or not
 	void set_atan(bool value);
 
-	// sets if the "if less than zero" operator is used or not
+	// sets if the "if a < 0 then b else c" operator is used or not
 	void set_iflz(bool value);
 
 	// sets if the "if a lower than b returns c else returns d" operator is used or not
