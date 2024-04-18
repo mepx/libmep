@@ -49,7 +49,7 @@ private:
 	int *class_labels;// it is computed for training data only
 	unsigned int* class_index_of_output_col;
 
-	bool from_csv_string_old(const char* file_name);
+	bool from_tabular_string_old(const char* file_name);
 
 	void delete_double_data(void);
 	void delete_long_data(void);
@@ -123,12 +123,12 @@ public:
     bool to_xml_node(pugi::xml_node parent);
 
 	// saves the training data to a csv files
-	bool to_csv_file(const char *file_name, char ListSeparator) const;
-	bool to_csv_open_file(FILE* f, char _list_separator) const;
+	bool to_tabular_file(const char *file_name, char ListSeparator) const;
+	bool to_tabular_open_file(FILE* f, char _list_separator) const;
 	
 	// loads the data from a csv file
-	bool from_csv_file(const char* file_name, char _list_separator, char _decimal_separator);
-	bool from_csv_file_no_conversion(const char* filename, char _list_separator);
+	bool from_tabular_file(const char* file_name, char _list_separator, char _decimal_separator);
+	bool from_tabular_file_no_conversion(const char* filename, char _list_separator);
 
 	// transform string values to real values
 	int from_string_automatic_replace_to_numeric_per_column_all(

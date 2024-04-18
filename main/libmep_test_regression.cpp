@@ -2,8 +2,8 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2024.03.31
-
+// last update on 2024.04.18
+//-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------
 static int generation_index;
@@ -27,7 +27,7 @@ int main(void)
 
 // take the input data from the https://github.com/mepx/libmep/tree/master/data folder
 
-	if (!training_data->from_csv_file("building1.csv", ' ', '.')) {
+	if (!training_data->from_tabular_file("building1.csv", ' ', '.')) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
 		printf("Press Enter...");
 		getchar();

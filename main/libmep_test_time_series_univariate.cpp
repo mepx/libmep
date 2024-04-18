@@ -35,7 +35,7 @@ int main(void)
 
 // take the input data from the https://github.com/mepx/libmep/tree/master/data folder
 
-	if (!training_data->from_csv_file("data/fibonacci.txt", ' ', '.')) {
+	if (!training_data->from_tabular_file("data/fibonacci.txt", ' ', '.')) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!");
 		printf("Press Enter...");
 		getchar();

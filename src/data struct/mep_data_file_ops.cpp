@@ -126,7 +126,7 @@ bool t_mep_data::from_one_of_m_format(const char* filename, unsigned int given_n
 }
 */
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv_file(const char* filename,
+bool t_mep_data::from_tabular_file(const char* filename,
 							   char _list_separator,
 							   char _decimal_separator)
 {
@@ -180,7 +180,7 @@ bool t_mep_data::from_csv_file(const char* filename,
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_csv_file_no_conversion(const char* filename, char _list_separator)
+bool t_mep_data::from_tabular_file_no_conversion(const char* filename, char _list_separator)
 {
 	FILE* f = NULL;
 #ifdef _WIN32
@@ -215,7 +215,7 @@ bool t_mep_data::from_csv_file_no_conversion(const char* filename, char _list_se
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_csv_file(const char* filename, char _list_separator) const
+bool t_mep_data::to_tabular_file(const char* filename, char _list_separator) const
 {
 	// this list separator is sent from outside
 
@@ -235,14 +235,14 @@ bool t_mep_data::to_csv_file(const char* filename, char _list_separator) const
 	if (!f)
 		return false;
 
-	to_csv_open_file(f, _list_separator);
+	to_tabular_open_file(f, _list_separator);
 
 	fclose(f);
 
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::to_csv_open_file(FILE*f, char _list_separator) const
+bool t_mep_data::to_tabular_open_file(FILE*f, char _list_separator) const
 {
 	// this list separator is sent from outside
 

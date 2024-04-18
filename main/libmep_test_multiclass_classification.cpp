@@ -2,7 +2,7 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on: 2024.03.31.0
+// last update on: 2024.04.18.0
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------
@@ -27,7 +27,7 @@ int main(void)
 
 	printf("Loading data ...\n");
 	// sample input file taken from the https://github.com/mepx/libmep/tree/master/data folder
-	if (!training_data->from_csv_file("iris.txt", ' ', '.')) {
+	if (!training_data->from_tabular_file("iris.txt", ' ', '.')) {
 		printf("Cannot load training data! Please make sure that the path to file is correct!\n");
 		printf("Press Enter...");
 		getchar();
