@@ -5,7 +5,7 @@
 |_cancer1_output1.csv_ | Binary classification |9 |1 | [1] |
 |_iris.txt_ |  3-class classification |4 |1 | [2] |
 |_fibonacci.txt_ |  Time-series |- |1 | ?|
-|_wage\_growth.csv.txt_ |  Time-series |- |8 | [3] |
+|_wage\_growth.csv_ |  Time-series |- |8 | [3] |
 
 1. Prechelt L., PROBEN 1–A Set of Neural Network Benchmark Problems and Benchmarking Rules, Technical report, Fakultät für Informatik, Universität Karlsruhe, 1994.
 
