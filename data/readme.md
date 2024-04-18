@@ -1,4 +1,4 @@
-|File     |Type |Num inputs |Num_outputs |Source |
+|File     |Type |Num inputs |Num outputs |Source |
 | ------- | --- | --------- | ---------- | ----- |
 |_building1.csv_ | Symbolic regression |1 |1 | [1] |
 |_cancer1.csv_ | Binary classification |9 |1 | [1] |
