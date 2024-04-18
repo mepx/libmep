@@ -1,10 +1,12 @@
+// Shows how to discover the Fibonacci formula
+// Predicts the next 10 values of the Fibonnaci serie
+// Univariate time-series
+//-----------------------------------------------------------------
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2024.04.16
-//-----------------------------------------------------------------
-// Shows how to discover the Fibonacci formula and to predict next 10 values of it
+// last update on 2024.04.18
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------
