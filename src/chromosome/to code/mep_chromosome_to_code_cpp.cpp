@@ -487,7 +487,7 @@ char* t_mep_chromosome::to_C_code(bool simplified,
 		if (problem_type == MEP_PROBLEM_TIME_SERIE &&
 			num_program_outputs > 1) {
 			unsigned int window_size = num_total_variables / num_program_outputs;
-			snprintf(tmp_s, 100, "  void mepx(long long x[%u][%u] /*inputs*/, long long *outputs)", 
+			snprintf(tmp_s, 100, "void mepx(long long x[%u][%u] /*inputs*/, long long *outputs)", 
 				window_size, num_program_outputs);
 			strcat(prog, tmp_s);
 		}
@@ -498,7 +498,7 @@ char* t_mep_chromosome::to_C_code(bool simplified,
 	else{// double
 		if (problem_type == MEP_PROBLEM_TIME_SERIE && num_program_outputs > 1) {
 			unsigned int window_size = num_total_variables / num_program_outputs;
-			snprintf(tmp_s, 100, "  void mepx(double x[%u][%u] /*inputs*/, double *outputs)",
+			snprintf(tmp_s, 100, "void mepx(double x[%u][%u] /*inputs*/, double *outputs)",
 				window_size, num_program_outputs);
 			strcat(prog, tmp_s);
 
