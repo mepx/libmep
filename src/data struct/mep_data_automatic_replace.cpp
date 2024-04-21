@@ -15,7 +15,6 @@
 #endif // WIN32
 //-----------------------------------------------------------------
 #include "mep_data.h"
-#include "mep_error_codes.h"
 #include "utils/func_utils.h"
 #include "utils/rands_generator_utils.h"
 #include "utils/validation_string.h"
@@ -255,7 +254,7 @@ int t_mep_data::from_string_automatic_replace_to_double_per_column_all(
 		setlocale(LC_NUMERIC, saved_locale);
 		free (saved_locale);
 
-		return E_MEP_OK;
+		return E_MEP_DATA_OK;
 	}
 	else {
 		setlocale(LC_NUMERIC, saved_locale);
@@ -469,7 +468,7 @@ int t_mep_data::from_string_automatic_replace_to_long_per_column_all(
 			}
 			other_data2->data_type = MEP_DATA_LONG_LONG;
 		}
-		return E_MEP_OK;
+		return E_MEP_DATA_OK;
 	}
 	else {
 		return E_MEP_NO_DATA;

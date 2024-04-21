@@ -15,7 +15,6 @@
 #endif // WIN32
 //-----------------------------------------------------------------
 #include "mep_data.h"
-#include "mep_error_codes.h"
 
 #include "utils/func_utils.h"
 #include "utils/rands_generator_utils.h"
@@ -289,7 +288,7 @@ int t_mep_data::scale_to_double_interval_selected_col(double min, double max,
 				other_data2->_data_double[t][col] += min;
 		}
 
-		return E_MEP_OK;
+		return E_MEP_DATA_OK;
 	}
 	else
 		return E_MEP_NO_DATA;
@@ -302,11 +301,11 @@ int t_mep_data::scale_to_double_interval_everywhere(
 {
 	for (unsigned int v = 0; v < num_cols; v++) {
 		int result = scale_to_double_interval_selected_col(min, max, v, other_data1, other_data2);
-		if (result != E_MEP_OK)
+		if (result != E_MEP_DATA_OK)
 			return result;
 		//is this numeric or alpha ?
 	}
-	return E_MEP_OK;
+	return E_MEP_DATA_OK;
 }
 //-----------------------------------------------------------------
 /*
@@ -327,10 +326,10 @@ int t_mep_data::scale_to_double_interval_all_variables(
 int t_mep_data::move_to(t_mep_data *dest, unsigned int count)
 {
 	if (!(data_type == dest->data_type || !dest->num_data))
-		return MEP_E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES; // can move only of the same type
+		return E_MEP_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES; // can move only of the same type
 
 	if (num_data && dest->num_data && num_cols != dest->num_cols)
-		return MEP_E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS; // 
+		return E_MEP_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS; //
 
 	if (num_data >= count) {
 
@@ -430,10 +429,9 @@ int t_mep_data::move_to(t_mep_data *dest, unsigned int count)
 		dest->num_data += count;
 	}
 	else
-		return MEP_E_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
-	return MEP_E_OK;
+		return E_MEP_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
+	return E_MEP_DATA_MOVE_OK;
 }
-
 //-----------------------------------------------------------------
 void t_mep_data::shuffle(t_seed &seed)
 {
@@ -531,10 +529,10 @@ int t_mep_data::is_one_of_m_multi_class_classification_problem(
 {
 	// test if last presumed_num_classes cols are 0 and 1 only
 	if (presumed_num_classes < 2)
-		return MEP_DATA_NUM_CLASSES_TOO_FEW;
+		return E_MEP_DATA_NUM_CLASSES_TOO_FEW;
 
 	if (presumed_num_classes >= num_cols)
-		return MEP_DATA_NUM_CLASSES_TOO_MANY;
+		return E_MEP_DATA_NUM_CLASSES_TOO_MANY;
 
 	for (unsigned int r = 0; r < num_data; r++)
 		if ((checked && checked[r]) || !checked){
@@ -543,7 +541,7 @@ int t_mep_data::is_one_of_m_multi_class_classification_problem(
 			for (unsigned int c = num_cols - presumed_num_classes; c < num_cols; c++) {
 				double value;
 				if (!is_valid_double(_data_string[r][c], &value))
-					return MEP_DATA_NOT_NUMERICAL_VALUE;
+					return E_MEP_DATA_NOT_NUMERICAL_VALUE;
 				if (fabs(value) < 1E-6)
 					count_0++;
 				else
@@ -551,11 +549,11 @@ int t_mep_data::is_one_of_m_multi_class_classification_problem(
 						count_1++;
 			}
 			if (count_1 + count_0 != presumed_num_classes)
-				return MEP_DATA_NOT_ONE_OF_M;
+				return E_MEP_DATA_NOT_ONE_OF_M;
 			if (count_1 != 1)
-				return MEP_DATA_MORE_THAN_ONE_1;
+				return E_MEP_DATA_MORE_THAN_ONE_1;
 		}
-	return MEP_E_OK;
+	return E_MEP_DATA_OK;
 }
 //-----------------------------------------------------------------
 void t_mep_data::to_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes)

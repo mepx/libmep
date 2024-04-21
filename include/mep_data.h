@@ -16,18 +16,23 @@
 #define MEP_DATA_STRING 1
 #define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
 //-----------------------------------------------------------------
+#define E_MEP_DATA_OK 0
+#define E_MEP_NO_DATA 1
+#define E_MEP_DATA_MUST_HAVE_REAL_TYPE 2
+#define E_MEP_DATA_MUST_HAVE_STRING_TYPE 3
+//----------------------------------------------------------------
 
-#define MEP_E_OK 0
-#define MEP_E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
-#define MEP_E_NOT_ENOUGH_DATA_TO_MOVE 2
-#define MEP_E_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
+#define E_MEP_DATA_MOVE_OK 0
+#define E_MEP_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
+#define E_MEP_NOT_ENOUGH_DATA_TO_MOVE 2
+#define E_MEP_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3
 //-----------------------------------------------------------------
 
-#define MEP_DATA_NUM_CLASSES_TOO_FEW 1
-#define MEP_DATA_NUM_CLASSES_TOO_MANY 2
-#define MEP_DATA_NOT_NUMERICAL_VALUE 3
-#define MEP_DATA_NOT_ONE_OF_M 4
-#define MEP_DATA_MORE_THAN_ONE_1 5
+#define E_MEP_DATA_NUM_CLASSES_TOO_FEW 1
+#define E_MEP_DATA_NUM_CLASSES_TOO_MANY 2
+#define E_MEP_DATA_NOT_NUMERICAL_VALUE 3
+#define E_MEP_DATA_NOT_ONE_OF_M 4
+#define E_MEP_DATA_MORE_THAN_ONE_1 5
 //-----------------------------------------------------------------
 class t_mep_data: public t_setter_data_base {
 private:
