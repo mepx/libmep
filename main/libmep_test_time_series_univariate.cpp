@@ -1,3 +1,5 @@
+// Multi Expression Programming library example
+//-----------------------------------------------------------------
 // Shows how to discover the Fibonacci formula
 // Predicts the next 10 values of the Fibonnaci serie
 // Univariate time-series
@@ -6,7 +8,7 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2024.04.18
+// last update on 2024.04.21
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------

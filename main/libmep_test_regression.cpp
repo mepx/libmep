@@ -1,8 +1,10 @@
+// Multi Expression Programming library example
+//-----------------------------------------------------------------
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2024.04.18
+// last update on 2024.04.21
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------

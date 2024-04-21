@@ -1,3 +1,5 @@
+// Multi Expression Programming library example
+//-----------------------------------------------------------------
 // Shows how to handle multivariate time-series
 // Predicts the next 10 values of the serie
 //-----------------------------------------------------------------
@@ -5,7 +7,7 @@
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-// last update on 2024.04.18.1
+// last update on 2024.04.21.0
 //-----------------------------------------------------------------
 #include "libmep.h"
 //-----------------------------------------------------------------
