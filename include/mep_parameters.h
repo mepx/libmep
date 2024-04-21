@@ -28,8 +28,8 @@
 #define MEP_TIME_SERIES_TEST 0
 #define MEP_TIME_SERIES_PREDICTION 1
 //-----------------------------------------------------------------
-#define MEP_UNIFORM_CROSSOVER 0
-#define MEP_ONE_CUTTING_POINT_CROSSOVER 1
+#define MEP_CROSSOVER_UNIFORM 0
+#define MEP_CROSSOVER_ONE_CUTTING_POINT 1
 //-----------------------------------------------------------------
 class t_mep_parameters{
 private:

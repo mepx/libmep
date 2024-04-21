@@ -420,7 +420,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(
 					// crossover
 					double p = mep_real_rand(seeds[pop_index], 0, 1);
 					if (p < mep_parameters.get_crossover_probability()) {
-						if (mep_parameters.get_crossover_type() == MEP_UNIFORM_CROSSOVER)
+						if (mep_parameters.get_crossover_type() == MEP_CROSSOVER_UNIFORM)
 							a_sub_population->individuals[r1].uniform_crossover(
 								a_sub_population->individuals[r2],
 								a_sub_population->offspring1, a_sub_population->offspring2,

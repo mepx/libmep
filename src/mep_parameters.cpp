@@ -31,7 +31,7 @@ void t_mep_parameters::init(void)
 	variables_probability = 0.5;
 	constants_probability = 0;
 	use_validation_data = true;
-	crossover_type = MEP_UNIFORM_CROSSOVER;
+	crossover_type = MEP_CROSSOVER_UNIFORM;
 	simplified_programs = 0;
 	num_threads = 2;
 	random_subset_selection_size_percent = 100;
@@ -210,7 +210,7 @@ bool t_mep_parameters::from_xml_node(pugi::xml_node parent)
 		crossover_type = (unsigned int)atoi(value_as_cstring);
 	}
 	else
-		crossover_type = MEP_UNIFORM_CROSSOVER;
+		crossover_type = MEP_CROSSOVER_UNIFORM;
 
 	node = parent.child("subpopulation_size");
 	if (node) {
