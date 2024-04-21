@@ -4,8 +4,8 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#ifndef mep_error_functions_H
-#define mep_error_functions_H
+#ifndef mep_loss_functions_H
+#define mep_loss_functions_H
 //-----------------------------------------------------------------
 typedef double (*t_mep_error_function_double)(double, double);
 //-----------------------------------------------------------------

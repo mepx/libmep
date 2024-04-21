@@ -11,7 +11,7 @@
 #include "mep_parameters.h"
 #include "mep_binary_classification_utils.h"
 #include "mep_data.h"
-#include "mep_error_functions.h"
+#include "mep_loss_functions.h"
 #include "utils/pugixml.hpp"
 //-----------------------------------------------------------------
 struct t_code3{
