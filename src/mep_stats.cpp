@@ -1,21 +1,20 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
 //---------------------------------------------------------------------------
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#include "mep_stats.h"
-#include "mep_parameters.h"
-
-
+//---------------------------------------------------------------------------
 #ifdef _WIN32
 #include <windows.h>
 #endif
+//---------------------------------------------------------------------------
+#include "mep_stats.h"
+#include "mep_parameters.h"
 //---------------------------------------------------------------------------
 t_mep_single_run_statistics::t_mep_single_run_statistics(void)
 {

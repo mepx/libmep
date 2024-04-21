@@ -1,3 +1,4 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
@@ -5,9 +6,8 @@
 //---------------------------------------------------------------------------
 #ifndef MEP_SUBPOPULATION_H
 #define MEP_SUBPOPULATION_H
-
+//-----------------------------------------------------------------
 #include "mep_chromosome.h"
-
 //-----------------------------------------------------------------
 class t_sub_population {
 public:

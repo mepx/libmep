@@ -1,3 +1,4 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
@@ -225,22 +226,27 @@ public:
 	// set time series mode
 	void set_time_series_mode(unsigned int new_value);
 
+	// time series window size
 	unsigned int get_window_size(void) const;
 
+	// time series window size
 	void set_window_size(unsigned int window_size);
 	
-	//
+	// data type
 	void set_data_type(char _new_data_type);
 	char get_data_type(void) const;
 	
 	// returns the number of outputs of the program
 	unsigned int get_num_outputs(void) const;
+
+	// sets the number of outputs of the program
 	void set_num_outputs(unsigned int new_num);
 	
 	// precision to compare values
 	double get_precision(void) const;
-	void set_precision(double new_precision);
-	
+
+	// precision to compare values
+	void set_precision(double new_precision);	
 };
 //-----------------------------------------------------------------
 #endif // PARAMETERS_CLASS_H_INCLUDED

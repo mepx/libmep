@@ -1,10 +1,11 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
 //---------------------------------------------------------------------------
 #include <stdlib.h>
-
+//---------------------------------------------------------------------------
 #include "mep_subpopulation.h"
 //-----------------------------------------------------------------
 t_sub_population::t_sub_population()

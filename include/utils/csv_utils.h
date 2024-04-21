@@ -1,11 +1,11 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
-
+//-----------------------------------------------------------------
 #ifndef CSV_UTILS_H
 #define CSV_UTILS_H
-
 //-----------------------------------------------------------------
 #include <stdio.h>
 //-----------------------------------------------------------------

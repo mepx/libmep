@@ -1,3 +1,4 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
@@ -22,11 +23,15 @@ struct t_code3{
 //-----------------------------------------------------------------
 class t_mep_chromosome{
 private:
+	char data_type;
+
 	unsigned int code_length;
 	unsigned int num_total_variables;
 	unsigned int num_constants;
+
 	double *real_constants;
 	long long* long_constants;
+
 	unsigned int num_program_outputs; // do not confuse it with the number of data outputs!!!!!!!!
 
 	t_code3 *prg;                   // a string of genes (instructions)
@@ -46,7 +51,6 @@ private:
 	double* centers;						// center for each class;
 	
 	unsigned int problem_type;
-	char data_type;
 	unsigned int error_measure;
 	
 	int *class_labels;
@@ -141,29 +145,29 @@ private:
 										long long** data_long,
 										char* prog);
 	void print_MEP_code_C(char* s_prog,
-							const t_code3* mep_code,
-		unsigned int num_utilized_instructions);
+						  const t_code3* mep_code,
+						  unsigned int num_utilized_instructions);
 	void print_output_calculation_C(char* s_prog,
 									int num_utilized_instructions,
 									const unsigned int *index_output_instructions);
 	
 	void print_output_calculation_Excel_VBA(char* s_prog,
 											int num_utilized_instructions,
-										  const unsigned int *index_output_instructions);
+											const unsigned int *index_output_instructions);
 	void print_MEP_code_Excel_VBA(char* s_prog,
-								const t_code3* mep_code,
-								unsigned int num_utilized_instructions);
+								  const t_code3* mep_code,
+								  unsigned int num_utilized_instructions);
 	
 	void print_example_of_utilization_Python(double** data_double,
 										long long** data_long,
 										char* prog);
 	void print_MEP_code_Python(char* s_prog,
-							const t_code3* mep_code,
-				unsigned int num_utilized_instructions);
+							   const t_code3* mep_code,
+							   unsigned int num_utilized_instructions);
 
 	void print_output_calculation_Python(char* s_prog,
-									int num_utilized_instructions,
-									const unsigned int *index_output_instructions);
+										 int num_utilized_instructions,
+										 const unsigned int *index_output_instructions);
 public:
 
 	// constructor
@@ -194,9 +198,10 @@ public:
 	// a row of data is also required because the main C program will also contain an example on how to run the obtained program
 	char * to_C_code(bool simplified,
 					 double **data_double, long long** data_long,
-				const char* libmep_version);
+					 const char* libmep_version);
 
-	char* to_Excel_VBA_function_code(bool simplified, const char* libmep_version);
+	char* to_Excel_VBA_function_code(bool simplified,
+									const char* libmep_version);
 	
 	char* to_Python_code(bool simplified,
 						 double **data_double,
@@ -205,39 +210,45 @@ public:
 
 	char* to_C_infix_code(double **data_double,
 						  long long** data_long,
-		 const char* libmep_version);
+						  const char* libmep_version);
 	
 	char* to_Latex_code(const char* libmep_version);
 
 	double get_fitness(void) const;
     
-	void generate_random(const t_mep_parameters &parameters, const t_mep_constants & mep_constants, 
-		const int *actual_operators, unsigned int num_actual_operators,
-		const unsigned int *actual_used_variables, unsigned int num_actual_used_variables, t_seed& seed);
+	void generate_random(const t_mep_parameters &parameters, 
+						 const t_mep_constants & mep_constants,
+						 const int *actual_operators, unsigned int num_actual_operators,
+						 const unsigned int *actual_used_variables, unsigned int num_actual_used_variables, 
+						 t_seed& seed);
     
 	// -1 if this is better than other, 1 if this is worse than other; 0 if are equal
 	int compare(const t_mep_chromosome &other, double precision);
 
 	void mutation(const t_mep_parameters &parameters, 
-			const t_mep_constants & mep_constants, 
+				  const t_mep_constants & mep_constants, 
 				  const int *actual_operators, unsigned int num_actual_operators,
 				  const unsigned int *actual_used_variables, 
 				  unsigned int num_actual_used_variables, t_seed& seed);
 
-	void one_cut_point_crossover(const t_mep_chromosome &parent2, t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, 
-							const t_mep_constants & mep_constants, t_seed& seed);
-	void uniform_crossover(const t_mep_chromosome &parent2, 
-					t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, const t_mep_constants & mep_constants, t_seed& seed);
+	void one_cut_point_crossover(const t_mep_chromosome &parent2, 
+								 t_mep_chromosome &offspring1, t_mep_chromosome &offspring2,
+								 const t_mep_constants & mep_constants,
+								 t_seed& seed);
+	void uniform_crossover(const t_mep_chromosome &parent2,
+						   t_mep_chromosome &offspring1, t_mep_chromosome &offspring2, 
+						   const t_mep_constants & mep_constants,
+						   t_seed& seed);
 
 	void compute_fitness(const t_mep_data& mep_dataset, const t_mep_data& mep_dataset_ts,
-		unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
-		double** cached_eval_matrix_double, long long** cached_eval_matrix_long,
+						 unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
+						 double** cached_eval_matrix_double, long long** cached_eval_matrix_long,
 						 double** cached_sum_of_errors,
-		double* cached_threashold, s_value_class* tmp_value_class,
-		unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
-		double** eval_double, long long** eval_long,
+						 double* cached_threashold, s_value_class* tmp_value_class,
+						 unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
+						 double** eval_double, long long** eval_long,
 						 char* gene_used_for_output,
-		t_seed& seed);
+						 t_seed& seed);
 	/*
 	void compute_fitness(const t_mep_data& mep_dataset, const t_mep_data& mep_dataset_ts,
 		unsigned int* random_subset_indexes, unsigned int random_subset_selection_size,
@@ -248,21 +259,20 @@ public:
 		t_seed& seed);
 */
 	void fitness_regression(const t_mep_data &mep_dataset, 
-			unsigned int *random_subset_indexes,
+							unsigned int *random_subset_indexes,
 							unsigned int random_subset_selection_size,
-			double** cached_variables_eval_matrix_double,
+							double** cached_variables_eval_matrix_double,
 							long long** cached_variables_eval_matrix_long,
 							double ** cached_sum_of_errors,
-		unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
-			double ** eval_matrix_double, long long** eval_matrix_long,
+							unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 
+							double ** eval_matrix_double, long long** eval_matrix_long,
 							char *gene_used_for_output,
 							t_mep_error_function_double mep_error_function_double,
 							t_mep_error_function_long mep_error_function_long,
 							t_seed &seed);
 
-
 	void fitness_binary_classification(const t_mep_data &mep_dataset, 
-			unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
+									   unsigned int *random_subset_indexes, unsigned int random_subset_selection_size, 
 			double **cached_eval_matrix, double ** cached_sum_of_errors,
 									   double * cached_threashold,
 		unsigned int num_actual_variables, unsigned int * actual_enabled_variables, 

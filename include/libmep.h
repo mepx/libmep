@@ -1,10 +1,11 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#ifndef lib_mep_H
-#define lib_mep_H
+#ifndef libmep_H
+#define libmep_H
 //-----------------------------------------------------------------
 #include <thread>
 #include <mutex>

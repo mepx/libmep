@@ -1,3 +1,4 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
@@ -6,10 +7,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <locale.h>
-
+//-----------------------------------------------------------------
 #ifdef _WIN32
-#include <windows.h>
+	#include <windows.h>
 #endif // _WIN32
+//-----------------------------------------------------------------
 
 #include "mep_data.h"
 //-----------------------------------------------------------------

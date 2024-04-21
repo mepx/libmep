@@ -1,3 +1,4 @@
+// Multi Expression Programming library
 // Author: Mihai Oltean, mihai.oltean@gmail.com
 // https://mepx.org
 // https://github.com/mepx
@@ -6,7 +7,6 @@
 #include <math.h>
 #include <errno.h>
 #include <float.h>
-
 //---------------------------------------------------------------------------
 #include "mep_chromosome.h"
 #include "mep_functions.h"
