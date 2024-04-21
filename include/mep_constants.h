@@ -14,6 +14,8 @@
 //-----------------------------------------------------------------
 class t_mep_constants{
 private:
+	char data_type; // 0-double, 1-string, 2-long long
+
 	unsigned int num_automatic_constants;
 	unsigned int num_user_defined_constants;
 	double min_constants_interval_double, max_constants_interval_double;
@@ -32,9 +34,6 @@ private:
 	long long constants_mutation_max_deviation_long;
 
 	bool modified;
-	
-	char data_type; // 0-double, 1-string, 2-long long
-
 public:
 	t_mep_constants(void);
 	~t_mep_constants(void);

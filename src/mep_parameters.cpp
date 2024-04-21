@@ -8,6 +8,7 @@
 #include <stdlib.h>
 //---------------------------------------------------------------------------
 #include "mep_parameters.h"
+#include "mep_data.h"
 //---------------------------------------------------------------------------
 t_mep_parameters::t_mep_parameters(void)
 {

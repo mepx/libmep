@@ -8,10 +8,7 @@
 #define mep_parameters_H
 //-----------------------------------------------------------------
 #include "utils/pugixml.hpp"
-//-----------------------------------------------------------------
-#define MEP_DATA_DOUBLE 0
-#define MEP_DATA_STRING 1
-#define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
+
 //-----------------------------------------------------------------
 #define MEP_PROBLEM_REGRESSION 0
 #define MEP_PROBLEM_BINARY_CLASSIFICATION 1
@@ -36,12 +33,13 @@
 //-----------------------------------------------------------------
 class t_mep_parameters{
 private:
-    double mutation_probability;                // mutation probability
+	char data_type;
+
+	double mutation_probability;                // mutation probability
     double crossover_probability;               // crossover probability
-	unsigned int code_length;							// the number of genes
+	unsigned int code_length;						// the number of genes
     
 	unsigned int subpopulation_size;                 // the number of individuals in population  (must be an odd number!!!)
-	unsigned int num_threads;
 	unsigned int tournament_size;
 	unsigned int num_generations;
 	unsigned int problem_type; // 0- regression, 1-binary classification, 2- multi class, 3- time series
@@ -55,6 +53,7 @@ private:
 	unsigned int num_generations_for_which_random_subset_is_kept_fixed;
 
 	unsigned int random_seed;
+	unsigned int num_threads;
 	unsigned int num_runs;
 
 	bool simplified_programs;
@@ -69,7 +68,6 @@ private:
 	
 	unsigned int num_problem_outputs;
 	
-	char data_type;
 	double precision;
 public:
 

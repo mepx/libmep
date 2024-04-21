@@ -32,6 +32,11 @@ private:
 
 	t_mep_parameters mep_parameters;
 	t_mep_constants mep_constants;
+	t_mep_functions mep_operators;
+
+	t_mep_data training_data;
+	t_mep_data validation_data;
+	t_mep_data test_data;
 
 	t_sub_population* population; // array of subpopulations
 	double **cached_eval_variables_matrix_double;
@@ -46,8 +51,6 @@ private:
 	unsigned int best_individual_index_for_test;
 	unsigned int best_subpopulation_index_for_test;
 
-	t_mep_functions mep_operators;
-
 	unsigned int num_selected_operators;
 
 	int actual_operators[MEP_MAX_OPERATORS];
@@ -55,10 +58,6 @@ private:
 	bool _stopped;
 	bool _stopped_signal_sent;
 	int last_run_index;
-
-	t_mep_data training_data;
-	t_mep_data validation_data;
-	t_mep_data test_data;
 
 	// data transformed for time series
 	t_mep_data training_data_ts;
@@ -150,6 +149,10 @@ public:
 	t_mep_data *get_validation_data_ptr(void);
 	t_mep_data *get_test_data_ptr(void);
 
+	t_mep_functions* get_functions_ptr(void);
+	t_mep_constants* get_constants_ptr(void);
+	t_mep_parameters* get_parameters_ptr(void);
+
 	// returns the version of the library
 	const char * get_version(void) const;
 
@@ -194,10 +197,6 @@ public:
 	
 	// loads everything from a pugixml node
 	bool from_xml_node(pugi::xml_node parent);
-
-	t_mep_functions* get_functions_ptr(void);
-	t_mep_constants* get_constants_ptr(void);
-	t_mep_parameters* get_parameters_ptr(void);
 
 	// clears everything
 	void clear_stats(void);

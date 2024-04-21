@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2024.4.18.1-beta");
+	strcpy(version, "2024.4.21.0-beta");
 
 	num_selected_operators = 0;
 
@@ -296,8 +296,6 @@ int t_mep::start(f_on_progress on_generation,
 		compute_cached_eval_matrix_double2(array_value_class[0]);
 
 	t_seed* seeds = new t_seed[mep_parameters.get_num_subpopulations()];
-	//for (unsigned int p = 0; p < mep_parameters.get_num_subpopulations(); p++)
-		//seeds[p].init(p);
 
 	last_run_index = -1;
 
@@ -1644,14 +1642,13 @@ bool t_mep::could_be_univariate_time_serie(void) const
 		(test_data.get_num_rows() && test_data.get_num_cols() == 1));
 }
 //---------------------------------------------------------------------------
-
 unsigned int t_mep::get_num_total_variables(void) const
 {
 	return num_total_variables;
 }
 //---------------------------------------------------------------------------
+// 1653
 // 1452
 // 2177
 // 2054
 // 2314
-

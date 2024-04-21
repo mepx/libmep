@@ -86,10 +86,11 @@ class t_mep_functions
 	bool modified;
 
 	t_mep_functions(void);
-	bool operator==(const t_mep_functions& other) const;
 	
 	void init(void);
 
+	bool operator==(const t_mep_functions& other) const;
+	
     void to_xml_node(pugi::xml_node parent);
     bool from_xml_node(pugi::xml_node parent);
 

@@ -9,7 +9,7 @@
 #include <string.h>
 //---------------------------------------------------------------------------
 #include "mep_constants.h"
-#include "mep_parameters.h"
+#include "mep_data.h"
 #include "utils/validation_double.h"
 //---------------------------------------------------------------------------
 t_mep_constants::t_mep_constants(void)

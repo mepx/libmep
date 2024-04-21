@@ -12,6 +12,10 @@
 #include "utils/rands_generator_utils.h"
 #include "utils/csv_utils.h"
 //-----------------------------------------------------------------
+#define MEP_DATA_DOUBLE 0
+#define MEP_DATA_STRING 1
+#define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
+//-----------------------------------------------------------------
 
 #define MEP_E_OK 0
 #define MEP_E_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
