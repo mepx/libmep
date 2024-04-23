@@ -17,13 +17,13 @@
 #define MEP_DATA_LONG_LONG 2 // LONG LONG is currently under development!
 //-----------------------------------------------------------------
 
-#define E_MEP_DATA_OK 0
+#define E_MEP_OK 0 // that is general for all
+
 #define E_MEP_NO_DATA 1
 #define E_MEP_DATA_MUST_HAVE_REAL_TYPE 2
 #define E_MEP_DATA_MUST_HAVE_STRING_TYPE 3
 //----------------------------------------------------------------
 
-#define E_MEP_DATA_MOVE_OK 0
 #define E_MEP_CANNOT_MOVE_DATA_OF_DIFFERENT_TYPES 1
 #define E_MEP_NOT_ENOUGH_DATA_TO_MOVE 2
 #define E_MEP_DEST_AND_SOURCE_MUST_HAVE_THE_SAME_NUMBER_OF_COLUMNS 3

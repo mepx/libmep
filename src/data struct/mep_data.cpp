@@ -288,7 +288,7 @@ int t_mep_data::scale_to_double_interval_selected_col(double min, double max,
 				other_data2->_data_double[t][col] += min;
 		}
 
-		return E_MEP_DATA_OK;
+		return E_MEP_OK;
 	}
 	else
 		return E_MEP_NO_DATA;
@@ -301,11 +301,11 @@ int t_mep_data::scale_to_double_interval_everywhere(
 {
 	for (unsigned int v = 0; v < num_cols; v++) {
 		int result = scale_to_double_interval_selected_col(min, max, v, other_data1, other_data2);
-		if (result != E_MEP_DATA_OK)
+		if (result != E_MEP_OK)
 			return result;
 		//is this numeric or alpha ?
 	}
-	return E_MEP_DATA_OK;
+	return E_MEP_OK;
 }
 //-----------------------------------------------------------------
 /*
@@ -430,7 +430,7 @@ int t_mep_data::move_to(t_mep_data *dest, unsigned int count)
 	}
 	else
 		return E_MEP_NOT_ENOUGH_DATA_TO_MOVE; // not enough data
-	return E_MEP_DATA_MOVE_OK;
+	return E_MEP_OK;
 }
 //-----------------------------------------------------------------
 void t_mep_data::shuffle(t_seed &seed)
@@ -553,7 +553,7 @@ int t_mep_data::is_one_of_m_multi_class_classification_problem(
 			if (count_1 != 1)
 				return E_MEP_DATA_MORE_THAN_ONE_1;
 		}
-	return E_MEP_DATA_OK;
+	return E_MEP_OK;
 }
 //-----------------------------------------------------------------
 void t_mep_data::to_one_of_m_multi_class_classification_problem(unsigned int presumed_num_classes)
