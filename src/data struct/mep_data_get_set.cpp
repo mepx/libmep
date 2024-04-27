@@ -28,7 +28,7 @@ double* t_mep_data::get_row_as_double(unsigned int row)const
 	return _data_double[row];
 }
 //-----------------------------------------------------------------
-long long* t_mep_data::get_row_as_long(unsigned int row)const
+long long* t_mep_data::get_row_as_long_long(unsigned int row)const
 {
 	return _data_long_long[row];
 }
@@ -45,12 +45,12 @@ void t_mep_data::get_range_values_double(unsigned int row,
 	memcpy(values, _data_double[row] + start_col, sizeof(double) * count);
 }
 //-----------------------------------------------------------------
-long long t_mep_data::get_value_long(unsigned int row, unsigned int col)const
+long long t_mep_data::get_value_long_long(unsigned int row, unsigned int col)const
 {
 	return _data_long_long[row][col];
 }
 //-----------------------------------------------------------------
-void t_mep_data::get_range_values_long(unsigned int row,
+void t_mep_data::get_range_values_long_long(unsigned int row,
 										   unsigned int start_col, unsigned int count,
 										   long long* values)const
 {
@@ -67,7 +67,7 @@ double** t_mep_data::get_data_matrix_as_double(void) const
 	return _data_double;
 }
 //-----------------------------------------------------------------
-long long** t_mep_data::get_data_matrix_as_long(void) const
+long long** t_mep_data::get_data_matrix_as_long_long(void) const
 {
 	return _data_long_long;
 }

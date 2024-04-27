@@ -19,10 +19,10 @@ void t_mep_chromosome::fitness_regression_cache_all_training_data(
 	unsigned int num_actual_variables, unsigned int* actual_enabled_variables,
 	long long** eval_matrix,
 	char* gene_used_for_output,
-	t_mep_error_function_long mep_error_function,
+	t_mep_error_function_long_long mep_error_function,
 	t_seed& seed)
 {
-	long long** data = mep_dataset.get_data_matrix_as_long();
+	long long** data = mep_dataset.get_data_matrix_as_long_long();
 	unsigned int num_rows = mep_dataset.get_num_rows();
 
 	// evaluate a_chromosome
@@ -278,9 +278,9 @@ bool t_mep_chromosome::compute_regression_error_on_data_return_error_long(
 								double* error_per_output,
 								double& total_error,
 							unsigned int& index_error_gene,
-	t_mep_error_function_long mep_error_function) const
+	t_mep_error_function_long_long mep_error_function) const
 {
-	long long** data = mep_data.get_data_matrix_as_long();
+	long long** data = mep_data.get_data_matrix_as_long_long();
 	unsigned int num_data = mep_data.get_num_rows();
 	
 	long long *actual_output_long = new long long[num_program_outputs];
@@ -317,9 +317,9 @@ bool t_mep_chromosome::compute_regression_error_on_data_long(
 	const t_mep_data &mep_data,
 	double* error_per_output,
 	double& total_error,
-	t_mep_error_function_long mep_error_function) const
+	t_mep_error_function_long_long mep_error_function) const
 {
-	long long** data = mep_data.get_data_matrix_as_long();
+	long long** data = mep_data.get_data_matrix_as_long_long();
 	unsigned int num_data = mep_data.get_num_rows();
 
 	for (unsigned int o = 0; o < num_program_outputs; o++)

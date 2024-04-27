@@ -154,7 +154,7 @@ bool t_mep_data::from_string_cast_to_double(void)
 	return true;
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_string_cast_to_long(void)
+bool t_mep_data::from_string_cast_to_long_long(void)
 {
 	if (!_data_string) {
 		data_type = MEP_DATA_LONG_LONG;
@@ -1015,7 +1015,7 @@ void t_mep_data::assign_class_index_from_training_class_labels(
     }
 }
 //-----------------------------------------------------------------
-bool t_mep_data::from_double_to_long(void)
+bool t_mep_data::from_double_to_long_long(void)
 {
 	if (data_type != MEP_DATA_DOUBLE)
 		return true;
@@ -1042,7 +1042,7 @@ bool t_mep_data::from_double_to_long(void)
 	return true;
 }
 //-----------------------------------------------------------------
-void t_mep_data::from_long_to_double(void)
+void t_mep_data::from_long_long_to_double(void)
 {
 	if (data_type != MEP_DATA_LONG_LONG)
 		return;
@@ -1069,9 +1069,9 @@ bool t_mep_data::set_data_type(char new_data_type)
 		return true;
 	
 	if (data_type == MEP_DATA_DOUBLE && new_data_type == MEP_DATA_LONG_LONG)
-		return from_double_to_long();
+		return from_double_to_long_long();
 	if (data_type == MEP_DATA_LONG_LONG && new_data_type == MEP_DATA_DOUBLE){
-		from_long_to_double();
+		from_long_long_to_double();
 		return true;
 	}
 	return false;

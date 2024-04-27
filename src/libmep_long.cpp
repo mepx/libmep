@@ -77,7 +77,7 @@ bool t_mep::get_output(unsigned int run_index, long long* inputs, long long* out
 	return true;
 }
 //---------------------------------------------------------------------------
-void t_mep::compute_cached_eval_matrix_long2(s_value_class * array_value_class)
+void t_mep::compute_cached_eval_matrix_long_long2(s_value_class * array_value_class)
 {
 	long long** data;
 
@@ -85,11 +85,11 @@ void t_mep::compute_cached_eval_matrix_long2(s_value_class * array_value_class)
 
 	if (mep_parameters.get_problem_type() == MEP_PROBLEM_TIME_SERIE) {
 		num_rows = training_data_ts.get_num_rows();
-		data = training_data_ts.get_data_matrix_as_long();
+		data = training_data_ts.get_data_matrix_as_long_long();
 	}
 	else {
 		num_rows = training_data.get_num_rows();
-		data = training_data.get_data_matrix_as_long();
+		data = training_data.get_data_matrix_as_long_long();
 	}
 
 	unsigned int num_problem_outputs = mep_parameters.get_num_outputs();
@@ -101,21 +101,21 @@ void t_mep::compute_cached_eval_matrix_long2(s_value_class * array_value_class)
 				cached_sum_of_errors_for_variables[actual_variable][o] = 0;
 			if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 				for (unsigned int k = 0; k < num_rows; k++) {
-					cached_eval_variables_matrix_long[actual_enabled_variables[v]][k] =
+					cached_eval_variables_matrix_long_long[actual_enabled_variables[v]][k] =
 							data[k][actual_enabled_variables[v]];
 					for (unsigned int o = 0; o < num_problem_outputs; o++)
 						cached_sum_of_errors_for_variables[actual_variable][o] +=
-							mep_absolute_error_long(
-									cached_eval_variables_matrix_long[actual_enabled_variables[v]][k],
+							mep_absolute_error_long_long(
+									cached_eval_variables_matrix_long_long[actual_enabled_variables[v]][k],
 									data[k][num_total_variables + o]);
 				}
 			else// MEP_REGRESSION_MEAN_SQUARED_ERROR
 				for (unsigned int k = 0; k < num_rows; k++) {
-					cached_eval_variables_matrix_long[actual_enabled_variables[v]][k] =
+					cached_eval_variables_matrix_long_long[actual_enabled_variables[v]][k] =
 							data[k][actual_enabled_variables[v]];
 					for (unsigned int o = 0; o < num_problem_outputs; o++)
 						cached_sum_of_errors_for_variables[actual_variable][o] +=
-							mep_squared_error_long(cached_eval_variables_matrix_long[actual_enabled_variables[v]][k],
+							mep_squared_error_long_long(cached_eval_variables_matrix_long_long[actual_enabled_variables[v]][k],
 									data[k][num_total_variables + o]);
 				}
 
@@ -129,7 +129,7 @@ void t_mep::compute_cached_eval_matrix_long2(s_value_class * array_value_class)
 
 			cached_threashold[actual_variable] = 0;
 			for (unsigned int k = 0; k < num_rows; k++) {
-				cached_eval_variables_matrix_long[actual_variable][k] =
+				cached_eval_variables_matrix_long_long[actual_variable][k] =
 						data[k][actual_enabled_variables[v]];
 				array_value_class[k].value = (double)data[k][actual_variable];
 				array_value_class[k].class_index = (int)data[k][num_total_variables];
@@ -187,11 +187,11 @@ void t_mep::allocate_values(long long**** eval_matrix_long)
 			(*eval_matrix_long)[c][i] = new long long[num_rows];
 	}
 
-	cached_eval_variables_matrix_long = new long long* [num_total_variables];
+	cached_eval_variables_matrix_long_long = new long long* [num_total_variables];
 	for (unsigned int i = 0; i < num_total_variables; i++)
-		cached_eval_variables_matrix_long[i] = NULL;
+		cached_eval_variables_matrix_long_long[i] = NULL;
 	for (unsigned int i = 0; i < num_actual_variables; i++)
-		cached_eval_variables_matrix_long[actual_enabled_variables[i]] = new long long[num_rows];
+		cached_eval_variables_matrix_long_long[actual_enabled_variables[i]] = new long long[num_rows];
 
 	cached_sum_of_errors_for_variables = new double*[num_total_variables];
 	for (unsigned int i = 0; i < num_total_variables; i++)
@@ -211,11 +211,11 @@ void t_mep::delete_values(long long**** eval_matrix)
 		delete[] * eval_matrix;
 		(*eval_matrix) = NULL;
 	}
-	if (cached_eval_variables_matrix_long) {
+	if (cached_eval_variables_matrix_long_long) {
 		for (unsigned int i = 0; i < num_total_variables; i++)
-			delete[] cached_eval_variables_matrix_long[i];
-		delete[] cached_eval_variables_matrix_long;
-		cached_eval_variables_matrix_long = NULL;
+			delete[] cached_eval_variables_matrix_long_long[i];
+		delete[] cached_eval_variables_matrix_long_long;
+		cached_eval_variables_matrix_long_long = NULL;
 	}
 
 	if (cached_sum_of_errors_for_variables) {
@@ -238,7 +238,7 @@ void t_mep::compute_previous_data_for_time_series_validation(long long *previous
 	unsigned int num_outputs = mep_parameters.get_num_outputs();
 
 	int num_training_data = training_data.get_num_rows();
-	long long** training_matrix = training_data.get_data_matrix_as_long();
+	long long** training_matrix = training_data.get_data_matrix_as_long_long();
 	for (unsigned int w = 0; w < window_size; w++)
 		for (unsigned int c = 0; c < num_outputs; c++)
 			previous_data[w * num_outputs + c] = training_matrix[num_training_data - window_size + w][c];
@@ -247,7 +247,7 @@ void t_mep::compute_previous_data_for_time_series_validation(long long *previous
 void t_mep::compute_previous_data_for_time_series_training(long long* previous_data)
 {
 	unsigned int window_size = mep_parameters.get_window_size();
-	long long** training_matrix = training_data.get_data_matrix_as_long();
+	long long** training_matrix = training_data.get_data_matrix_as_long_long();
 	unsigned int num_outputs = mep_parameters.get_num_outputs();
 
 	for (unsigned int w = 0; w < window_size; w++)
@@ -260,10 +260,10 @@ void t_mep::compute_previous_data_for_time_series_test(long long* previous_data)
 	unsigned int window_size = mep_parameters.get_window_size();
 	unsigned int num_outputs = mep_parameters.get_num_outputs();
 
-	long long** validation_matrix = validation_data.get_data_matrix_as_long();
+	long long** validation_matrix = validation_data.get_data_matrix_as_long_long();
 	unsigned int num_validation_data = validation_data.get_num_rows();
 
-	long long** training_matrix = training_data.get_data_matrix_as_long();
+	long long** training_matrix = training_data.get_data_matrix_as_long_long();
 	unsigned int num_training_data = training_data.get_num_rows();
 	//unsigned int num_training_cols = training_data.get_num_cols();
 
@@ -299,13 +299,13 @@ void t_mep::compute_previous_data_for_time_series_prediction(long long* previous
 	unsigned int num_outputs = mep_parameters.get_num_outputs();
 
 	if (test_data.get_num_rows()) {
-		long long** test_matrix = test_data.get_data_matrix_as_long();
+		long long** test_matrix = test_data.get_data_matrix_as_long_long();
 		unsigned int num_test_data = test_data.get_num_rows();
 
-		long long** validation_matrix = validation_data.get_data_matrix_as_long();
+		long long** validation_matrix = validation_data.get_data_matrix_as_long_long();
 		unsigned int num_validation_data = validation_data.get_num_rows();
 
-		long long** training_matrix = training_data.get_data_matrix_as_long();
+		long long** training_matrix = training_data.get_data_matrix_as_long_long();
 		unsigned int num_training_data = training_data.get_num_rows();
 		//unsigned int num_training_cols = training_data.get_num_cols();
 
@@ -342,9 +342,9 @@ void t_mep::compute_previous_data_for_time_series_prediction(long long* previous
 	}
 	else
 		if (validation_data.get_num_rows()) {
-			long long** validation_matrix = validation_data.get_data_matrix_as_long();
+			long long** validation_matrix = validation_data.get_data_matrix_as_long_long();
 			unsigned int num_validation_data = validation_data.get_num_rows();
-			long long** training_matrix = training_data.get_data_matrix_as_long();
+			long long** training_matrix = training_data.get_data_matrix_as_long_long();
 			unsigned int num_training_data = training_data.get_num_rows();
 			//unsigned int num_training_cols = training_data.get_num_cols();
 
@@ -369,7 +369,7 @@ void t_mep::compute_previous_data_for_time_series_prediction(long long* previous
 			}
 		}
 		else {// take data from training
-			long long** training_matrix = training_data.get_data_matrix_as_long();
+			long long** training_matrix = training_data.get_data_matrix_as_long_long();
 			unsigned int num_training_data = training_data.get_num_rows();
 			for (unsigned int w = 0; w < window_size; w++)
 				for (unsigned int c = 0; c < num_outputs; c++)
@@ -394,7 +394,7 @@ void t_mep::compute_output_on_training(int run_index,
 
 			for (unsigned int i = 0; i < num_data; i++) {
 				valid_output[i] = get_output(run_index,
-											 training_data.get_row_as_long(i),
+											 training_data.get_row_as_long_long(i),
 											 output[i]);
 			}
 		}
@@ -408,7 +408,7 @@ void t_mep::compute_output_on_training(int run_index,
 
 			compute_previous_data_for_time_series_training(previous_data);
 
-			long long** training_matrix = training_data.get_data_matrix_as_long();
+			long long** training_matrix = training_data.get_data_matrix_as_long_long();
 			unsigned int num_training_data = training_data.get_num_rows();
 
 			for (unsigned int w = 0; w < window_size; w++) {
@@ -444,7 +444,7 @@ void t_mep::compute_output_on_validation(int run_index, long long** output, char
 		unsigned int num_data = validation_data.get_num_rows();
 		for (unsigned int i = 0; i < num_data; i++) {
 			valid_output[i] = get_output(run_index,
-										 validation_data.get_row_as_long(i),
+										 validation_data.get_row_as_long_long(i),
 										 output[i]);
 		}
 	}
@@ -454,7 +454,7 @@ void t_mep::compute_output_on_validation(int run_index, long long** output, char
 		unsigned int num_outputs = mep_parameters.get_num_outputs();
 
 		long long* previous_data = new long long[window_size * num_outputs];
-		long long** validation_matrix = validation_data.get_data_matrix_as_long();
+		long long** validation_matrix = validation_data.get_data_matrix_as_long_long();
 		unsigned int num_validation_data = validation_data.get_num_rows();
 
 		compute_previous_data_for_time_series_validation(previous_data);
@@ -483,7 +483,7 @@ void t_mep::compute_output_on_test(int run_index, long long** output, char* vali
 		//long long output_long[1];
 		for (unsigned int i = 0; i < num_data; i++) {
 			valid_output[i] = get_output(run_index,
-										 test_data.get_row_as_long(i),
+										 test_data.get_row_as_long_long(i),
 										 output[i]);
 			//if (valid_output[i])
 				//output[i] = output_long[0];
@@ -496,7 +496,7 @@ void t_mep::compute_output_on_test(int run_index, long long** output, char* vali
 
 		long long* previous_data = new long long[window_size * num_outputs];
 
-		long long** test_matrix = test_data.get_data_matrix_as_long();
+		long long** test_matrix = test_data.get_data_matrix_as_long_long();
 		unsigned int num_test_data = test_data.get_num_rows();
 		compute_previous_data_for_time_series_test(previous_data);
 
@@ -581,9 +581,9 @@ bool t_mep::predict_on_test(int run_index, long long** output, char* valid_outpu
 	//int num_previous_data;
 	//double** previous_matrix;
 	if (validation_data.get_num_rows()) {
-		long long** validation_matrix = validation_data.get_data_matrix_as_long();
+		long long** validation_matrix = validation_data.get_data_matrix_as_long_long();
 		unsigned int num_validation_data = validation_data.get_num_rows();
-		long long** training_matrix = training_data.get_data_matrix_as_long();
+		long long** training_matrix = training_data.get_data_matrix_as_long_long();
 		unsigned int num_training_data = training_data.get_num_rows();
 		//unsigned int num_training_cols = training_data.get_num_cols();
 
@@ -608,7 +608,7 @@ bool t_mep::predict_on_test(int run_index, long long** output, char* valid_outpu
 		}
 	}
 	else {// take data from training
-		long long** training_matrix = training_data.get_data_matrix_as_long();
+		long long** training_matrix = training_data.get_data_matrix_as_long_long();
 		unsigned int num_training_data = training_data.get_num_rows();
 		for (unsigned int w = 0; w < window_size; w++)
 			for (unsigned int c = 0; c < num_outputs; c++)
@@ -837,7 +837,7 @@ void t_mep::get_target_for_all_data(bool get_training,
 		unsigned int num_cols = mep_data_ptr->get_num_cols();
 		for (unsigned int i = 0; i < local_num_data; i++) {
 			
-			mep_data_ptr->get_range_values_long(i, num_cols - num_outputs, num_outputs, target[num_data + i]);
+			mep_data_ptr->get_range_values_long_long(i, num_cols - num_outputs, num_outputs, target[num_data + i]);
 			has_target[num_data + i] = 1;
 			
 			for (unsigned int o = 0; o < num_outputs; o++){
@@ -855,7 +855,7 @@ void t_mep::get_target_for_all_data(bool get_training,
 		unsigned int local_num_data = mep_data_ptr->get_num_rows();
 		unsigned int num_cols = mep_data_ptr->get_num_cols();
 		for (unsigned int i = 0; i < local_num_data; i++) {
-			mep_data_ptr->get_range_values_long(i, num_cols - num_outputs,
+			mep_data_ptr->get_range_values_long_long(i, num_cols - num_outputs,
 												num_outputs,
 												target[num_data + i]);
 			has_target[num_data + i] = 1;
@@ -876,7 +876,7 @@ void t_mep::get_target_for_all_data(bool get_training,
 		unsigned int num_cols = mep_data_ptr->get_num_cols();
 		if (test_data.get_num_cols() == training_data.get_num_cols()) {// has target
 			for (unsigned int i = 0; i < local_num_data; i++) {
-				mep_data_ptr->get_range_values_long(i, num_cols - num_outputs,
+				mep_data_ptr->get_range_values_long_long(i, num_cols - num_outputs,
 													num_outputs,
 													target[num_data + i]);
 				has_target[num_data + i] = 1;

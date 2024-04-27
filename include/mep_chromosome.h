@@ -4,8 +4,8 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#ifndef MEP_CHROMOSOME_CLASS_H
-#define MEP_CHROMOSOME_CLASS_H
+#ifndef MEP_CHROMOSOME_H
+#define MEP_CHROMOSOME_H
 //-----------------------------------------------------------------
 #include "mep_constants.h"
 #include "mep_parameters.h"
@@ -91,7 +91,7 @@ private:
 													unsigned int * actual_enabled_variables,
 			long long **,
 													char *gene_used_for_output,
-													t_mep_error_function_long,
+													t_mep_error_function_long_long,
 													t_seed &seed);
 	
 	void fitness_regression_no_cache(const t_mep_data &mep_dataset,
@@ -268,7 +268,7 @@ public:
 							double ** eval_matrix_double, long long** eval_matrix_long,
 							char *gene_used_for_output,
 							t_mep_error_function_double mep_error_function_double,
-							t_mep_error_function_long mep_error_function_long,
+							t_mep_error_function_long_long mep_error_function_long_long,
 							t_seed &seed);
 
 	void fitness_binary_classification(const t_mep_data &mep_dataset, 
@@ -325,7 +325,7 @@ public:
 	   double *error_per_output, double &total_error,
 	   unsigned int& index_error_gene,
 		t_mep_error_function_double mep_error_function_double,
-	   t_mep_error_function_long mep_error_function_long) const;
+	   t_mep_error_function_long_long mep_error_function_long_long) const;
 	
 	bool compute_regression_error_on_data_return_error_double(const t_mep_data &mep_data,
 			double *error_per_output, double &total_error,
@@ -335,20 +335,20 @@ public:
 	bool compute_regression_error_on_data_return_error_long(const t_mep_data &mep_data,
 															double *error_per_output, double &total_error,
 															unsigned int &index_error_gene,
-			const t_mep_error_function_long mep_error_function) const;
+			const t_mep_error_function_long_long mep_error_function) const;
 	
 	bool compute_regression_error_on_data(
 		const t_mep_data& mep_data,
 										  double *error_per_output, double &total_error,
 		t_mep_error_function_double mep_error_function_double,
-		t_mep_error_function_long mep_error_function_long) const;
+		t_mep_error_function_long_long mep_error_function_long_long) const;
 	
 	bool compute_regression_error_on_data_double(const t_mep_data &mep_data,
 												 double *error_per_output, double &total_error,
 						const t_mep_error_function_double mep_error_function) const;
 	bool compute_regression_error_on_data_long(const t_mep_data &mep_data,
 											   double *error_per_output, double &total_error,
-											   const t_mep_error_function_long mep_error_function) const;
+											   const t_mep_error_function_long_long mep_error_function) const;
 	
 	bool compute_time_series_error_on_data_return_error(double* previous_data,
 														unsigned int window_size,
@@ -364,7 +364,7 @@ public:
 														double *error_per_output,
 														double& total_error,
 														unsigned int& index_error_gene,
-		const t_mep_error_function_long mep_error_function) const;
+		const t_mep_error_function_long_long mep_error_function) const;
 
 	bool compute_time_series_error_on_data(double* previous_data,
 										   unsigned int window_size,
@@ -378,7 +378,7 @@ public:
 										   const t_mep_data &mep_data,
 										   double *error_per_output,
 										   double& total_error,
-										   const t_mep_error_function_long mep_error_function) const;
+										   const t_mep_error_function_long_long mep_error_function) const;
 
 	bool compute_time_series_output_on_given_data(
 		double* previous_data, unsigned int window_size,

@@ -267,14 +267,14 @@ void t_mep::compute_test_error(const t_mep_chromosome &best_program,
 			if (best_program.compute_regression_error_on_data(
 				test_data,
 						test_error_per_output, total_test_error,
-				mep_absolute_error_double, mep_absolute_error_long)) {}
+				mep_absolute_error_double, mep_absolute_error_long_long)) {}
 				;
 		}
 		else {
 			if (best_program.compute_regression_error_on_data(
 					test_data,
 					test_error_per_output, total_test_error,
-					mep_squared_error_double, mep_squared_error_long)){ }
+					mep_squared_error_double, mep_squared_error_long_long)){ }
 				;
 		}
 		break;
@@ -290,7 +290,7 @@ void t_mep::compute_test_error(const t_mep_chromosome &best_program,
 					previous_data, window_size,
 					test_data,test_error_per_output,
 					total_test_error,
-					mep_absolute_error_long)) {
+					mep_absolute_error_long_long)) {
 				}
 				;
 			}
@@ -299,7 +299,7 @@ void t_mep::compute_test_error(const t_mep_chromosome &best_program,
 					previous_data, window_size,
 					test_data, test_error_per_output,
 					total_test_error,
-					mep_squared_error_long)) {
+					mep_squared_error_long_long)) {
 				}
 				;
 			}

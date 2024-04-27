@@ -14,9 +14,9 @@ bool t_mep_chromosome::compute_time_series_error_on_data_return_error(
 	double* error_per_output,
 	double& total_error,
 	unsigned int& index_error_gene,
-	t_mep_error_function_long mep_error_function) const
+	t_mep_error_function_long_long mep_error_function) const
 {
-	long long** data = mep_data.get_data_matrix_as_long();
+	long long** data = mep_data.get_data_matrix_as_long_long();
 	unsigned int num_data = mep_data.get_num_rows();
 	total_error = 0;
 	//double actual_output_double[1];
@@ -59,9 +59,9 @@ bool t_mep_chromosome::compute_time_series_error_on_data(
 	const t_mep_data& mep_data,
 	double* error_per_output,
 	double& total_error,
-	const t_mep_error_function_long mep_error_function) const
+	const t_mep_error_function_long_long mep_error_function) const
 {
-	long long** data = mep_data.get_data_matrix_as_long();
+	long long** data = mep_data.get_data_matrix_as_long_long();
 	unsigned int num_data = mep_data.get_num_rows();
 	total_error = 0;
 //	double actual_output_double[1];

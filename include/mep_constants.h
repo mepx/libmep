@@ -19,11 +19,11 @@ private:
 	unsigned int num_automatic_constants;
 	unsigned int num_user_defined_constants;
 	double min_constants_interval_double, max_constants_interval_double;
-	long long min_constants_interval_long, max_constants_interval_long;
+	long long min_constants_interval_long_long, max_constants_interval_long_long;
 
 	double *constants_double;
 	
-	long long *constants_long;
+	long long *constants_long_long;
 
 	unsigned int constants_type;
 	bool constants_can_evolve;
@@ -31,7 +31,7 @@ private:
 	
 	double constants_mutation_max_deviation_double;
 	
-	long long constants_mutation_max_deviation_long;
+	long long constants_mutation_max_deviation_long_long;
 
 	bool modified;
 public:
@@ -53,15 +53,15 @@ public:
 
 	// returns the min interval for automatic constants
 	double get_min_constants_interval_double(void) const;
-	long long get_min_constants_interval_long(void) const;
+	long long get_min_constants_interval_long_long(void) const;
 
 	// returns the max interval for automatic constants
 	double get_max_constants_interval_double(void) const;
-	long long get_max_constants_interval_long(void) const;
+	long long get_max_constants_interval_long_long(void) const;
 
 	// returns a constant
 	double get_constants_double(unsigned int index) const;
-	long long get_constants_long(unsigned int index) const;
+	long long get_constants_long_long(unsigned int index) const;
 
 	// returns the constants type
 	// 0 - USER_DEFINED_CONSTANTS
@@ -76,7 +76,7 @@ public:
 
 	// returns the max deviation within which the constants can evolve
 	double get_constants_mutation_max_deviation_double(void) const;
-	long long get_constants_mutation_max_deviation_long(void) const;
+	long long get_constants_mutation_max_deviation_long_long(void) const;
 
 	// sets the number of automatically generated constantss
 	void set_num_automatic_constants(unsigned int value);
@@ -86,15 +86,15 @@ public:
 
 	// sets the lower bound of the constants interval
 	void set_min_constants_interval_double(double value);
-	void set_min_constants_interval_long(long long value);
+	void set_min_constants_interval_long_long(long long value);
 
 	// sets the upper bound of the constants interval
 	void set_max_constants_interval_double(double value);
-	void set_max_constants_interval_long(long long value);
+	void set_max_constants_interval_long_long(long long value);
 
 	// sets a particular user-defined constant
 	void set_constants_double(unsigned int index, double value);
-	void set_constants_long(unsigned int index, long long value);
+	void set_constants_long_long(unsigned int index, long long value);
 
 	// sets the constants type
 	// 0 - USER_DEFINED_CONSTANTS
@@ -109,7 +109,7 @@ public:
 
 	// sets the max deviation when constants can evolve
 	void set_constants_mutation_max_deviation_double(double value);
-	void set_constants_mutation_max_deviation_long(long long value);
+	void set_constants_mutation_max_deviation_long_long(long long value);
 	
 	char get_data_type(void) const;
 	

@@ -443,7 +443,7 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 		if (mep_constants.get_constants_type() == MEP_CONSTANTS_USER_DEFINED) {
 			if (data_type == MEP_DATA_LONG_LONG)
 				for (unsigned int c = 0; c < num_constants; c++)
-					long_constants[c] = mep_constants.get_constants_long(c);
+					long_constants[c] = mep_constants.get_constants_long_long(c);
 			else// it is double
 				for (unsigned int c = 0; c < num_constants; c++)
 					real_constants[c] = mep_constants.get_constants_double(c);
@@ -452,8 +452,8 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 			if (data_type == MEP_DATA_LONG_LONG){
 				for (unsigned int c = 0; c < num_constants; c++)
 					long_constants[c] = mep_long_long_rand(seed,
-												  mep_constants.get_min_constants_interval_long(),
-											mep_constants.get_max_constants_interval_long() + 1);
+												  mep_constants.get_min_constants_interval_long_long(),
+											mep_constants.get_max_constants_interval_long_long() + 1);
 			}
 			else
 				for (unsigned int c = 0; c < num_constants; c++)
@@ -547,21 +547,21 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 		for (unsigned int c = 0; c < num_constants; c++) {
 			p = mep_real_rand(seed, 0, 1);      // mutate the operator
 			long long tmp_cst_d = mep_long_long_rand(seed, 0,
-													 mep_constants.get_constants_mutation_max_deviation_long() + 1);
+													 mep_constants.get_constants_mutation_max_deviation_long_long() + 1);
 			
 			if (p < pm) {
 				if (mep_int_01_rand(seed)) {// coin
 					if (mep_constants.get_constants_can_evolve_outside_initial_interval())
 						long_constants[c] += tmp_cst_d;
 					else
-						if (long_constants[c] + tmp_cst_d <= mep_constants.get_max_constants_interval_long())
+						if (long_constants[c] + tmp_cst_d <= mep_constants.get_max_constants_interval_long_long())
 							long_constants[c] += tmp_cst_d;
 				}
 				else {
 					if (mep_constants.get_constants_can_evolve_outside_initial_interval())
 						long_constants[c] -= tmp_cst_d;
 					else
-						if (long_constants[c] - tmp_cst_d >= mep_constants.get_min_constants_interval_long())
+						if (long_constants[c] - tmp_cst_d >= mep_constants.get_min_constants_interval_long_long())
 							long_constants[c] -= tmp_cst_d;
 				}
 				break;// 1 mutation for constants only??
@@ -804,7 +804,7 @@ void t_mep_chromosome::compute_fitness(const t_mep_data& mep_dataset,
 				num_actual_variables, actual_enabled_variables,
 				eval_double, eval_long, gene_used_for_output,
 							   mep_absolute_error_double,
-							   mep_absolute_error_long, seed);
+							   mep_absolute_error_long_long, seed);
 		else
 			fitness_regression(mep_dataset,
 				random_subset_indexes, random_subset_selection_size,
@@ -814,7 +814,7 @@ void t_mep_chromosome::compute_fitness(const t_mep_data& mep_dataset,
 				num_actual_variables, actual_enabled_variables,
 				eval_double, eval_long, gene_used_for_output,
 							   mep_squared_error_double,
-							   mep_absolute_error_long, seed);
+							   mep_absolute_error_long_long, seed);
 		break;
 	case MEP_PROBLEM_TIME_SERIE:
 		if (error_measure == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
@@ -826,7 +826,7 @@ void t_mep_chromosome::compute_fitness(const t_mep_data& mep_dataset,
 				num_actual_variables, actual_enabled_variables,
 				eval_double, eval_long, gene_used_for_output,
 							   mep_absolute_error_double,
-							   mep_absolute_error_long, seed);
+							   mep_absolute_error_long_long, seed);
 		else
 			fitness_regression(mep_dataset_ts,
 				random_subset_indexes, random_subset_selection_size,
@@ -836,7 +836,7 @@ void t_mep_chromosome::compute_fitness(const t_mep_data& mep_dataset,
 				num_actual_variables, actual_enabled_variables,
 				eval_double, eval_long, gene_used_for_output,
 							   mep_squared_error_double,
-							   mep_absolute_error_long, seed);
+							   mep_absolute_error_long_long, seed);
 		break;
 	case MEP_PROBLEM_BINARY_CLASSIFICATION:
 		fitness_binary_classification(mep_dataset,

@@ -17,7 +17,7 @@ void t_mep_chromosome::fitness_regression(const t_mep_data &mep_dataset,
 		double ** eval_matrix_double, long long** eval_matrix_long,
 										  char *gene_used_for_output,
 						t_mep_error_function_double mep_error_function_double,
-						t_mep_error_function_long mep_error_function_long,
+						t_mep_error_function_long_long mep_error_function_long,
 						t_seed &seed)
 {
 	if (mep_dataset.get_data_type() == MEP_DATA_LONG_LONG)
@@ -41,7 +41,7 @@ bool t_mep_chromosome::compute_regression_error_on_data_return_error(
 	double* error_per_output, double& total_error,
 	unsigned int& index_error_gene,
 	t_mep_error_function_double mep_error_function_double,
-	t_mep_error_function_long mep_error_function_long) const
+	t_mep_error_function_long_long mep_error_function_long) const
 {
 	if (mep_data.get_data_type() == MEP_DATA_LONG_LONG)
 		return compute_regression_error_on_data_return_error_long(mep_data,
@@ -57,7 +57,7 @@ bool t_mep_chromosome::compute_regression_error_on_data(
 	const t_mep_data& mep_data,
 	double* error_per_output, double& total_error,
 	t_mep_error_function_double mep_error_function_double,
-	t_mep_error_function_long mep_error_function_long) const
+	t_mep_error_function_long_long mep_error_function_long) const
 {
 	if (mep_data.get_data_type() == MEP_DATA_LONG_LONG)
 		return compute_regression_error_on_data_long(mep_data,

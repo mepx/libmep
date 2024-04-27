@@ -40,7 +40,7 @@ private:
 
 	t_sub_population* population; // array of subpopulations
 	double **cached_eval_variables_matrix_double;
-	long long **cached_eval_variables_matrix_long;
+	long long **cached_eval_variables_matrix_long_long;
 	
 	double **cached_sum_of_errors_for_variables;
 	double *cached_threashold;
@@ -93,7 +93,7 @@ private:
 	unsigned int tournament(const t_sub_population &pop, t_seed &seed) const;
 
 	double compute_validation_error(unsigned int &, unsigned int&,
-			double **eval_double, long long** eval_long,
+			double **eval_double, long long** eval_long_long,
 									s_value_class *tmp_value_class,
 									char* gene_used_for_output,
 			t_seed *seeds, double &num_incorrectly_classified);
@@ -113,14 +113,14 @@ private:
 	void compute_best_and_average_error(double &best_error, double &mean_error, 
 			double &num_incorrectly_classified, double &average_incorrectly_classified);
 	void compute_cached_eval_matrix_double2(s_value_class *array_value_class);
-	void compute_cached_eval_matrix_long2(s_value_class *array_value_class);
+	void compute_cached_eval_matrix_long_long2(s_value_class *array_value_class);
 	
 	void delete_sub_population(t_sub_population &pop);
 
 	void evolve_one_subpopulation_for_one_generation(unsigned int *current_subpop_index, 
 			std::mutex* mutex, t_sub_population * sub_populations, 
 			int generation_index, bool recompute_fitness, 
-			double ** eval_double, long long** eval_long,
+			double ** eval_double, long long** eval_long_long,
 			s_value_class *tmp_value_class, char *gene_used_for_output,
 													 t_seed* seeds);
 	void get_random_subset(unsigned int count, unsigned int *indecses, t_seed& seed) const;
@@ -203,11 +203,11 @@ public:
 
 	// returns the chromosome as a C program
 	char* program_as_C(unsigned int run_index, bool simplified,
-					   double **inputs_double, long long** inputs_long) const;
+					   double **inputs_double, long long** inputs_long_long) const;
 
 	char* program_as_C_infix(unsigned int run_index,
 							 double** inputs_double,
-							 long long** inputs_long) const;
+							 long long** inputs_long_long) const;
 	char* program_as_Latex(unsigned int run_index) const;
 
 	// returns the chromosome as an Excel function
@@ -216,7 +216,7 @@ public:
 	// returns the chromosome as an Python function
 	char* program_as_Python(unsigned int run_index, bool simplified,
 							double** inputs_double,
-							long long** inputs_long) const;
+							long long** inputs_long_long) const;
 
 	// init operators, parameters and clears all data
 	void init(void);

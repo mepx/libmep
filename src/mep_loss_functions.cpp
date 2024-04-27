@@ -18,12 +18,12 @@ double mep_squared_error_double(double x, double y)
 	return (x - y) * (x - y);
 }
 //---------------------------------------------------------------------------
-double mep_absolute_error_long(long long x, long long y)
+double mep_absolute_error_long_long(long long x, long long y)
 {
 	return fabs(x - y);
 }
 //---------------------------------------------------------------------------
-double mep_squared_error_long(long long x, long long y)
+double mep_squared_error_long_long(long long x, long long y)
 {
 	return (double)((x - y) * (x - y));
 }

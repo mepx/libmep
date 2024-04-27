@@ -19,7 +19,7 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2024.4.23.0-beta");
+	strcpy(version, "2024.4.27.0-beta");
 
 	num_selected_operators = 0;
 
@@ -278,20 +278,20 @@ int t_mep::start(f_on_progress on_generation,
 	num_selected_operators = mep_operators.get_list_of_operators(actual_operators);
 
 	double*** eval_double = NULL;           // an array where the values of each expression are stored
-	long long*** eval_long = NULL;
+	long long*** eval_long_long = NULL;
 	
 	s_value_class * *array_value_class;
 	char** gene_used_for_output;
 
 	if (mep_parameters.get_data_type() == MEP_DATA_LONG_LONG)
-		allocate_values(&eval_long);
+		allocate_values(&eval_long_long);
 	else
 		allocate_values(&eval_double);
 	
 	allocate_extra_arrays(&array_value_class, &gene_used_for_output);
 
 	if (mep_parameters.get_data_type() == MEP_DATA_LONG_LONG)
-		compute_cached_eval_matrix_long2(array_value_class[0]);
+		compute_cached_eval_matrix_long_long2(array_value_class[0]);
 	else
 		compute_cached_eval_matrix_double2(array_value_class[0]);
 
@@ -306,7 +306,7 @@ int t_mep::start(f_on_progress on_generation,
 		for (unsigned int p = 0; p < mep_parameters.get_num_subpopulations(); p++)
 			seeds[p].init((run_index + mep_parameters.get_random_seed()) * mep_parameters.get_num_subpopulations() + p);
 
-		start_steady_state(run_index, seeds, eval_double, eval_long,
+		start_steady_state(run_index, seeds, eval_double, eval_long_long,
 						   array_value_class, gene_used_for_output,
 						   on_generation, on_new_evaluation);
 		if (on_complete_run)
@@ -322,7 +322,7 @@ int t_mep::start(f_on_progress on_generation,
 			(test_data.get_num_cols() == training_data.get_num_cols()));
 
 	if (mep_parameters.get_data_type() == MEP_DATA_LONG_LONG)
-		delete_values(&eval_long);
+		delete_values(&eval_long_long);
 	else
 		delete_values(&eval_double);
 	
@@ -382,7 +382,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(
 														training_data_ts,
 						random_subset_indexes, random_subset_selection_size,
 						cached_eval_variables_matrix_double,
-						cached_eval_variables_matrix_long,
+						cached_eval_variables_matrix_long_long,
 						cached_sum_of_errors_for_variables,
 						cached_threashold, tmp_value_class,
 						num_actual_variables, actual_enabled_variables,
@@ -401,7 +401,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(
 												training_data_ts,
 							random_subset_indexes, random_subset_selection_size,
 							cached_eval_variables_matrix_double,
-							cached_eval_variables_matrix_long,
+							cached_eval_variables_matrix_long_long,
 						cached_sum_of_errors_for_variables,
 							cached_threashold,
 							 tmp_value_class,
@@ -445,7 +445,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(
 					a_sub_population->offspring1.compute_fitness(training_data, training_data_ts,
 						random_subset_indexes, random_subset_selection_size,
 						cached_eval_variables_matrix_double,
-								cached_eval_variables_matrix_long,
+								cached_eval_variables_matrix_long_long,
 								cached_sum_of_errors_for_variables,
 						cached_threashold, tmp_value_class,
 						num_actual_variables, actual_enabled_variables,
@@ -460,7 +460,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(
 					a_sub_population->offspring2.compute_fitness(training_data, training_data_ts,
 						random_subset_indexes, random_subset_selection_size,
 						cached_eval_variables_matrix_double,
-										cached_eval_variables_matrix_long,
+										cached_eval_variables_matrix_long_long,
 										cached_sum_of_errors_for_variables,
 						cached_threashold, tmp_value_class,
 						num_actual_variables, actual_enabled_variables,
@@ -722,14 +722,16 @@ double t_mep::compute_validation_error(
 					validation_data,
 				 validation_error_per_output,
 					validation_error,
-					index_error_gene, mep_absolute_error_double, mep_absolute_error_long);
+					index_error_gene, mep_absolute_error_double, 
+									 mep_absolute_error_long_long);
 			else
 				result = best_sub_pop.individuals[best_sub_pop.best_index].compute_regression_error_on_data_return_error(
 																	validation_data,
 																	validation_error_per_output,
 																	validation_error,
 																	index_error_gene,
-																	mep_squared_error_double, mep_squared_error_long);
+																	mep_squared_error_double,
+																	mep_squared_error_long_long);
 			while (!result) {
 				// I have to mutate that a_chromosome.
 				best_sub_pop.individuals[best_sub_pop.best_index].set_gene_operation(index_error_gene,
@@ -738,21 +740,23 @@ double t_mep::compute_validation_error(
 				if (mep_parameters.get_error_measure() == MEP_REGRESSION_MEAN_ABSOLUTE_ERROR)
 					best_sub_pop.individuals[best_sub_pop.best_index].fitness_regression(training_data,
 						random_subset_indexes, random_subset_selection_size,
-						cached_eval_variables_matrix_double, cached_eval_variables_matrix_long,
+						cached_eval_variables_matrix_double, 
+						cached_eval_variables_matrix_long_long,
 						cached_sum_of_errors_for_variables,
 						num_actual_variables, actual_enabled_variables,
 						eval_double, eval_long, gene_used_for_output,
-						mep_absolute_error_double, mep_absolute_error_long,
+						mep_absolute_error_double, mep_absolute_error_long_long,
 						seeds[best_subpopulation_index]);
 				else
 					best_sub_pop.individuals[best_sub_pop.best_index].fitness_regression(training_data,
 						random_subset_indexes, random_subset_selection_size,
 						cached_eval_variables_matrix_double,
-						cached_eval_variables_matrix_long,
-																						 cached_sum_of_errors_for_variables,
+						cached_eval_variables_matrix_long_long,
+						cached_sum_of_errors_for_variables,
 						num_actual_variables, actual_enabled_variables,
 						eval_double, eval_long, gene_used_for_output,
-						mep_squared_error_double, mep_squared_error_long, seeds[best_subpopulation_index]);
+						mep_squared_error_double, mep_squared_error_long_long,
+						seeds[best_subpopulation_index]);
 				best_sub_pop.individuals[best_sub_pop.best_index].count_num_utilized_genes();
 				// resort the population
 				//sort_by_fitness(pop[best_subpopulation_index]);
@@ -769,13 +773,15 @@ double t_mep::compute_validation_error(
 						validation_data,
 					 validation_error_per_output,
 						validation_error,
-						index_error_gene, mep_absolute_error_double, mep_absolute_error_long);
+						index_error_gene, 
+						mep_absolute_error_double, mep_absolute_error_long_long);
 				else
 					result = best_sub_pop.individuals[best_sub_pop.best_index].compute_regression_error_on_data_return_error(
 						validation_data,
 						 validation_error_per_output,
 						validation_error,
-						index_error_gene, mep_squared_error_double, mep_squared_error_long);
+						index_error_gene, 
+						mep_squared_error_double, mep_squared_error_long_long);
 			}
 			// now it is ok; no errors on
 			if ((validation_error < best_validation_error) ||
@@ -800,13 +806,15 @@ double t_mep::compute_validation_error(
 					result = best_sub_pop.individuals[best_sub_pop.best_index].compute_time_series_error_on_data_return_error(
 						previous_data_long, window_size,
 						validation_data,
-						validation_error_per_output, validation_error, index_error_gene, mep_absolute_error_long);
+						validation_error_per_output, validation_error, index_error_gene,
+						mep_absolute_error_long_long);
 				else
 					result = best_sub_pop.individuals[best_sub_pop.best_index].compute_time_series_error_on_data_return_error(
 						previous_data_long, window_size,
 						validation_data,
 						validation_error_per_output,
-						validation_error, index_error_gene, mep_squared_error_long);
+						validation_error, index_error_gene,
+						mep_squared_error_long_long);
 			}
 			else{// double
 				previous_data_double = new double[window_size * num_outputs];
@@ -836,20 +844,21 @@ double t_mep::compute_validation_error(
 						training_data_ts,
 						random_subset_indexes, random_subset_selection_size,
 						cached_eval_variables_matrix_double,
-						cached_eval_variables_matrix_long,
+						cached_eval_variables_matrix_long_long,
 																						 cached_sum_of_errors_for_variables,
 						num_actual_variables, actual_enabled_variables,
 						eval_double, eval_long, gene_used_for_output,
-						mep_absolute_error_double, mep_absolute_error_long,
+						mep_absolute_error_double, mep_absolute_error_long_long,
 						seeds[best_subpopulation_index]);
 				else
 					best_sub_pop.individuals[best_sub_pop.best_index].fitness_regression(training_data_ts,
 						random_subset_indexes, random_subset_selection_size,
-						cached_eval_variables_matrix_double, cached_eval_variables_matrix_long,
-																						 cached_sum_of_errors_for_variables,
+						cached_eval_variables_matrix_double, 
+						cached_eval_variables_matrix_long_long,
+						cached_sum_of_errors_for_variables,
 						num_actual_variables, actual_enabled_variables,
 						eval_double, eval_long, gene_used_for_output,
-						mep_squared_error_double, mep_squared_error_long,
+						mep_squared_error_double, mep_squared_error_long_long,
 						seeds[best_subpopulation_index]);
 				best_sub_pop.individuals[best_sub_pop.best_index].count_num_utilized_genes();
 				// resort the population
@@ -869,12 +878,14 @@ double t_mep::compute_validation_error(
 						result = best_sub_pop.individuals[best_sub_pop.best_index].compute_time_series_error_on_data_return_error(
 																																  previous_data_long, window_size,
 							validation_data, validation_error_per_output,
-							validation_error, index_error_gene, mep_absolute_error_long);
+							validation_error, index_error_gene, 
+														mep_absolute_error_long_long);
 					else
 						result = best_sub_pop.individuals[best_sub_pop.best_index].compute_time_series_error_on_data_return_error(
 																																  previous_data_long, window_size,
 							validation_data,validation_error_per_output,
-							validation_error, index_error_gene, mep_squared_error_long);
+							validation_error, index_error_gene,
+																																  mep_squared_error_long_long);
 
 				}
 				else{

@@ -102,12 +102,12 @@ public:
 	
 	// returns a training data as double (if data type is 0)
 	// assumes that row and col are valid; no test for out of range are performed
-	long long** get_data_matrix_as_long(void) const;
+	long long** get_data_matrix_as_long_long(void) const;
 
 	// returns an entire row as a pointer to double
 	double* get_row_as_double(unsigned int row) const;
 
-	long long* get_row_as_long(unsigned int row) const;
+	long long* get_row_as_long_long(unsigned int row) const;
 
 	double get_value_double(unsigned int row, unsigned int col) const;
 	void get_range_values_double(unsigned int row,
@@ -115,8 +115,8 @@ public:
 								 double* values) const;
 
 	char* get_value_string(unsigned int row, unsigned int col) const;
-	long long get_value_long(unsigned int row, unsigned int col) const;
-	void get_range_values_long(unsigned int row,
+	long long get_value_long_long(unsigned int row, unsigned int col) const;
+	void get_range_values_long_long(unsigned int row,
 							   unsigned int start_col, unsigned int count,
 							   long long* values) const;
     
@@ -255,16 +255,16 @@ public:
 
 	bool are_all_output_int(void) const;
 	
-	bool are_all_data_long(void) const;
+	bool are_all_data_long_long(void) const;
 	
-	bool from_double_to_long(void);
-	void from_long_to_double(void);
+	bool from_double_to_long_long(void);
+	void from_long_long_to_double(void);
 	
 	void swap_data(t_mep_data& other);
 	
 	void remove_unchecked_rows(const char* checked);
 	bool from_string_cast_to_double(void);
-	bool from_string_cast_to_long(void);
+	bool from_string_cast_to_long_long(void);
 };
 //-----------------------------------------------------------------
 #endif
