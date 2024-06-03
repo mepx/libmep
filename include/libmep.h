@@ -4,6 +4,8 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
+#define LIBMEP_VERSION "2023.6.3.1"
+//-----------------------------------------------------------------
 #ifndef libmep_H
 #define libmep_H
 //-----------------------------------------------------------------
@@ -28,7 +30,8 @@ typedef void(*f_on_progress)(void);
 class t_mep{
 
 private:
-	char version[100];
+	//char version[100];
+	char version_used_for_training[100];
 
 	t_mep_parameters mep_parameters;
 	t_mep_constants mep_constants;

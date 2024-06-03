@@ -18,7 +18,9 @@
 //-----------------------------------------------------------------
 void t_mep::to_xml_node(pugi::xml_node parent)
 {
-	// utilized variables
+	pugi::xml_node version_used_for_training_node = parent.append_child("version_used_for_training");
+	pugi::xml_node version_used_for_training_data_node = version_used_for_training_node.append_child(pugi::node_pcdata);
+	version_used_for_training_data_node.set_value(version_used_for_training);
 
 	pugi::xml_node training_node = parent.append_child("training");
 	training_data.to_xml_node(training_node);
@@ -91,7 +93,15 @@ bool t_mep::from_xml_node(pugi::xml_node parent)
 		variables_enabled = NULL;
 	}
 
-	pugi::xml_node node = parent.child("parameters");
+	pugi::xml_node node = parent.child("version_used_for_training");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		strncpy(version_used_for_training, value_as_cstring, 100);
+	}
+	else
+		version_used_for_training[0] = 0;
+	
+	node = parent.child("parameters");
 	if (node) {
 		mep_parameters.from_xml_node(node);
 		if (mep_parameters.get_random_subset_selection_size_percent() == 0) {
@@ -231,7 +241,7 @@ bool t_mep::to_xml_file(const char* filename)
 
 	pugi::xml_node version_node = body.append_child("version");
 	pugi::xml_node data = version_node.append_child(pugi::node_pcdata);
-	data.set_value(version);
+	data.set_value(LIBMEP_VERSION);
 
 	pugi::xml_node problem_description_node = body.append_child("problem_description");
 	data = problem_description_node.append_child(pugi::node_pcdata);

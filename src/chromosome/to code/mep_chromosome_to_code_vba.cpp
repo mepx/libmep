@@ -183,8 +183,8 @@ void t_mep_chromosome::print_MEP_code_Excel_VBA(char* s_prog,
 }
 //---------------------------------------------------------------------------
 void t_mep_chromosome::print_output_calculation_Excel_VBA(char* s_prog,
-											int num_utilized_instructions,
-											const unsigned int *index_output_instructions)
+														  int num_utilized_instructions,
+														  const unsigned int *index_output_instructions)
 {
 	char tmp_s[100];
 	
@@ -332,7 +332,7 @@ void t_mep_chromosome::print_output_calculation_Excel_VBA(char* s_prog,
 }
 //---------------------------------------------------------------------------
 char* t_mep_chromosome::to_Excel_VBA_function_code(bool simplified,
-												const char* libmep_version)
+												   const char* libmep_version)
 {
 	char* old_locale = setlocale(LC_NUMERIC, NULL);
 	char* saved_locale = strdup (old_locale);

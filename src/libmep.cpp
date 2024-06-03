@@ -19,7 +19,8 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-	strcpy(version, "2024.6.3.0-beta");
+//	strcpy(version, "2024.6.3.1-beta");
+	version_used_for_training[0] = 0;
 
 	num_selected_operators = 0;
 
@@ -248,6 +249,8 @@ int t_mep::start(f_on_progress on_generation,
 
 	_stopped = false;
 	_stopped_signal_sent = false;
+	
+	strcpy(version_used_for_training, LIBMEP_VERSION);
 
 	compute_list_of_enabled_variables();
 
@@ -1116,7 +1119,10 @@ char* t_mep::program_as_C(unsigned int run_index,
 						  long long** inputs_long) const
 {
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_code(
-			simplified, inputs_double, inputs_long, version);
+																			simplified,
+																			inputs_double,
+																			inputs_long,
+																			version_used_for_training);
 }
 //---------------------------------------------------------------------------
 char* t_mep::program_as_C_infix(unsigned int run_index,
@@ -1125,19 +1131,20 @@ char* t_mep::program_as_C_infix(unsigned int run_index,
 {
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_C_infix_code(
 			inputs_double, inputs_long,
-		version);
+																				  version_used_for_training);
 }
 //---------------------------------------------------------------------------
 char* t_mep::program_as_Latex(unsigned int run_index) const
 {
-	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Latex_code(version);
+	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Latex_code(version_used_for_training);
 }
 //---------------------------------------------------------------------------
 char* t_mep::program_as_Excel_function(unsigned int run_index,
 									   bool simplified)const
 {
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Excel_VBA_function_code(
-		simplified, version);
+																							 simplified, 
+																							 version_used_for_training);
 }
 //---------------------------------------------------------------------------
 char* t_mep::program_as_Python(unsigned int run_index,
@@ -1147,8 +1154,8 @@ char* t_mep::program_as_Python(unsigned int run_index,
 	return get_stats_ptr()->get_stat_ptr(run_index)->best_program.to_Python_code(
 								simplified,
 								inputs_double, inputs_long,
-								version
-	);
+																				 version_used_for_training
+																				 );
 }
 //---------------------------------------------------------------------------
 void t_mep::set_num_total_variables(unsigned int value)
@@ -1161,32 +1168,33 @@ void t_mep::set_num_total_variables(unsigned int value)
 //---------------------------------------------------------------------------
 void t_mep::init(void)
 {
-	if (_stopped) {
-		mep_parameters.init();
-		mep_operators.init();
-		mep_constants.init();
+	if (!_stopped)
+		return;
+	mep_parameters.init();
+	mep_operators.init();
+	mep_constants.init();
 
-		if (actual_enabled_variables) {
-			delete[] actual_enabled_variables;
-			actual_enabled_variables = NULL;
-		}
-		if (variables_enabled) {
-			delete[] variables_enabled;
-			variables_enabled = NULL;
-		}
-
-		num_actual_variables = 0;
-
-		if (problem_description) {
-			delete[] problem_description;
-			problem_description = NULL;
-		}
-
-		problem_description = new char[100];
-		strcpy(problem_description, "Problem description here ...");
-
-		modified_project = false;
+	if (actual_enabled_variables) {
+		delete[] actual_enabled_variables;
+		actual_enabled_variables = NULL;
 	}
+	if (variables_enabled) {
+		delete[] variables_enabled;
+		variables_enabled = NULL;
+	}
+
+	num_actual_variables = 0;
+
+	if (problem_description) {
+		delete[] problem_description;
+		problem_description = NULL;
+	}
+
+	problem_description = new char[100];
+	strcpy(problem_description, "Problem description here ...");
+
+	modified_project = false;
+	strcpy(version_used_for_training, LIBMEP_VERSION);
 }
 //---------------------------------------------------------------------------
 void t_mep::compute_list_of_enabled_variables(void)
@@ -1641,7 +1649,7 @@ const t_mep_all_runs_statistics* t_mep::get_stats_ptr(void)const
 //---------------------------------------------------------------------------
 const char* t_mep::get_version(void) const
 {
-	return version;
+	return LIBMEP_VERSION;
 }
 //---------------------------------------------------------------------------
 bool t_mep::could_be_univariate_time_serie(void) const
