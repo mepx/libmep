@@ -51,7 +51,7 @@ double mep_real_rand(t_seed &seed, double _min, double _max)
 	return RNG(seed) / (double)0xFFFFFFFF * (_max - _min) + _min;
 }
 //---------------------------------------------------------------------------
-int mep_int_01_rand(t_seed& seed)
+unsigned int mep_int_01_rand(t_seed& seed)
 {
 	return RNG(seed) % 2;
 }
