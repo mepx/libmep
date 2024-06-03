@@ -251,10 +251,10 @@ void t_mep_chromosome::print_MEP_code_Python(char* s_prog,
 
 		if (mep_code[i].op < 0) {
 			print_instruction_to_Python(mep_code[i].op,
-										mep_code[i].addr1,
-										mep_code[i].addr2,
-										mep_code[i].addr3,
-										mep_code[i].addr4,
+										mep_code[i].addr[0],
+										mep_code[i].addr[1],
+										mep_code[i].addr[2],
+										mep_code[i].addr[3],
 										data_type,
 										tmp_s);
 			strcat(s_prog, tmp_s);

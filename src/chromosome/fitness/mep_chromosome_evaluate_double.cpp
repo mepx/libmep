@@ -23,124 +23,124 @@ bool t_mep_chromosome::evaluate(double *inputs,
 		bool is_error_case = false;// division by zero, other errors
 		switch (prg[i].op) {
 		case  O_ADDITION:  // +
-			eval_vect[i] = eval_vect[prg[i].addr1] + eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] + eval_vect[prg[i].addr[1]];
 			break;
 		case  O_SUBTRACTION:  // -
-			eval_vect[i] = eval_vect[prg[i].addr1] - eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] - eval_vect[prg[i].addr[1]];
 			break;
 		case  O_MULTIPLICATION:  // *
-			eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] * eval_vect[prg[i].addr[1]];
 			break;
 		case  O_DIVISION:  //  /
-			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr[1]]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
-				eval_vect[i] = eval_vect[prg[i].addr1] / eval_vect[prg[i].addr2];
+				eval_vect[i] = eval_vect[prg[i].addr[0]] / eval_vect[prg[i].addr[1]];
 			break;
 		case O_POWER:
-			eval_vect[i] = pow(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+			eval_vect[i] = pow(eval_vect[prg[i].addr[0]], eval_vect[prg[i].addr[1]]);
 			break;
 		case O_SQRT:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else
-				eval_vect[i] = sqrt(eval_vect[prg[i].addr1]);
+				eval_vect[i] = sqrt(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_EXP:
-			eval_vect[i] = exp(eval_vect[prg[i].addr1]);
+			eval_vect[i] = exp(eval_vect[prg[i].addr[0]]);
 
 			break;
 		case O_POW10:
-			eval_vect[i] = pow(10, eval_vect[prg[i].addr1]);
+			eval_vect[i] = pow(10, eval_vect[prg[i].addr[0]]);
 			break;
 		case O_LN:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else                // an exception occured !!!
-				eval_vect[i] = log(eval_vect[prg[i].addr1]);
+				eval_vect[i] = log(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_LOG10:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else
-				eval_vect[i] = log10(eval_vect[prg[i].addr1]);
+				eval_vect[i] = log10(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_LOG2:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else
-				eval_vect[i] = log2(eval_vect[prg[i].addr1]);
+				eval_vect[i] = log2(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_FLOOR:
-			eval_vect[i] = floor(eval_vect[prg[i].addr1]);
+			eval_vect[i] = floor(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_CEIL:
-			eval_vect[i] = ceil(eval_vect[prg[i].addr1]);
+			eval_vect[i] = ceil(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_ABS:
-			eval_vect[i] = fabs(eval_vect[prg[i].addr1]);
+			eval_vect[i] = fabs(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_INV:
-			if (fabs(eval_vect[prg[i].addr1]) < MEP_DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr[0]]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
-				eval_vect[i] = 1 / eval_vect[prg[i].addr1];
+				eval_vect[i] = 1 / eval_vect[prg[i].addr[0]];
 			break;
 		case O_NEG:
-			eval_vect[i] = -eval_vect[prg[i].addr1];
+			eval_vect[i] = -eval_vect[prg[i].addr[0]];
 			break;
 		case O_X2:
-			eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr1];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] * eval_vect[prg[i].addr[0]];
 			break;
 		case O_MIN:
-			eval_vect[i] = eval_vect[prg[i].addr1] < eval_vect[prg[i].addr2] ? eval_vect[prg[i].addr1] : eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < eval_vect[prg[i].addr[1]] ? eval_vect[prg[i].addr[0]] : eval_vect[prg[i].addr[1]];
 			break;
 		case O_MAX:
-			eval_vect[i] = eval_vect[prg[i].addr1] > eval_vect[prg[i].addr2] ? eval_vect[prg[i].addr1] : eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] > eval_vect[prg[i].addr[1]] ? eval_vect[prg[i].addr[0]] : eval_vect[prg[i].addr[1]];
 			break;
 
 		case O_SIN:
-			eval_vect[i] = sin(eval_vect[prg[i].addr1]);
+			eval_vect[i] = sin(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_COS:
-			eval_vect[i] = cos(eval_vect[prg[i].addr1]);
+			eval_vect[i] = cos(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_TAN:
-			eval_vect[i] = tan(eval_vect[prg[i].addr1]);
+			eval_vect[i] = tan(eval_vect[prg[i].addr[0]]);
 			break;
 
 		case O_ASIN:
-			if (eval_vect[prg[i].addr1] < -1 || eval_vect[prg[i].addr1] > 1)
+			if (eval_vect[prg[i].addr[0]] < -1 || eval_vect[prg[i].addr[0]] > 1)
 				is_error_case = true;
 			else
-				eval_vect[i] = asin(eval_vect[prg[i].addr1]);
+				eval_vect[i] = asin(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_ACOS:
-			if (eval_vect[prg[i].addr1] < -1 || eval_vect[prg[i].addr1] > 1)
+			if (eval_vect[prg[i].addr[0]] < -1 || eval_vect[prg[i].addr[0]] > 1)
 				is_error_case = true;
 			else
-				eval_vect[i] = acos(eval_vect[prg[i].addr1]);
+				eval_vect[i] = acos(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_ATAN:
-			eval_vect[i] = atan(eval_vect[prg[i].addr1]);
+			eval_vect[i] = atan(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_IFLZ:
-			eval_vect[i] = eval_vect[prg[i].addr1] < 0 ? eval_vect[prg[i].addr2] : eval_vect[prg[i].addr3];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < 0 ? eval_vect[prg[i].addr[1]] : eval_vect[prg[i].addr[2]];
 			break;
 		case O_IFALBCD:
-			eval_vect[i] = eval_vect[prg[i].addr1] < eval_vect[prg[i].addr2] ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < eval_vect[prg[i].addr[1]] ? eval_vect[prg[i].addr[2]] : eval_vect[prg[i].addr[3]];
 			break;
 		case O_IF_A_OR_B_CD:
-			eval_vect[i] = eval_vect[prg[i].addr1] < 0 || eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < 0 || eval_vect[prg[i].addr[1]] < 0 ? eval_vect[prg[i].addr[2]] : eval_vect[prg[i].addr[3]];
 			break;
 		case O_IF_A_XOR_B_CD:
-			eval_vect[i] = eval_vect[prg[i].addr1] < 0 != eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < 0 != eval_vect[prg[i].addr[1]] < 0 ? eval_vect[prg[i].addr[2]] : eval_vect[prg[i].addr[3]];
 			break;
 		case O_FMOD:
-			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr[1]]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
-				eval_vect[i] = fmod(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+				eval_vect[i] = fmod(eval_vect[prg[i].addr[0]], eval_vect[prg[i].addr[1]]);
 			break;
 		case O_INPUTS_AVERAGE:
 			eval_vect[i] = 0;
@@ -188,124 +188,124 @@ bool t_mep_chromosome::get_first_max_index(double *inputs,
 		bool is_error_case = false;// division by zero, other errors
 		switch (prg[i].op) {
 		case  O_ADDITION:  // +
-			eval_vect[i] = eval_vect[prg[i].addr1] + eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] + eval_vect[prg[i].addr[1]];
 			break;
 		case  O_SUBTRACTION:  // -
-			eval_vect[i] = eval_vect[prg[i].addr1] - eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] - eval_vect[prg[i].addr[1]];
 			break;
 		case  O_MULTIPLICATION:  // *
-			eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] * eval_vect[prg[i].addr[1]];
 			break;
 		case  O_DIVISION:  //  /
-			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr[1]]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
-				eval_vect[i] = eval_vect[prg[i].addr1] / eval_vect[prg[i].addr2];
+				eval_vect[i] = eval_vect[prg[i].addr[0]] / eval_vect[prg[i].addr[1]];
 			break;
 		case O_POWER:
-			eval_vect[i] = pow(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+			eval_vect[i] = pow(eval_vect[prg[i].addr[0]], eval_vect[prg[i].addr[1]]);
 			break;
 		case O_SQRT:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else
-				eval_vect[i] = sqrt(eval_vect[prg[i].addr1]);
+				eval_vect[i] = sqrt(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_EXP:
-			eval_vect[i] = exp(eval_vect[prg[i].addr1]);
+			eval_vect[i] = exp(eval_vect[prg[i].addr[0]]);
 
 			break;
 		case O_POW10:
-			eval_vect[i] = pow(10, eval_vect[prg[i].addr1]);
+			eval_vect[i] = pow(10, eval_vect[prg[i].addr[0]]);
 			break;
 		case O_LN:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else                // an exception occured !!!
-				eval_vect[i] = log(eval_vect[prg[i].addr1]);
+				eval_vect[i] = log(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_LOG10:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else
-				eval_vect[i] = log10(eval_vect[prg[i].addr1]);
+				eval_vect[i] = log10(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_LOG2:
-			if (eval_vect[prg[i].addr1] <= 0)
+			if (eval_vect[prg[i].addr[0]] <= 0)
 				is_error_case = true;
 			else
-				eval_vect[i] = log2(eval_vect[prg[i].addr1]);
+				eval_vect[i] = log2(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_FLOOR:
-			eval_vect[i] = floor(eval_vect[prg[i].addr1]);
+			eval_vect[i] = floor(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_CEIL:
-			eval_vect[i] = ceil(eval_vect[prg[i].addr1]);
+			eval_vect[i] = ceil(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_ABS:
-			eval_vect[i] = fabs(eval_vect[prg[i].addr1]);
+			eval_vect[i] = fabs(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_INV:
-			if (fabs(eval_vect[prg[i].addr1]) < MEP_DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr[0]]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
-				eval_vect[i] = 1.0 / eval_vect[prg[i].addr1];
+				eval_vect[i] = 1.0 / eval_vect[prg[i].addr[0]];
 			break;
 		case O_NEG:
-			eval_vect[i] = -eval_vect[prg[i].addr1];
+			eval_vect[i] = -eval_vect[prg[i].addr[0]];
 			break;
 		case O_X2:
-			eval_vect[i] = eval_vect[prg[i].addr1] * eval_vect[prg[i].addr1];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] * eval_vect[prg[i].addr[0]];
 			break;
 		case O_MIN:
-			eval_vect[i] = eval_vect[prg[i].addr1] < eval_vect[prg[i].addr2] ? eval_vect[prg[i].addr1] : eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < eval_vect[prg[i].addr[1]] ? eval_vect[prg[i].addr[0]] : eval_vect[prg[i].addr[1]];
 			break;
 		case O_MAX:
-			eval_vect[i] = eval_vect[prg[i].addr1] > eval_vect[prg[i].addr2] ? eval_vect[prg[i].addr1] : eval_vect[prg[i].addr2];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] > eval_vect[prg[i].addr[1]] ? eval_vect[prg[i].addr[0]] : eval_vect[prg[i].addr[1]];
 			break;
 
 		case O_SIN:
-			eval_vect[i] = sin(eval_vect[prg[i].addr1]);
+			eval_vect[i] = sin(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_COS:
-			eval_vect[i] = cos(eval_vect[prg[i].addr1]);
+			eval_vect[i] = cos(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_TAN:
-			eval_vect[i] = tan(eval_vect[prg[i].addr1]);
+			eval_vect[i] = tan(eval_vect[prg[i].addr[0]]);
 			break;
 
 		case O_ASIN:
-			if (eval_vect[prg[i].addr1] < -1 || eval_vect[prg[i].addr1] > 1)
+			if (eval_vect[prg[i].addr[0]] < -1 || eval_vect[prg[i].addr[0]] > 1)
 				is_error_case = true;
 			else
-				eval_vect[i] = asin(eval_vect[prg[i].addr1]);
+				eval_vect[i] = asin(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_ACOS:
-			if (eval_vect[prg[i].addr1] < -1 || eval_vect[prg[i].addr1] > 1)
+			if (eval_vect[prg[i].addr[0]] < -1 || eval_vect[prg[i].addr[0]] > 1)
 				is_error_case = true;
 			else
-				eval_vect[i] = acos(eval_vect[prg[i].addr1]);
+				eval_vect[i] = acos(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_ATAN:
-			eval_vect[i] = atan(eval_vect[prg[i].addr1]);
+			eval_vect[i] = atan(eval_vect[prg[i].addr[0]]);
 			break;
 		case O_IFLZ:
-			eval_vect[i] = eval_vect[prg[i].addr1] < 0 ? eval_vect[prg[i].addr2] : eval_vect[prg[i].addr3];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < 0 ? eval_vect[prg[i].addr[1]] : eval_vect[prg[i].addr[2]];
 			break;
 		case O_IFALBCD:
-			eval_vect[i] = eval_vect[prg[i].addr1] < eval_vect[prg[i].addr2] ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < eval_vect[prg[i].addr[1]] ? eval_vect[prg[i].addr[2]] : eval_vect[prg[i].addr[3]];
 			break;
 		case O_IF_A_OR_B_CD:
-			eval_vect[i] = eval_vect[prg[i].addr1] < 0 || eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < 0 || eval_vect[prg[i].addr[1]] < 0 ? eval_vect[prg[i].addr[2]] : eval_vect[prg[i].addr[3]];
 			break;
 		case O_IF_A_XOR_B_CD:
-			eval_vect[i] = eval_vect[prg[i].addr1] < 0 != eval_vect[prg[i].addr2] < 0 ? eval_vect[prg[i].addr3] : eval_vect[prg[i].addr4];
+			eval_vect[i] = eval_vect[prg[i].addr[0]] < 0 != eval_vect[prg[i].addr[1]] < 0 ? eval_vect[prg[i].addr[2]] : eval_vect[prg[i].addr[3]];
 			break;
 		case O_FMOD:
-			if (fabs(eval_vect[prg[i].addr2]) < MEP_DIVISION_PROTECT)
+			if (fabs(eval_vect[prg[i].addr[1]]) < MEP_DIVISION_PROTECT)
 				is_error_case = true;
 			else
-				eval_vect[i] = fmod(eval_vect[prg[i].addr1], eval_vect[prg[i].addr2]);
+				eval_vect[i] = fmod(eval_vect[prg[i].addr[0]], eval_vect[prg[i].addr[1]]);
 			break;
 
 		default:  // a variable
@@ -356,37 +356,37 @@ void t_mep_chromosome::compute_eval_matrix(
 		//int num_training_data = mep_dataset->get_num_rows();
 
 		if (prg[i].op < 0) {// an operator
-			if (prg[prg[i].addr1].op >= 0)
-				if (prg[prg[i].addr1].op < (int)num_total_variables)
-					arg1 = cached_variables_eval_matrix[prg[prg[i].addr1].op];
+			if (prg[prg[i].addr[0]].op >= 0)
+				if (prg[prg[i].addr[0]].op < (int)num_total_variables)
+					arg1 = cached_variables_eval_matrix[prg[prg[i].addr[0]].op];
 				else
-					arg1 = eval_double[line_of_constants[prg[prg[i].addr1].op - num_total_variables]];
+					arg1 = eval_double[line_of_constants[prg[prg[i].addr[0]].op - num_total_variables]];
 			else
-				arg1 = eval_double[prg[i].addr1];
+				arg1 = eval_double[prg[i].addr[0]];
 
-			if (prg[prg[i].addr2].op >= 0)
-				if (prg[prg[i].addr2].op < (int)num_total_variables)
-					arg2 = cached_variables_eval_matrix[prg[prg[i].addr2].op];
+			if (prg[prg[i].addr[1]].op >= 0)
+				if (prg[prg[i].addr[1]].op < (int)num_total_variables)
+					arg2 = cached_variables_eval_matrix[prg[prg[i].addr[1]].op];
 				else
-					arg2 = eval_double[line_of_constants[prg[prg[i].addr2].op - num_total_variables]];
+					arg2 = eval_double[line_of_constants[prg[prg[i].addr[1]].op - num_total_variables]];
 			else
-				arg2 = eval_double[prg[i].addr2];
+				arg2 = eval_double[prg[i].addr[1]];
 
-			if (prg[prg[i].addr3].op >= 0)
-				if (prg[prg[i].addr3].op < (int)num_total_variables)
-					arg3 = cached_variables_eval_matrix[prg[prg[i].addr3].op];
+			if (prg[prg[i].addr[2]].op >= 0)
+				if (prg[prg[i].addr[2]].op < (int)num_total_variables)
+					arg3 = cached_variables_eval_matrix[prg[prg[i].addr[2]].op];
 				else
-					arg3 = eval_double[line_of_constants[prg[prg[i].addr3].op - num_total_variables]];
+					arg3 = eval_double[line_of_constants[prg[prg[i].addr[2]].op - num_total_variables]];
 			else
-				arg3 = eval_double[prg[i].addr3];
+				arg3 = eval_double[prg[i].addr[2]];
 
-			if (prg[prg[i].addr4].op >= 0)
-				if (prg[prg[i].addr4].op < (int)num_total_variables)
-					arg4 = cached_variables_eval_matrix[prg[prg[i].addr4].op];
+			if (prg[prg[i].addr[3]].op >= 0)
+				if (prg[prg[i].addr[3]].op < (int)num_total_variables)
+					arg4 = cached_variables_eval_matrix[prg[prg[i].addr[3]].op];
 				else
-					arg4 = eval_double[line_of_constants[prg[prg[i].addr4].op - num_total_variables]];
+					arg4 = eval_double[line_of_constants[prg[prg[i].addr[3]].op - num_total_variables]];
 			else
-				arg4 = eval_double[prg[i].addr4];
+				arg4 = eval_double[prg[i].addr[3]];
 		}
 		else {
 			arg1 = arg2 = arg3 = arg4 = NULL; // just to silence some compiler warnings

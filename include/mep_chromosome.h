@@ -18,7 +18,7 @@ struct t_code3{
 	int op;            // either a variable or an operator; 
 						// variables are positive 0,1,2,...; 
 						// operators are negative -1, -2, -3...
-	unsigned int addr1, addr2, addr3, addr4;    // pointers to arguments
+	unsigned int addr[4];    // pointers to arguments
 };
 //-----------------------------------------------------------------
 class t_mep_chromosome{

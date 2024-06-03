@@ -289,43 +289,43 @@ void t_mep_chromosome::swap_pointers(t_mep_chromosome& source)
 void t_mep_chromosome::mark(unsigned int position, char* marked)
 {
 	if ((prg[position].op < 0) && !marked[position]) {
-		mark(prg[position].addr1, marked);
+		mark(prg[position].addr[0], marked);
 
 		switch (prg[position].op) {
 		case O_ADDITION:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_SUBTRACTION:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_MULTIPLICATION:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_DIVISION:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_POWER:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_MIN:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_MAX:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_FMOD:
-			mark(prg[position].addr2, marked);
+			mark(prg[position].addr[1], marked);
 			break;
 		case O_IFLZ:
-			mark(prg[position].addr2, marked);
-			mark(prg[position].addr3, marked);
+			mark(prg[position].addr[1], marked);
+			mark(prg[position].addr[2], marked);
 			break;
 		case O_IFALBCD:
 		case O_IF_A_OR_B_CD:
 		case O_IF_A_XOR_B_CD:
-			mark(prg[position].addr2, marked);
-			mark(prg[position].addr3, marked);
-			mark(prg[position].addr4, marked);
+			mark(prg[position].addr[1], marked);
+			mark(prg[position].addr[2], marked);
+			mark(prg[position].addr[3], marked);
 			break;
 		}
 	}
@@ -399,10 +399,10 @@ void t_mep_chromosome::simplify(void)
 				}
 			simplified_prg[num_utilized_genes] = prg[i];
 			if (prg[i].op < 0) {
-				simplified_prg[num_utilized_genes].addr1 -= skipped[prg[i].addr1];
-				simplified_prg[num_utilized_genes].addr2 -= skipped[prg[i].addr2];
-				simplified_prg[num_utilized_genes].addr3 -= skipped[prg[i].addr3];
-				simplified_prg[num_utilized_genes].addr4 -= skipped[prg[i].addr4];
+				simplified_prg[num_utilized_genes].addr[0] -= skipped[prg[i].addr[0]];
+				simplified_prg[num_utilized_genes].addr[1] -= skipped[prg[i].addr[1]];
+				simplified_prg[num_utilized_genes].addr[2] -= skipped[prg[i].addr[2]];
+				simplified_prg[num_utilized_genes].addr[3] -= skipped[prg[i].addr[3]];
 			}
 			num_utilized_genes++;
 		}
@@ -482,10 +482,10 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 			else
 				prg[i].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants);
 
-		prg[i].addr1 = mep_unsigned_int_rand(seed, 0, i);
-		prg[i].addr2 = mep_unsigned_int_rand(seed, 0, i);
-		prg[i].addr3 = mep_unsigned_int_rand(seed, 0, i);
-		prg[i].addr4 = mep_unsigned_int_rand(seed, 0, i);
+		prg[i].addr[0] = mep_unsigned_int_rand(seed, 0, i);
+		prg[i].addr[1] = mep_unsigned_int_rand(seed, 0, i);
+		prg[i].addr[2] = mep_unsigned_int_rand(seed, 0, i);
+		prg[i].addr[3] = mep_unsigned_int_rand(seed, 0, i);
 	}
 }
 //---------------------------------------------------------------------------
@@ -527,17 +527,17 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 
 		p = mep_real_rand(seed, 0, 1);      // mutate the first address  (adr1)
 		if (p < pm)
-			prg[i].addr1 = mep_unsigned_int_rand(seed, 0, i);
+			prg[i].addr[0] = mep_unsigned_int_rand(seed, 0, i);
 
 		p = mep_real_rand(seed, 0, 1);      // mutate the second address   (adr2)
 		if (p < pm)
-			prg[i].addr2 = mep_unsigned_int_rand(seed, 0, i);
+			prg[i].addr[1] = mep_unsigned_int_rand(seed, 0, i);
 		p = mep_real_rand(seed, 0, 1);      // mutate the 3rd address   (adr3)
 		if (p < pm)
-			prg[i].addr3 = mep_unsigned_int_rand(seed, 0, i);
+			prg[i].addr[2] = mep_unsigned_int_rand(seed, 0, i);
 		p = mep_real_rand(seed, 0, 1);      // mutate the 4th address   (adr4)
 		if (p < pm)
-			prg[i].addr4 = mep_unsigned_int_rand(seed, 0, i);
+			prg[i].addr[3] = mep_unsigned_int_rand(seed, 0, i);
 	}
 	// lets see if I can evolve constants
 

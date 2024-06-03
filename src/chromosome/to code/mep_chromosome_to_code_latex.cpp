@@ -113,43 +113,43 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 {
 	switch (prg[mep_index].op) {
 	case O_ADDITION:
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 1);
 		strcat(s_prg, "+");
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 		break;
 	case O_SUBTRACTION:
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 1);
 		strcat(s_prg, "-");
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
-		if (prg[prg[mep_index].addr2].op < 0) {
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
+		if (prg[prg[mep_index].addr[1]].op < 0) {
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		break;
 	case O_MULTIPLICATION:
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "*");
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -158,14 +158,14 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 8);
 		strcat(s_prg, "\\frac{");
 		
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "{");
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 			
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
@@ -174,73 +174,73 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 	case O_POWER:
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 4);
 		strcat(s_prg, "}^{");
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_SQRT:
 		increase_string_capacity2(s_prg, capacity, 8);
 		strcat(s_prg, "\\sqrt{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_EXP:
 		increase_string_capacity2(s_prg, capacity, 4);
 		strcat(s_prg, "e^{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_POW10:
 		increase_string_capacity2(s_prg, capacity, 5);
 		strcat(s_prg, "10^{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_LN:
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\ln {");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_LOG10:
 		increase_string_capacity2(s_prg, capacity, 12);
 		strcat(s_prg, "\\log_10 {");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_LOG2:
 		increase_string_capacity2(s_prg, capacity, 10);
 		strcat(s_prg, "\\log_2 {");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_FLOOR:
 		increase_string_capacity2(s_prg, capacity, 9);
 		strcat(s_prg, "\\floor(");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ")");
 		break;
 	case O_CEIL:
 		increase_string_capacity2(s_prg, capacity, 8);
 		strcat(s_prg, "\\ceil(");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ")");
 		break;
 	case O_ABS:
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\abs{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
@@ -248,7 +248,7 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 11);
 		strcat(s_prg, "\\frac{1}{");
 
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ")");
 
@@ -257,24 +257,24 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "-");
 
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		break;
 	case O_X2:
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -286,13 +286,13 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\min{");
 
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 
 		increase_string_capacity2(s_prg, capacity, 3);
 		strcat(s_prg, ", ");
 
 
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
@@ -302,13 +302,13 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\max{");
 
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 
 		increase_string_capacity2(s_prg, capacity, 3);
 		strcat(s_prg, ", ");
 
 
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
@@ -316,42 +316,42 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 	case O_SIN:
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\sin{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_COS:
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\cos{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_TAN:
 		increase_string_capacity2(s_prg, capacity, 7);
 		strcat(s_prg, "\\tan{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_ASIN:
 		increase_string_capacity2(s_prg, capacity, 9);
 		strcat(s_prg, "\\arcsin{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_ACOS:
 		increase_string_capacity2(s_prg, capacity, 9);
 		strcat(s_prg, "\\arccos{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
 	case O_ATAN:
 		increase_string_capacity2(s_prg, capacity, 9);
 		strcat(s_prg, "arctan{");
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "}");
 		break;
@@ -359,12 +359,12 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "(");
 
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -372,27 +372,27 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 4);
 		strcat(s_prg, "<0?");
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ":");
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr3, s_prg, capacity);
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[2], s_prg, capacity);
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -404,25 +404,25 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "(");
 
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "<");
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -430,27 +430,27 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "?");
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr3, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[2], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ":");
 
-		if (prg[prg[mep_index].addr4].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[3]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr4, s_prg, capacity);
-		if (prg[prg[mep_index].addr4].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[3], s_prg, capacity);
+		if (prg[prg[mep_index].addr[3]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -462,25 +462,25 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "(");
 
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 6);
 		strcat(s_prg, "<0 ||");
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -488,27 +488,27 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 4);
 		strcat(s_prg, "<0?");
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr3, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[2], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ":");
 
-		if (prg[prg[mep_index].addr4].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[3]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr4, s_prg, capacity);
-		if (prg[prg[mep_index].addr4].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[3], s_prg, capacity);
+		if (prg[prg[mep_index].addr[3]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -519,25 +519,25 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 	case O_IF_A_XOR_B_CD:
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "(");
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 6);
 		strcat(s_prg, "<0 !=");
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -545,27 +545,27 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		increase_string_capacity2(s_prg, capacity, 4);
 		strcat(s_prg, "<0?");
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr3, s_prg, capacity);
+		code_to_Latex(prg[mep_index].addr[2], s_prg, capacity);
 
-		if (prg[prg[mep_index].addr3].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[2]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, ":");
 
-		if (prg[prg[mep_index].addr4].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[3]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
 
-		code_to_Latex(prg[mep_index].addr4, s_prg, capacity);
-		if (prg[prg[mep_index].addr4].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[3], s_prg, capacity);
+		if (prg[prg[mep_index].addr[3]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
@@ -573,25 +573,24 @@ void t_mep_chromosome::code_to_Latex(unsigned int mep_index,
 		strcat(s_prg, ")");
 		break;
 	case O_FMOD:
-			
 		
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr1, s_prg, capacity);
-		if (prg[prg[mep_index].addr1].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[0], s_prg, capacity);
+		if (prg[prg[mep_index].addr[0]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}
 		increase_string_capacity2(s_prg, capacity, 2);
 		strcat(s_prg, "%");
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, "(");
 		}
-		code_to_Latex(prg[mep_index].addr2, s_prg, capacity);
-		if (prg[prg[mep_index].addr2].op < 0) { // it is an operator
+		code_to_Latex(prg[mep_index].addr[1], s_prg, capacity);
+		if (prg[prg[mep_index].addr[1]].op < 0) { // it is an operator
 			increase_string_capacity2(s_prg, capacity, 2);
 			strcat(s_prg, ")");
 		}

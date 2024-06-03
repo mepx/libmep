@@ -50,7 +50,7 @@ void t_mep_chromosome::to_xml_node(pugi::xml_node parent) const
 		node = node_code.append_child("i");
 		data = node.append_child(pugi::node_pcdata);
 		if (prg[i].op < 0) // operator
-			snprintf(tmp_str, 100, "%d %d %d %d %d", prg[i].op, prg[i].addr1, prg[i].addr2, prg[i].addr3, prg[i].addr4);
+			snprintf(tmp_str, 100, "%d %d %d %d %d", prg[i].op, prg[i].addr[0], prg[i].addr[1], prg[i].addr[2], prg[i].addr[3]);
 		else
 			snprintf(tmp_str, 100, "%d", prg[i].op);
 		data.set_value(tmp_str);
@@ -210,10 +210,10 @@ int t_mep_chromosome::from_xml_node(pugi::xml_node parent,
 					const char *value_as_cstring = row.child_value();
 					sscanf(value_as_cstring, "%d", &prg[i].op);
 					if (prg[i].op < 0) { // operator
-						int num_read = sscanf(value_as_cstring, "%d%u%u%u%u", &prg[i].op, &prg[i].addr1, &prg[i].addr2, &prg[i].addr3, &prg[i].addr4);
+						int num_read = sscanf(value_as_cstring, "%d%u%u%u%u", &prg[i].op, &prg[i].addr[0], &prg[i].addr[1], &prg[i].addr[2], &prg[i].addr[3]);
 						if (num_read < 4) {
-							prg[i].addr3 = 0;
-							prg[i].addr4 = 0;
+							prg[i].addr[2] = 0;
+							prg[i].addr[3] = 0;
 						}
 
 					}
@@ -224,10 +224,10 @@ int t_mep_chromosome::from_xml_node(pugi::xml_node parent,
 						const char *value_as_cstring = row.child_value();
 						sscanf(value_as_cstring, "%d", &prg[i].op);
 						if (prg[i].op < 0) { // operator
-							int num_read = sscanf(value_as_cstring, "%d%u%u%u%u", &prg[i].op, &prg[i].addr1, &prg[i].addr2, &prg[i].addr3, &prg[i].addr4);
+							int num_read = sscanf(value_as_cstring, "%d%u%u%u%u", &prg[i].op, &prg[i].addr[0], &prg[i].addr[1], &prg[i].addr[2], &prg[i].addr[3]);
 							if (num_read < 4) {
-								prg[i].addr3 = 0;
-								prg[i].addr4 = 0;
+								prg[i].addr[2] = 0;
+								prg[i].addr[3] = 0;
 							}
 
 						}
