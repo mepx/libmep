@@ -192,8 +192,8 @@ t_mep_chromosome& t_mep_chromosome::operator = (const t_mep_chromosome &source)
 		//!!!!!!!!!!!!!!!!!!!! this is not efficient. I must delete memory only when it is needed, at the end of all runs.!!!!!!!!!!!!!!!!!!!!!!!
 		
 		for (unsigned int i = 0; i < code_length; i++) {
-			prg[i] = source.prg[i];
-			//			simplified_prg[i] = source.simplified_prg[i];
+			prg[i].op = source.prg[i].op;
+			memcpy(prg[i].addr, source.prg[i].addr, 4 * sizeof(unsigned int));
 		}
 		fitness = source.fitness;        // the fitness
 
