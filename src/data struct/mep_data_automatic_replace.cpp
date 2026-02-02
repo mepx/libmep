@@ -196,7 +196,7 @@ int t_mep_data::from_string_automatic_replace_to_double_per_column_all(
 			if (other_data2 && other_data2->data_type == MEP_DATA_STRING) {
 				double tmp_double2;
 				for (unsigned int r = 0; r < other_data2->num_data; r++) {
-					if (!other_data2->_data_string[r][v]) {
+					if (!(other_data2->_data_string[r][v])) {
 						//other_data2->_data_double[r][v] = -1;
 						continue;
 					}
@@ -218,7 +218,7 @@ int t_mep_data::from_string_automatic_replace_to_double_per_column_all(
 						k++;
 					}
 					else {
-						other_data2->_data_double[r][v] = tmp_double2;
+						(other_data2->_data_double[r][v]) = tmp_double2;
 						delete[] other_data2->_data_string[r][v];
 						other_data2->_data_string[r][v] = NULL;
 					}
@@ -435,7 +435,7 @@ int t_mep_data::from_string_automatic_replace_to_long_per_column_all(
 						k++;
 					}
 					else {
-						other_data2->_data_long_long[r][v] = tmp_long2;
+						(other_data2->_data_long_long[r][v]) = tmp_long2;
 						delete[] other_data2->_data_string[r][v];
 						other_data2->_data_string[r][v] = NULL;
 					}
