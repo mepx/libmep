@@ -9,6 +9,7 @@
 #include <math.h>
 #include <string.h>
 #include <locale.h>
+#include <chrono>
 //-----------------------------------------------------------------
 #ifdef _WIN32
 	#include <windows.h>
@@ -19,7 +20,6 @@
 //---------------------------------------------------------------------------
 t_mep::t_mep()
 {
-//	strcpy(version, "2024.6.3.1-beta");
 	version_used_for_training[0] = 0;
 
 	num_selected_operators = 0;
@@ -421,7 +421,7 @@ void t_mep::evolve_one_subpopulation_for_one_generation(
 					unsigned int r1 = tournament(*a_sub_population, seeds[pop_index]);
 					unsigned int r2 = tournament(*a_sub_population, seeds[pop_index]);
 					// crossover
-					double p = mep_real_rand(seeds[pop_index], 0, 1);
+					double p = mep_real_01_rand(seeds[pop_index]);
 					if (p < mep_parameters.get_crossover_probability()) {
 						if (mep_parameters.get_crossover_type() == MEP_CROSSOVER_UNIFORM)
 							a_sub_population->individuals[r1].uniform_crossover(
@@ -683,7 +683,7 @@ void t_mep::get_random_subset(unsigned int requested_size,
 		double p_selection = requested_size / (double)num_data;
 		unsigned int count_real = 0;
 		for (unsigned int i = 0; i < num_data; i++) {
-			double p = mep_real_rand(seed, 0, 1);
+			double p = mep_real_01_rand(seed);
 			if (p <= p_selection) {
 				indexes[count_real] = i;
 				count_real++;
