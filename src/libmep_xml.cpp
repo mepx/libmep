@@ -22,6 +22,10 @@ void t_mep::to_xml_node(pugi::xml_node parent)
 	pugi::xml_node version_used_for_training_data_node = version_used_for_training_node.append_child(pugi::node_pcdata);
 	version_used_for_training_data_node.set_value(version_used_for_training);
 
+	pugi::xml_node problem_description_node = parent.append_child("problem_description");
+	pugi::xml_node data_node = problem_description_node.append_child(pugi::node_pcdata);
+	data_node.set_value(get_problem_description());
+
 	pugi::xml_node training_node = parent.append_child("training");
 	training_data.to_xml_node(training_node);
 	pugi::xml_node validation_node = parent.append_child("validation");
@@ -110,6 +114,18 @@ bool t_mep::from_xml_node(pugi::xml_node parent)
 	}
 	else
 		mep_parameters.init();
+
+	// try again here to find the problem description
+	node = parent.child("problem_description");
+	if (node) {
+		const char* value_as_cstring = node.child_value();
+		if (strlen(value_as_cstring)) {
+			set_problem_description(value_as_cstring);
+		}
+	}
+	else {
+		set_problem_description("Problem description here ...");
+	}
 
 	training_data.clear_data();
 	node = parent.child("training");
@@ -242,11 +258,11 @@ bool t_mep::to_xml_file(const char* filename)
 	pugi::xml_node version_node = body.append_child("version");
 	pugi::xml_node data = version_node.append_child(pugi::node_pcdata);
 	data.set_value(LIBMEP_VERSION);
-
+	/*
 	pugi::xml_node problem_description_node = body.append_child("problem_description");
 	data = problem_description_node.append_child(pugi::node_pcdata);
 	data.set_value(problem_description);
-
+	*/
 	pugi::xml_node alg_node = body.append_child("algorithm");
 	to_xml_node(alg_node);
 
@@ -324,9 +340,9 @@ bool t_mep::from_xml_file(const char* filename)
 		return false;
 	}
 
-	pugi::xml_node body_node = doc.child("project");
+	pugi::xml_node project_node = doc.child("project");
 
-	if (!body_node) {
+	if (!project_node) {
 		setlocale(LC_NUMERIC, saved_locale);
 		free (saved_locale);
 
@@ -337,21 +353,18 @@ bool t_mep::from_xml_file(const char* filename)
 		delete[] problem_description;
 		problem_description = NULL;
 	}
-	pugi::xml_node node = body_node.child("problem_description");
-	if (node) {
-		const char* value_as_cstring = node.child_value();
 
-		if (strlen(value_as_cstring)) {
-			problem_description = new char[strlen(value_as_cstring) + 1];
-			strcpy(problem_description, value_as_cstring);
-		}
-	}
-	else {
-		problem_description = new char[100];
-		strcpy(problem_description, "Problem description here ...");
-	}
+	pugi::xml_node old_problem_description_node = project_node.child("problem_description");
+	if (old_problem_description_node) {
+		const char* value_as_cstring = old_problem_description_node.child_value();
 
-	pugi::xml_node alg_node = body_node.child("algorithm");
+		if (strlen(value_as_cstring))
+			set_problem_description(value_as_cstring);
+	}
+	else
+		set_problem_description("Problem description here ...");
+
+	pugi::xml_node alg_node = project_node.child("algorithm");
 
 	if (!alg_node) {
 		setlocale(LC_NUMERIC, saved_locale);

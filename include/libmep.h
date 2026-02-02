@@ -4,7 +4,7 @@
 // https://github.com/mepx
 // License: MIT
 //-----------------------------------------------------------------
-#define LIBMEP_VERSION "2023.6.3.1"
+#define LIBMEP_VERSION "2026.2.2.0"
 //-----------------------------------------------------------------
 #ifndef libmep_H
 #define libmep_H
