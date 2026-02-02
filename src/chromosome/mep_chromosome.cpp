@@ -472,7 +472,7 @@ void t_mep_chromosome::generate_random(const t_mep_parameters &parameters,
 		prg[0].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants);
 
 	for (unsigned int i = 1; i < parameters.get_code_length(); i++) {
-		p = mep_real_rand(seed, 0, 1);
+		p = mep_real_01_rand(seed);
 
 		if (p <= parameters.get_operators_probability())
 			prg[i].op = (int)actual_operators[mep_unsigned_int_rand(seed, 0, num_actual_operators)];
@@ -500,7 +500,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 	// mutate each symbol with the same pm probability
 	// mutate the first instruction
 	double pm = parameters.get_mutation_probability();
-	double p = mep_real_rand(seed, 0, 1);
+	double p = mep_real_01_rand(seed);
 	if (p < pm) {
 		double sum = parameters.get_variables_probability() + parameters.get_constants_probability();
 		double q = mep_real_rand(seed, 0, sum);
@@ -512,9 +512,9 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 	}
 	// mutate the other instructions
 	for (unsigned int i = 1; i < code_length; i++) {
-		p = mep_real_rand(seed, 0, 1);      // mutate the operator
+		p = mep_real_01_rand(seed);      // mutate the operator
 		if (p < pm) {
-			double q = mep_real_rand(seed, 0, 1);
+			double q = mep_real_01_rand(seed);
 
 			if (q <= parameters.get_operators_probability())
 				prg[i].op = actual_operators[mep_unsigned_int_rand(seed, 0, num_actual_operators)];
@@ -525,17 +525,17 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 					prg[i].op = (int)num_total_variables + (int)mep_unsigned_int_rand(seed, 0, num_constants);
 		}
 
-		p = mep_real_rand(seed, 0, 1);      // mutate the first address  (adr1)
+		p = mep_real_01_rand(seed);      // mutate the first address  (adr1)
 		if (p < pm)
 			prg[i].addr[0] = mep_unsigned_int_rand(seed, 0, i);
 
-		p = mep_real_rand(seed, 0, 1);      // mutate the second address   (adr2)
+		p = mep_real_01_rand(seed);      // mutate the second address   (adr2)
 		if (p < pm)
 			prg[i].addr[1] = mep_unsigned_int_rand(seed, 0, i);
-		p = mep_real_rand(seed, 0, 1);      // mutate the 3rd address   (adr3)
+		p = mep_real_01_rand(seed);      // mutate the 3rd address   (adr3)
 		if (p < pm)
 			prg[i].addr[2] = mep_unsigned_int_rand(seed, 0, i);
-		p = mep_real_rand(seed, 0, 1);      // mutate the 4th address   (adr4)
+		p = mep_real_01_rand(seed);      // mutate the 4th address   (adr4)
 		if (p < pm)
 			prg[i].addr[3] = mep_unsigned_int_rand(seed, 0, i);
 	}
@@ -545,7 +545,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 		mep_constants.get_constants_type() == MEP_CONSTANTS_AUTOMATIC){
 		if (data_type == MEP_DATA_LONG_LONG)
 		for (unsigned int c = 0; c < num_constants; c++) {
-			p = mep_real_rand(seed, 0, 1);      // mutate the operator
+			p = mep_real_01_rand(seed);      // mutate the operator
 			long long tmp_cst_d = mep_long_long_rand(seed, 0,
 													 mep_constants.get_constants_mutation_max_deviation_long_long() + 1);
 			
@@ -569,7 +569,7 @@ void t_mep_chromosome::mutation(const t_mep_parameters &parameters,
 		}
 		else// it is double
 			for (unsigned int c = 0; c < num_constants; c++) {
-				p = mep_real_rand(seed, 0, 1);      // mutate the operator
+				p = mep_real_01_rand(seed);      // mutate the operator
 				double tmp_cst_d = mep_real_rand(seed, 0, mep_constants.get_constants_mutation_max_deviation_double());
 				
 				if (p < pm) {
