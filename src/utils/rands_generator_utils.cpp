@@ -15,7 +15,7 @@ t_seed::t_seed(uint32_t seed)
 void t_seed::init(uint32_t seed)
 {
 	z1 = 1 + seed;
-	z2 = 1 + seed;
+	z2 = 2 + seed;
 }
 //---------------------------------------------------------------------------
 uint32_t rotl(const uint32_t x, int k)
@@ -36,17 +36,17 @@ uint32_t RNG(t_seed &state)
 	return result;
 }
 //---------------------------------------------------------------------------
-unsigned int mep_unsigned_int_rand(t_seed &seed, unsigned int _min, unsigned int _max)
+unsigned int mep_unsigned_int_rand(t_seed &seed, unsigned int _min, unsigned int _max) //[min, max)
 {
 	return (unsigned int)(RNG(seed) % (_max - _min) + _min);
 }
 //---------------------------------------------------------------------------
-long long mep_long_long_rand(t_seed &seed, long long _min, long long _max)
+long long mep_long_long_rand(t_seed &seed, long long _min, long long _max)//[min, max)
 {
 	return (long long)(RNG(seed) % (_max - _min) + _min);
 }
 //---------------------------------------------------------------------------
-double mep_real_rand(t_seed &seed, double _min, double _max)
+double mep_real_rand(t_seed &seed, double _min, double _max)//[min, max)
 {
 	return RNG(seed) / (double)0xFFFFFFFF * (_max - _min) + _min;
 }
@@ -63,6 +63,6 @@ char mep_char_01_rand(t_seed& seed)
 //---------------------------------------------------------------------------
 double mep_real_01_rand(t_seed& seed)
 {
-	return RNG(seed);
+	return RNG(seed) / (double)0xFFFFFFFF;
 }
 //---------------------------------------------------------------------------
