@@ -339,19 +339,20 @@ bool t_mep_chromosome::get_first_max_index(double *inputs,
 }
 //---------------------------------------------------------------------------
 void t_mep_chromosome::compute_eval_matrix(
-										   unsigned int num_training_data,
-			double **cached_variables_eval_matrix,
-			unsigned int num_actual_variables,
-												  unsigned int * actual_enabled_variables,
-			int *line_of_constants, double ** eval_double,
-										   t_seed & seed)
+								unsigned int num_training_data,
+								double **cached_variables_eval_matrix,
+								unsigned int num_actual_variables,
+								unsigned int * actual_enabled_variables,
+								int *line_of_constants, 
+								double ** eval_double,
+								t_seed & seed)
 {
 	//	bool is_error_case;  // division by zero, other errors
 
 	for (unsigned int i = 0; i < code_length; i++){   // read the t_mep_chromosome from top to down
 		// and compute the fitness of each expression by dynamic programming
 		errno = 0;
-		double *arg1, *arg2, *arg3, *arg4;
+		const double *arg1, *arg2, *arg3, *arg4;
 		double *eval = eval_double[i];
 		//int num_training_data = mep_dataset->get_num_rows();
 
